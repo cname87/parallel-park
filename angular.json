@@ -33,7 +33,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              // "node_modules/zimjs/bundle.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -96,7 +98,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              // "node_modules/zimjs/bundle.js"
+            ]
           }
         },
         "lint": {
@@ -127,5 +131,8 @@
       }
     }
   },
-  "defaultProject": "parallel-park"
+  "defaultProject": "parallel-park",
+  "cli": {
+    "analytics": "7e9eb7fd-31ec-4efb-883f-e6fbb3211a06"
+  }
 }

@@ -1,0 +1,53 @@
+import { Component, OnInit } from '@angular/core';
+import { CarService } from './car.service';
+import { StreetService } from './street.service';
+
+declare var Frame:any;
+declare var Grid:any;
+declare var Rectangle:any;
+declare var Stage:any;
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
+export class AppComponent implements OnInit {
+
+  constructor(
+    private carService: CarService,
+    private streetService: StreetService,
+  ) { }
+
+  ngOnInit(){
+    let car = this.carService.getCar()
+    console.log(car.length);
+    let street = this.streetService.getStreet();
+    const scaling = "fit";
+    const width = 800;
+    const height = 400;
+    const color = "light";
+    const outerColor = "dark";
+
+    var stage = new Stage("canvasID");
+
+
+    const frame = new Frame(scaling, width, height, color, outerColor);
+    frame.on("ready", () => {
+      console.log("Event ready received from ZIM Frame");
+      var grid = new Grid({percent:false});
+
+      let rearCar = new Rectangle(
+        street.rearCarScaledLength,
+        street.rearCarScaledWidth,
+        "red",
+        "black",
+        1,
+      )
+      .pos(street.x, street.y)
+      .addTo();
+      stage.update();
+    });
+  }
+
+}
