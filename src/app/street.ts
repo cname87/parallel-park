@@ -20,8 +20,6 @@ export class Street {
   // // const carFromKerb = frontCarWidth + carFromSideOfFrontCar;
   // const carFromKerb = 0;
 
-
-
   constructor(
     stageW = 1200,
     stageH = 800,
@@ -40,24 +38,22 @@ export class Street {
     this.rearCarFromBottom = rearCarFromBottom;
   }
 
-
-  public get rearCarScaledLength() : number {
+  public get rearCarScaledLength(): number {
     return this.rearCarLength / this.scale;
   }
 
-  public get rearCarScaledWidth() : number {
+  public get rearCarScaledWidth(): number {
     return this.rearCarWidth / this.scale;
   }
 
-  public get x() : number {
+  public get x(): number {
     return this.rearCarFromLeft / this.scale;
   }
 
-  public get y() : number {
+  public get y(): number {
     const rearCarScaledFromBottom = this.rearCarFromBottom / this.scale;
-    const distScaledFromTop
-      = this.stageH - this.rearCarScaledWidth - rearCarScaledFromBottom;
-    return (distScaledFromTop);
+    const distScaledFromTop =
+      this.stageH - this.rearCarScaledWidth - rearCarScaledFromBottom;
+    return distScaledFromTop;
   }
-
 }

@@ -1,5 +1,4 @@
 export class Car {
-
   /**
    * All distances in millimeters
    * All angles in degrees
@@ -11,11 +10,11 @@ export class Car {
    */
 
   private rearOverhang: number;
-  private wheelBase: number
-  private frontOverhang: number
-  private wheelToWheelWidth: number
-  private sideOverhang: number
-  private turningCircle: number
+  private wheelBase: number;
+  private frontOverhang: number;
+  private wheelToWheelWidth: number;
+  private sideOverhang: number;
+  private turningCircle: number;
   centerPositionX: number;
   centerPositionY: number;
   rotation: number;
@@ -48,24 +47,26 @@ export class Car {
     this.speed = speed;
   }
 
-  public get length() : number {
-    return (this.rearOverhang + this.wheelBase + this.frontOverhang);
+  public get length(): number {
+    return this.rearOverhang + this.wheelBase + this.frontOverhang;
   }
 
-  public get width() : number {
-    return (this.wheelToWheelWidth + (2 * this.sideOverhang));
+  public get width(): number {
+    return this.wheelToWheelWidth + 2 * this.sideOverhang;
   }
 
-  public get turnCentre() : number {
+  public get turnCentre(): number {
     return (
-      Math.sqrt(Math.pow(this.turningCircle, 2) -
-      Math.pow((this.rearOverhang + this.wheelBase), 2)) -
-      (this.width / 2)
+      Math.sqrt(
+        Math.pow(this.turningCircle, 2) -
+          Math.pow(this.rearOverhang + this.wheelBase, 2),
+      ) -
+      this.width / 2
     );
   }
 
   /* This returns the change in the position of the center of the car, when driven for time t, as x and y values
-  */
+   */
   calcDeltaPositionXY(
     time = 0.001, // movement time in seconds, defaults to 1ms
   ) {
@@ -80,5 +81,4 @@ export class Car {
   ) {
     return -10;
   }
-
 }
