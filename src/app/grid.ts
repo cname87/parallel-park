@@ -4,17 +4,26 @@ export class Grid {
   /**
    * This prints a grid on the passed-in canvas where each box is equivalent to the number of pixels divided by the scale.
    * @param scale The number of pixels per box
-   * @param canvas The canvas upon which to draw the grid
    * @param stage The createjs stage
    */
 
   /** TODO Add numbers across the top and sides */
 
-  constructor(scale = 5, canvas: HTMLCanvasElement, stage: createjs.Stage) {
-    const canvasW = canvas.width;
-    const canvasH = canvas.height;
+  constructor(stage: createjs.Stage, scale = 5) {
+    const canvasW = (stage.canvas as HTMLCanvasElement).width;
+    const canvasH = (stage.canvas as HTMLCanvasElement).height;
 
     // Set up grid
+    const gridContainer = new createjs.Container();
+
+    const border = new createjs.Shape();
+    border.graphics
+      .endFill()
+      .beginStroke('Black')
+      .setStrokeStyle(1)
+      .rect(0, 0, canvasW, canvasH);
+    gridContainer.addChild(border);
+
     const line = new createjs.Shape();
     for (let y = 0; y <= canvasH; y += scale) {
       let strokeT = 0.5;
@@ -24,10 +33,9 @@ export class Grid {
       line.graphics
         .beginStroke('Grey')
         .setStrokeStyle(strokeT)
-        .moveTo(0, y)
-        .lineTo(canvasW, y);
-      line.cache(0, 0, canvasW, canvasH);
-      stage.addChild(line);
+        .moveTo(-0.5, y - 0.5) // 0.5 there to snap to pixel
+        .lineTo(canvasW + 0.5, y - 0.5);
+      gridContainer.addChild(line);
     }
 
     for (let x = 0; x <= canvasW; x += scale) {
@@ -38,10 +46,13 @@ export class Grid {
       line.graphics
         .beginStroke('Grey')
         .setStrokeStyle(strokeT)
-        .moveTo(x, 0)
-        .lineTo(x, canvasH);
-      line.cache(0, 0, canvasW, canvasH);
-      stage.addChild(line);
+        .moveTo(x - 0.5, -0.5) // 0.5 there to snap to pixel
+        .lineTo(x - 0.5, canvasH + 0.5);
+      gridContainer.addChild(line);
     }
+
+    gridContainer.cache(0, 0, canvasW, canvasH);
+    stage.addChild(gridContainer);
+    stage.update();
   }
 }
