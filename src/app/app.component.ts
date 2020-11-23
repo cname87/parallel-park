@@ -52,8 +52,8 @@ export class AppComponent implements AfterViewInit {
      */
 
     const car = new Car({ stage, scale: this.distScale });
-    car.position();
-    car.moveLinear(2000);
-    car.moveAngle(-20, -100);
+    car.create();
+    // car.moveLinear(2000);
+    car.moveAngle(-360, -100);
   }
 }

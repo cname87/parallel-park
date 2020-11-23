@@ -1,5 +1,4 @@
 import * as createjs from 'createjs-module';
-import { runInThisContext } from 'vm';
 export class Car {
   /**
    * All distances in millimeters.
@@ -13,39 +12,44 @@ export class Car {
    */
 
   /* All defaults */
-  private defaultRearOverhang = 994 / 20;
-  private defaultWheelBase = 3400 / 20;
-  private defaultFrontOverhang = 894 / 20;
-  private defaultWheelToWheelWidth = 1628 / 20;
-  private defaultSideOverhang = 138 / 20;
-  private defaultTyreWidth = 215 / 20;
-  private defaultTyreLength = 540 / 20;
-  private defaultMinTurningRadius = 6600 / 20;
-  private defaultCenterPositionX = 3895 / 20;
-  private defaultCenterPositionY = 1152 / 20;
+  private defaultRearOverhang = Math.round(994 / 20);
+  private defaultWheelBase = Math.round(3400 / 20);
+  private defaultFrontOverhang = Math.round(894 / 20);
+  private defaultWheelToWheelWidth = Math.round(1628 / 20);
+  private defaultSideOverhang = Math.round(138 / 20);
+  private defaultTyreWidth = Math.round(215 / 20);
+  private defaultTyreLength = Math.round(540 / 20);
+  private defaultMinTurningRadius = Math.round(6600 / 20);
+  private defaultFrontDCornerFromLeft = Math.round(
+    (1000 + 250 + 994 + 3400 + 894) / 20,
+  );
+  private defaultFrontDCornerFromBottom = Math.round(200 / 20);
   private defaultRotation = 0;
-  private defaultSteeringWheelAnglePercentage = 0;
+  private defaultSteeringWheelAnglePercentage = -100;
+  private defaultSpeed = Math.round(1000 / 20);
 
   /* Set by the create() method */
   private rearOverhang = this.defaultRearOverhang;
-  private wheelBase = this.defaultWheelBase;
+  private wheelbase = this.defaultWheelBase;
   private frontOverhang = this.defaultFrontOverhang;
   private wheelToWheelWidth = this.defaultWheelToWheelWidth;
   private sideOverhang = this.defaultSideOverhang;
   private minTurningRadius = this.defaultMinTurningRadius;
-  private centerPositionX = this.defaultCenterPositionX;
-  private centerPositionY = this.defaultCenterPositionY;
+  private frontDCornerFromLeft = this.defaultFrontDCornerFromLeft;
+  private frontDCornerFromBottom = this.defaultFrontDCornerFromBottom;
   private tyreWidth = this.defaultTyreWidth;
   private tyreLength = this.defaultTyreLength;
   private rotation = this.defaultRotation;
   private steeringWheelAnglePercentage = this
     .defaultSteeringWheelAnglePercentage;
+  private speed = this.defaultSpeed;
 
   /* Set by the constructor */
   private stage: createjs.Stage;
   private canvasH: number;
   private scale: number;
-  private speed: number;
+
+  /* Needed across methods */
   private carContainer = new createjs.Container();
   private car = new createjs.Shape();
   private frontDTyre = new createjs.Shape();
@@ -72,83 +76,94 @@ export class Car {
     this.scale = scale;
   }
 
-  public get length(): number {
-    return this.rearOverhang + this.wheelBase + this.frontOverhang;
+  private get length(): number {
+    return this.rearOverhang + this.wheelbase + this.frontOverhang;
   }
 
-  public get width(): number {
+  private get width(): number {
     return this.wheelToWheelWidth + 2 * this.sideOverhang;
   }
 
-  public get rearBumperX(): number {
-    return this.centerPositionX - this.length / 2;
+  private get rearAxleToFront(): number {
+    return this.wheelbase + this.frontOverhang;
   }
 
-  public get bottom(): number {
-    return this.centerPositionY - this.width / 2;
-  }
-
-  /**
-   * minWheelbaseTurnCentre is the distance from the turn centre at full steer to the far side of the car opposite the wheelbase.
-   */
-  public get minWheelbaseTurnCentre(): number {
-    return Math.sqrt(
-      Math.pow(this.minTurningRadius, 2) -
-        Math.pow(this.frontOverhang + this.wheelBase, 2),
-    );
+  private get referencePoint() {
+    return {
+      x: this.frontDCornerFromLeft,
+      y: this.canvasH - this.frontDCornerFromBottom,
+    };
   }
 
   /**
    * The angle in degrees between a tangent to the rotation circle, when turning the minimum turning circle, and a line lengthwise through the car.
    * It assumes the supplied minTurningRadius is the radius of the turning circle of the outer front corner of the van.
    */
-  public get turnAngleMax(): number {
-    const rearAxleToFront = this.frontOverhang + this.wheelBase;
-    return Math.asin(rearAxleToFront / this.minTurningRadius) * (180 / Math.PI);
+  private get turnAngleMax(): number {
+    return (
+      Math.asin(this.rearAxleToFront / this.minTurningRadius) * (180 / Math.PI)
+    );
   }
 
   /**
    * The turning angle based on the steering wheel turn position.
    */
-  public get turnAngle(): number {
+  private get turnAngle(): number {
     return (this.turnAngleMax * this.steeringWheelAnglePercentage) / 100;
   }
 
   /**
    * The turning radius based on the steering wheel turn position.
    */
-  public get turningRadius(): number {
-    const rearAxleToFront = this.frontOverhang + this.wheelBase;
-    const radius = rearAxleToFront / Math.sin((this.turnAngle * Math.PI) / 180);
+  private get turningRadius(): number {
+    const radius =
+      this.rearAxleToFront / Math.sin((this.turnAngle * Math.PI) / 180);
     return Math.round(Math.abs(radius));
   }
 
   /**
    * wheelbaseTurnCentre is the distance from the turn centre to the far side of the car opposite the wheelbase.  It runs through the rear axle.
    */
-  public get wheelbaseTurnCentre(): number {
-    const rearAxleToFront = this.frontOverhang + this.wheelBase;
+  private get wheelbaseTurnCentre(): number {
     return Math.sqrt(
-      Math.pow(this.turningRadius, 2) - Math.pow(rearAxleToFront, 2),
+      Math.pow(this.turningRadius, 2) - Math.pow(this.rearAxleToFront, 2),
     );
   }
 
-  private get rotationX() {
-    const perpDistRotationToVan = this.wheelbaseTurnCentre - this.width;
-    const perpDistCenterToRearAxle = this.centerPositionX - this.rearOverhang;
-    const rotationToCenter = Math.sqrt(
-      Math.pow(perpDistRotationToVan, 2) +
-        Math.pow(perpDistCenterToRearAxle, 2),
+  private get frontDTyreAngle(): number {
+    return (
+      (Math.atan(
+        this.wheelbase / (this.wheelbaseTurnCentre - this.defaultSideOverhang),
+      ) *
+        180) /
+      Math.PI
     );
-    const offsetAngle =
-      (Math.atan(perpDistCenterToRearAxle / perpDistRotationToVan) * 180) /
-      Math.PI;
-      const OffsetX = rotationToCenter * Math.cos(offsetAngle * Math.PI / 180);
-    const OffsetX = rotationToCenter * Math.cos(offsetAngle * Math.PI / 180);
-    rotationY = this.canvasH - (carScaledFromBottom + wheebaseScaledTurnCentre);
   }
 
+  private get frontPTyreAngle(): number {
+    return (
+      (Math.atan(
+        this.wheelbase /
+          (this.wheelbaseTurnCentre -
+            this.wheelToWheelWidth -
+            this.defaultSideOverhang),
+      ) *
+        180) /
+      Math.PI
+    );
+  }
 
+  private get centerOfRotation() {
+    const angleA =
+      (Math.acos(this.rearAxleToFront / this.turningRadius) * 180) / Math.PI;
+    const angleB = angleA - this.rotation;
+    const offsetX = this.turningRadius * Math.cos((angleB * Math.PI) / 180);
+    const offsetY = this.turningRadius * Math.sin((angleB * Math.PI) / 180);
+    return {
+      x: this.referencePoint.x - offsetX,
+      y: this.referencePoint.y - offsetY,
+    };
+  }
 
   /**
    * Creates a new car on the canvas.
@@ -157,55 +172,54 @@ export class Car {
    * The car will be stationery on creation.
    *
    * @param rearOverhang: Distance from rear axle to rear bumper
-   * @param wheelBase: Distance from front axle to rear axle
+   * @param wheelbase: Distance from front axle to rear axle
    * @param frontOverhang: Distance from front axle to front bumper
    * @param wheelToWheelWidth: Distance from centre wheel to centre wheel on the same axis
    * @param sideOverhang: Distance from centre wheel to side wall (not including mirrors)
    * @param tyreWidth: Width of the tyres.
    * @param tyreLength: Length of the tyres.
-   * @param centerPositionX: Distance from the center of the car to the reference y axis
-   * @param centerPositionY: Distance from the center of the car to the reference x axis
+   * @param frontDCornerFromLeft: Distance from the center of the car to the reference y axis
+   * @param frontDCornerFromBottom: Distance from the center of the car to the reference x axis
    * @param rotation: The angle formed by a line lengthwise through the car and the x-axis
    * @param minTurningRadius: Radius of the circle formed by front outside corner when steering wheel at maximum turn
    * @param steeringWheelAnglePercentage: The turn of the steering wheel from -100 (max CCW) to 100 (max CW)
+   * @param speed: The speed in unscaled mm per second which the car moves at when asked to move. Note: the car only moves when commanded to do so.
    */
   create(
     rearOverhang = this.defaultRearOverhang * this.scale,
-    wheelBase = this.defaultWheelBase,
-    frontOverhang = this.defaultFrontOverhang,
-    wheelToWheelWidth = this.defaultWheelToWheelWidth,
-    sideOverhang = this.defaultSideOverhang,
-    tyreWidth = this.defaultTyreWidth,
-    tyreLength = this.defaultTyreLength,
-    minTurningRadius = this.defaultMinTurningRadius,
-    centerPositionX = this.defaultCenterPositionX,
-    centerPositionY = this.defaultCenterPositionY,
+    wheelbase = this.defaultWheelBase * this.scale,
+    frontOverhang = this.defaultFrontOverhang * this.scale,
+    wheelToWheelWidth = this.defaultWheelToWheelWidth * this.scale,
+    sideOverhang = this.defaultSideOverhang * this.scale,
+    tyreWidth = this.defaultTyreWidth * this.scale,
+    tyreLength = this.defaultTyreLength * this.scale,
+    minTurningRadius = this.defaultMinTurningRadius * this.scale,
+    frontDCornerFromLeft = this.defaultFrontDCornerFromLeft * this.scale,
+    frontDCornerFromBottom = this.defaultFrontDCornerFromBottom * this.scale,
     rotation = this.defaultRotation,
     steeringWheelAnglePercentage = this.defaultSteeringWheelAnglePercentage,
+    speed = this.defaultSpeed * this.scale,
   ) {
     /* Car size input parameters */
-    this.rearOverhang = rearOverhang / this.scale;
-    this.wheelBase = wheelBase / this.scale;
-    this.frontOverhang = frontOverhang / this.scale;
-    this.wheelToWheelWidth = wheelToWheelWidth / this.scale;
-    this.sideOverhang = sideOverhang / this.scale;
-    this.tyreWidth = tyreWidth / this.scale;
-    this.tyreLength = tyreLength / this.scale;
-    this.minTurningRadius = minTurningRadius / this.scale;
-    this.centerPositionX = centerPositionX / this.scale;
-    this.centerPositionY = centerPositionY / this.scale;
+    this.rearOverhang = Math.round(rearOverhang / this.scale);
+    this.wheelbase = Math.round(wheelbase / this.scale);
+    this.frontOverhang = Math.round(frontOverhang / this.scale);
+    this.wheelToWheelWidth = Math.round(wheelToWheelWidth / this.scale);
+    this.sideOverhang = Math.round(sideOverhang / this.scale);
+    this.tyreWidth = Math.round(tyreWidth / this.scale);
+    this.tyreLength = Math.round(tyreLength / this.scale);
+    this.minTurningRadius = Math.round(minTurningRadius / this.scale);
+    this.frontDCornerFromLeft = Math.round(frontDCornerFromLeft / this.scale);
+    this.frontDCornerFromBottom = Math.round(
+      frontDCornerFromBottom / this.scale,
+    );
     this.rotation = rotation;
     /* Limit input steeringwheel angle percentage to -100 to +100 */
     this.steeringWheelAnglePercentage =
       steeringWheelAnglePercentage >= 0
         ? Math.min(steeringWheelAnglePercentage, +100)
         : Math.max(steeringWheelAnglePercentage, -100);
-
-    /* Car position calculated parameters */
-    const carFromTop = this.canvasH - carWidth - carFromBottom;
-
-    /* Car movement calculated parameters */
-    const wheebaseScaledTurnCentre = this.wheelbaseTurnCentre / this.scale;
+    this.speed = Math.round(speed / this.scale);
 
     /* Create the car */
     /**
@@ -217,23 +231,27 @@ export class Car {
      * Sets the position of the top left hand corner of the Shape based on the origin co-ordinates set by regX and regY - see above
      * * NB: All rotations are around this position..
      */
-    this.carContainer.set({ x: rotationX, y: rotationY });
+    this.carContainer.set({
+      x: this.centerOfRotation.x,
+      y: this.centerOfRotation.y,
+    });
 
-    const carGraphicsX = carScaledFromLeft + carScaledLength - rotationX;
-    const carGraphicsY = carFromTop + carScaledWidth - rotationY;
-    this.car.graphics.beginFill('LightGreen').beginStroke('Black').rect(
-      /**
-       * Sets the co-ordinates of the reference corner of the Graphic based on the Shape position as determined above.
-       * This is set to the front driver-side tyre.
-       */
-      carGraphicsX,
-      carGraphicsY,
-      /**
-       * Can use -ve to move the position of the shape reference point (which sets the radius to the rotation point determined above) from the default top left hand corner.
-       */
-      -carScaledLength,
-      -carScaledWidth,
-    );
+    this.car.graphics
+      .beginFill('LightGreen')
+      .beginStroke('Black')
+      .rect(
+        /**
+         * Sets the co-ordinates of the reference corner of the Graphic based on the Shape position as determined above.
+         * This is set to the front driver-side tyre.
+         */
+        this.referencePoint.x - this.centerOfRotation.x,
+        this.referencePoint.y - this.centerOfRotation.y,
+        /**
+         * Can use -ve to move the position of the shape reference point (which sets the radius to the rotation point determined above) from the default top left hand corner.
+         */
+        -this.length,
+        -this.width,
+      );
     this.carContainer.addChild(this.car);
 
     const rearAxle = new createjs.Shape();
@@ -241,12 +259,15 @@ export class Car {
       .beginStroke('Black')
       .setStrokeStyle(0.5)
       .moveTo(
-        carGraphicsX - scaledFrontOverhang - scaledWheelBase,
-        carGraphicsY - scaledSideOverhang,
+        this.referencePoint.x - this.rearAxleToFront - this.centerOfRotation.x,
+        this.referencePoint.y - this.sideOverhang - this.centerOfRotation.y,
       )
       .lineTo(
-        carGraphicsX - scaledFrontOverhang - scaledWheelBase,
-        carGraphicsY - scaledSideOverhang - scaledWheelToWheelWidth,
+        this.referencePoint.x - this.rearAxleToFront - this.centerOfRotation.x,
+        this.referencePoint.y -
+          this.wheelToWheelWidth -
+          this.sideOverhang -
+          this.centerOfRotation.y,
       );
     this.carContainer.addChild(rearAxle);
 
@@ -255,71 +276,97 @@ export class Car {
       .beginStroke('Black')
       .setStrokeStyle(0.5)
       .moveTo(
-        carGraphicsX - scaledFrontOverhang,
-        carGraphicsY - scaledSideOverhang,
+        this.referencePoint.x - this.frontOverhang - this.centerOfRotation.x,
+        this.referencePoint.y - this.sideOverhang - this.centerOfRotation.y,
       )
       .lineTo(
-        carGraphicsX - scaledFrontOverhang,
-        carGraphicsY - carScaledWidth + scaledSideOverhang,
+        this.referencePoint.x - this.frontOverhang - this.centerOfRotation.x,
+        this.referencePoint.y -
+          this.wheelToWheelWidth -
+          this.sideOverhang -
+          this.centerOfRotation.y,
       );
     this.carContainer.addChild(frontAxle);
 
     this.frontDTyre.set({
-      x: carGraphicsX - scaledFrontOverhang,
-      y: carGraphicsY - scaledSideOverhang,
+      x: this.referencePoint.x - this.frontOverhang - this.centerOfRotation.x,
+      y: this.referencePoint.y - this.sideOverhang - this.centerOfRotation.y,
     });
     this.frontDTyre.graphics
-      .beginStroke('Black')
+      .beginFill('Black')
       .setStrokeStyle(1)
-      .moveTo(-scaledTyreLength / 2, 0)
-      .lineTo(scaledTyreLength / 2, 0);
+      .rect(
+        -this.tyreLength / 2,
+        -this.tyreWidth / 2,
+        this.tyreLength,
+        this.tyreWidth,
+      );
     this.carContainer.addChild(this.frontDTyre);
 
     this.frontPTyre.set({
-      x: carGraphicsX - scaledFrontOverhang,
-      y: carGraphicsY - carScaledWidth + scaledSideOverhang,
+      x: this.referencePoint.x - this.frontOverhang - this.centerOfRotation.x,
+      y:
+        this.referencePoint.y -
+        this.wheelToWheelWidth -
+        this.sideOverhang -
+        this.centerOfRotation.y,
     });
     this.frontPTyre.graphics
-      .beginStroke('Black')
+      .beginFill('Black')
       .setStrokeStyle(1)
-      .moveTo(-scaledTyreLength / 2, 0)
-      .lineTo(scaledTyreLength / 2, 0);
+      .rect(
+        -this.tyreLength / 2,
+        -this.tyreWidth / 2,
+        this.tyreLength,
+        this.tyreWidth,
+      );
     this.carContainer.addChild(this.frontPTyre);
 
     const rearDTyre = new createjs.Shape();
     rearDTyre.set({
-      x: carGraphicsX - scaledWheelBase - scaledFrontOverhang,
-      y: carGraphicsY - scaledSideOverhang,
+      x:
+        this.referencePoint.x -
+        this.frontOverhang -
+        this.centerOfRotation.x -
+        this.wheelbase,
+      y: this.referencePoint.y - this.sideOverhang - this.centerOfRotation.y,
     });
     rearDTyre.graphics
-      .beginStroke('Black')
+      .beginFill('Black')
       .setStrokeStyle(1)
-      .moveTo(-scaledTyreLength / 2, 0)
-      .lineTo(scaledTyreLength / 2, 0);
+      .rect(
+        -this.tyreLength / 2,
+        -this.tyreWidth / 2,
+        this.tyreLength,
+        this.tyreWidth,
+      );
     this.carContainer.addChild(rearDTyre);
 
     const rearPTyre = new createjs.Shape();
     rearPTyre.set({
-      x: carGraphicsX - scaledWheelBase - scaledFrontOverhang,
-      y: carGraphicsY - carScaledWidth + scaledSideOverhang,
+      x:
+        this.referencePoint.x -
+        this.frontOverhang -
+        this.centerOfRotation.x -
+        this.wheelbase,
+      y:
+        this.referencePoint.y -
+        this.wheelToWheelWidth -
+        this.sideOverhang -
+        this.centerOfRotation.y,
     });
     rearPTyre.graphics
-      .beginStroke('Black')
+      .beginFill('Black')
       .setStrokeStyle(1)
-      .moveTo(-scaledTyreLength / 2, 0)
-      .lineTo(scaledTyreLength / 2, 0);
+      .rect(
+        -this.tyreLength / 2,
+        -this.tyreWidth / 2,
+        this.tyreLength,
+        this.tyreWidth,
+      );
     this.carContainer.addChild(rearPTyre);
 
     this.stage.addChild(this.carContainer);
-
-    /* Add the front driver's corner turning circle for debug */
-    const circle = new createjs.Shape();
-    circle.set({ x: rotationX, y: rotationY });
-    circle.graphics
-      .endFill()
-      .beginStroke('Black')
-      .drawCircle(0, 0, this.minTurningRadius / this.scale);
-    this.stage.addChild(circle);
 
     this.stage.update();
   }
@@ -336,10 +383,9 @@ export class Car {
     createjs.Ticker.framerate = FPS;
     /* Calculate the distance moved in 1 tick */
     const tickTime = 1 / FPS;
-    const scaledSpeed = this.speed / this.scale;
     const tickMoveX =
       Math.sign(deltaPosition) *
-      scaledSpeed *
+      this.speed *
       tickTime *
       Math.cos(this.carContainer.rotation);
     /* Capture the current position */
@@ -385,10 +431,10 @@ export class Car {
    */
   public moveAngle(deltaAngle: number, steeringWheelTurnPercentage: number) {
     /* Limit input steeringwheel percentage */
-    this._steeringWheelAnglePercentage = steeringWheelTurnPercentage;
+    this.steeringWheelAnglePercentage = steeringWheelTurnPercentage;
     /* Set wheels per steering wheel angle */
-    this.frontDTyre.rotation = this.turnAngle;
-    this.frontPTyre.rotation = this.turnAngle;
+    this.frontDTyre.rotation = -this.frontDTyreAngle;
+    this.frontPTyre.rotation = -this.frontPTyreAngle;
     /* Create a tick very 10ms */
     const FPS = 100;
     createjs.Ticker.framerate = FPS;
@@ -398,6 +444,15 @@ export class Car {
     const tickAngle = (tickMove / this.turningRadius) * (180 / Math.PI);
     /* Capture the current angle */
     const startAngle = this.carContainer.rotation;
+
+    /* Add the front driver's corner turning circle for debug */
+    const circle = new createjs.Shape();
+    circle.set({ x: this.centerOfRotation.x, y: this.centerOfRotation.y });
+    circle.graphics
+      .endFill()
+      .beginStroke('Black')
+      .drawCircle(0, 0, this.turningRadius);
+    this.stage.addChild(circle);
 
     /**
      * Move the required distance in a series of ticks.
