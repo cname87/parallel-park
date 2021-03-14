@@ -1,0 +1,124 @@
+<form
+[formGroup]="customCarForm"
+class="form"
+fxLayout="row wrap"
+fxLayoutGap="0.5vw"
+fxLayoutAlign="center"
+>
+
+  <mat-form-field
+    color="primary"
+    appearance="fill"
+    hideRequiredMarker="true"
+    floatLabel="always"
+    fxFlex="0 1 19%"
+  >
+    <mat-label>Turning circle radius (mm)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="minTurningRadius"
+      [errorStateMatcher]="matcher"
+      [min]="minTurningRadius$ | async"
+      [max]="maxTurningRadius"
+      required
+    >
+      <mat-hint>Wall-to-wall turning radius</mat-hint>
+      <mat-error *ngIf="customCarForm.invalid">
+        Enter a number between {{ minTurningRadius$ | async }} and {{ maxTurningRadius }}
+      </mat-error>
+  </mat-form-field>
+
+  <mat-form-field
+    color="primary"
+    appearance="fill"
+    hideRequiredMarker="true"
+    floatLabel="always"
+    fxFlex="0 1 19%"
+  >
+    <mat-label>Wheelbase (mm)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="wheelbase"
+      [errorStateMatcher]="matcher"
+      [min]="minWheelBase"
+      [max]="maxWheelBase"
+      required
+    >
+      <mat-hint>The axle to axle distance</mat-hint>
+      <mat-error *ngIf="customCarForm.invalid">
+        Enter a number between {{ minWheelBase }} and {{ maxWheelBase }}
+      </mat-error>
+  </mat-form-field>
+
+  <mat-form-field
+    color="primary"
+    appearance="fill"
+    hideRequiredMarker="true"
+    floatLabel="always"
+    fxFlex="0 1 19%"
+  >
+    <mat-label>Width (mm)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="width"
+      [errorStateMatcher]="matcher"
+      [min]="minRearOverhang"
+      [max]="maxRearOverhang"
+      required
+    >
+      <mat-hint>The door to door width</mat-hint>
+      <mat-error *ngIf="customCarForm.invalid">
+        Enter a number between {{ minWidth }} and {{ maxWidth }}
+      </mat-error>
+  </mat-form-field>
+
+  <mat-form-field
+    color="primary"
+    appearance="fill"
+    hideRequiredMarker="true"
+    floatLabel="always"
+    fxFlex="0 1 19%"
+  >
+    <mat-label>Front Overhang (mm)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="frontOverhang"
+      [errorStateMatcher]="matcher"
+      [min]="minFrontOverhang"
+      [max]="maxFrontOverhang"
+      required
+    >
+      <mat-hint>Front axle to front bumper</mat-hint>
+      <mat-error *ngIf="customCarForm.invalid">
+        Enter a number between {{ minFrontOverhang }} and {{ maxFrontOverhang }}
+      </mat-error>
+  </mat-form-field>
+
+  <mat-form-field
+    color="primary"
+    appearance="fill"
+    hideRequiredMarker="true"
+    floatLabel="always"
+    fxFlex="0 1 19%"
+  >
+    <mat-label>Rear Overhang (mm)</mat-label>
+    <input
+      matInput
+      type="number"
+      formControlName="rearOverhang"
+      [errorStateMatcher]="matcher"
+      [min]="minRearOverhang"
+      [max]="maxRearOverhang"
+      required
+    >
+      <mat-hint>Rear axle to rear bumper</mat-hint>
+      <mat-error *ngIf="customCarForm.invalid">
+        Enter a number between {{ minRearOverhang }} and {{ maxRearOverhang }}
+      </mat-error>
+  </mat-form-field>
+
+</form>

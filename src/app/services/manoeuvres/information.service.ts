@@ -1,0 +1,251 @@
+/* eslint-disable max-len */
+import { Injectable } from '@angular/core';
+import { EManoeuvre, ISnackOpen, LoggingLevel } from '../../shared/types';
+import { CarService } from '../car.service';
+import { ConfigService } from '../config.service';
+import { LoggerService } from '../logger.service';
+import { StreetService } from '../street.service';
+
+interface IParams {
+  readonly manoeuvre: EManoeuvre;
+  readonly street: StreetService;
+  readonly car: CarService;
+  readonly config: ConfigService;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class InformationService {
+  constructor(private logger: LoggerService) {}
+
+  /**
+   * Returns an information message displayed to the user during a move.
+   *
+   * @returns Information message for a move.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  getMoveAMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMoveAMessage called`, LoggingLevel.TRACE);
+
+    switch (manoeuvre) {
+      case EManoeuvre.Park2Rotate0Straight:
+        return {
+          message:
+            'This manoeuvre starts turning late and takes one wide turn only, and enters at a maximum angle',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+        return {
+          message:
+            'This manoeuvre starts turning early and enters the parking space at a minimum angle',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+        return {
+          message:
+            'This manoeuvre starts turning when the rear axle is opposite the rear car bumper and enters at a medium angle',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+        return {
+          message:
+            'This manoeuvre is the same as the minimum angle manoeuvre but uses a shorter parking space as it reaches the rear car at an angle and then turns in. Note that all the other manoeuvres could be shortened by including this final turn in. (It also assumes the rear of the car cannot cross the kerb).',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park3UsingRulesMinAngle:
+        return {
+          message:
+            'Rule 1: Park 0.5m out from the front car and reverse until the rear bumper of the car is level with the rear bumper of the front car',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Leave:
+        return {
+          message: '',
+        };
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+
+  /**
+   * Returns an information message displayed to the user during a move.
+   *
+   * @returns Information message for a move.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  getMoveCMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMoveCMessage called`, LoggingLevel.TRACE);
+
+    switch (manoeuvre) {
+      case EManoeuvre.Park3UsingRulesMinAngle:
+        return {
+          message:
+            'Rule 2: Lock counterclockwise and turn in until your port side mirror lines up with a point 1 meter forward of the rear car',
+          snackConfig: {
+            duration: 5000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Leave:
+        return {
+          message: '',
+        };
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+
+  /**
+   * Returns an information message displayed to the user during a move.
+   *
+   * @returns Information message for a move.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  getMoveEMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMoveEMessage called`, LoggingLevel.TRACE);
+
+    switch (manoeuvre) {
+      case EManoeuvre.Park3UsingRulesMinAngle:
+        return {
+          message:
+            'Rule 3: Straighten the wheel and reverse until the front port corner is in front of the rear bumper of the front car by the required safety gap (e.g. 250mm), AND the car is within 0.5m of the kerb',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Leave:
+        return {
+          message: '',
+        };
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+
+  /**
+   * Returns an information message displayed to the user during a move.
+   *
+   * @returns Information message for a move.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  getMoveGMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMoveGMessage called`, LoggingLevel.TRACE);
+
+    switch (manoeuvre) {
+      case EManoeuvre.Park3UsingRulesMinAngle:
+        return {
+          message:
+            'Rule 4: Lock clockwise and reverse until you are as close to the rear car as you find comfortable',
+          snackConfig: {
+            duration: 5000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Leave:
+        return {
+          message: '',
+        };
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+
+  /**
+   * Returns an information message displayed to the user during a move.
+   *
+   * @returns Information message for a move.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  getMoveIMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMoveIMessage called`, LoggingLevel.TRACE);
+
+    switch (manoeuvre) {
+      case EManoeuvre.Park3UsingRulesMinAngle:
+        return {
+          message:
+            'Rule 4: Lock counterclockwise and move forward until you are parallel to the kerb',
+          snackConfig: {
+            duration: 5000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Leave:
+        return {
+          message: '',
+        };
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+}

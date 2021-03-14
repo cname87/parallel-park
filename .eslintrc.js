@@ -1,7 +1,3 @@
-/**
- * TODO fix eslint error
- * I have excluded this file from ./tsconfig.json which means I get a non-fixable eslint parsing error.  I can ignore for the moment as I exclude this file in .eslintignore => you will never see the error in an eslint run.
- */
 module.exports = {
   root: true,
   env: {
@@ -11,14 +7,7 @@ module.exports = {
     jasmine: true,
     protractor: true,
   },
-  extends: [
-    /**
-     * TODO enable airbnb
-     */
-    // 'airbnb-typescript/base',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
-  ],
+  extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
@@ -27,20 +16,11 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'prettier'],
   rules: {
-    /* rules I'm overriding but would like to meet */
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/interface-name-prefix': [
-      'off',
-      {
-        prefixWithI: 'always',
-        allowUnderscorePrefix: true,
-      },
-    ],
+    /* Rules I'm overriding but would like to meet */
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
 
-    /* set personal preferences below */
+    /* Set personal preferences below */
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'max-len': [
       'error',
       {

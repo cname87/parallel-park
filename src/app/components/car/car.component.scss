@@ -1,0 +1,5 @@
+@import 'src/styles/main-theme.scss';
+
+mat-form-field.mat-form-field {
+  @include scenario-menu;
+}

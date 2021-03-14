@@ -1,0 +1,60 @@
+/* You can add global styles to this file, and also import other style files */
+
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  overflow: hidden; /*  Disable scrollbars */
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Workaround for https://github.com/angular/material2/issues/4580.
+Note: Global style, as material elements, e.g. mat-form-field, are part of Angular Material and has its own encapsulation which component styles can't override */
+
+/* Customize mat-form-field */
+mat-form-field {
+
+  .mat-form-field {
+    &-underline {
+      position: static;
+    }
+
+    &-wrapper {
+      padding-bottom: 0;
+    }
+
+    &-subscript-wrapper {
+      position: static;
+      min-height: 1.25em;
+    }
+  }
+}
+
+/* Make radio button scalable */
+$smallRadioSize: clamp(1rem, 2vw, 2rem);
+.smallRadio .mat-radio-container{
+  height: $smallRadioSize;
+  width: $smallRadioSize;
+}
+.smallRadio .mat-radio-outer-circle{
+  height: $smallRadioSize;
+  width: $smallRadioSize;
+}
+.smallRadio .mat-radio-inner-circle{
+  height: $smallRadioSize;
+  width: $smallRadioSize;
+}
+.smallRadio .mat-radio-button .mat-radio-ripple{
+  height: 20px;
+  width: 20px;
+  left: calc(50% - $smallRadioSize);
+  top: calc(50% - $smallRadioSize);
+}
+
+/* The Snackbar call passes in 'snackBar' as a custom class */
+.mat-snack-bar-container.snackBar{
+  max-width: 100%;
+  button {
+    color:#ba68c8;
+  }
+}

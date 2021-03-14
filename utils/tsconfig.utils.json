@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+
+  "compilerOptions": {
+
+    "outDir": "../out-tsc/utils",
+
+    /* note - common.js for utils */
+    "module": "commonjs",
+
+  }
+}

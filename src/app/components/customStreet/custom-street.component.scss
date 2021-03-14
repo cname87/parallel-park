@@ -1,0 +1,19 @@
+@import 'src/styles/main-theme.scss';
+
+.form * {
+  min-width: 0;
+}
+
+input {
+  width: 100%;
+}
+
+mat-form-field.mat-form-field {
+  font-size : $fontDefault;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

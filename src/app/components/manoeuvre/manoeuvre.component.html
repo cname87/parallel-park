@@ -1,0 +1,19 @@
+<div>
+  <mat-form-field
+    [formGroup]="manoeuvreForm"
+    appearance="outline"
+  >
+    <mat-label>{{ message }}</mat-label>
+    <mat-select
+      formControlName="manoeuvre"
+    >
+      <mat-option
+        *ngFor="let manoeuvre of manoeuvres"
+        [value]="manoeuvre[0]"
+      >
+        {{manoeuvre[1]}}
+      </mat-option>
+    </mat-select>
+    <mat-hint>{{ hint }}</mat-hint>
+  </mat-form-field>
+</div>

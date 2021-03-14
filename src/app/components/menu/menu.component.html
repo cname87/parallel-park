@@ -1,0 +1,81 @@
+<div
+  class="mode"
+  fxLayout="row wrap"
+  fxLayoutAlign="center"
+  fxLayoutGap="1rem"
+>
+
+<app-mode
+  fxFlex="0 1 auto"
+  fxFlexAlign="left"
+>
+</app-mode>
+
+<app-button
+  fxFlex="0 1 auto"
+  fxFlexAlign="left"
+  buttonName='main'
+></app-button>
+</div>
+
+<div
+  class="selects"
+  fxLayout="row"
+  fxLayoutGap="0.5vw"
+  fxLayoutAlign="center"
+>
+
+  <app-manoeuvre
+    fxFlex="0 1 40%"
+    [ngStyle]="{'display': showScenarioForm}"
+  ></app-manoeuvre>
+
+  <app-car
+    fxFlex="0 1 30%"
+    [ngStyle]="{'display': showScenarioForm}"
+  ></app-car>
+
+  <app-street
+    fxFlex="0 1 30%"
+    [ngStyle]="{'display': showScenarioForm}"
+></app-street>
+
+</div>
+
+<div
+  class="custom"
+  fxLayout="row"
+  fxLayoutGap="1rem"
+  fxLayoutAlign="center"
+  [ngStyle]="{'display': showCustomCarForm}"
+>
+
+  <app-custom-car
+    fxFlex="0 1 100%"
+    [ngStyle]="{'display': showCustomCarForm}"
+  ></app-custom-car>
+
+</div>
+
+<div
+  class="custom"
+  fxLayout="row"
+  fxLayoutGap="1rem"
+  fxLayoutAlign="center"
+  [ngStyle]="{'display': showCustomStreetForm}"
+>
+
+  <app-custom-street
+    fxFlex="0 1 100%"
+    [ngStyle]="{'display': showCustomStreetForm}"
+  >
+  </app-custom-street>
+
+</div>
+
+<app-manual-mode
+  *ngIf="showManualMode"
+>
+</app-manual-mode>
+
+

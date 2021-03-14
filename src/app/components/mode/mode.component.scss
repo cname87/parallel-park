@@ -1,0 +1,17 @@
+@import 'src/styles/main-theme.scss';
+
+div.form{
+  text-align: center;
+  min-width: 0;
+}
+
+mat-radio-button.mat-radio-button{
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  font-size: $fontDefault;
+  overflow-wrap: normal;
+}
+
+.spans {
+  white-space: normal;
+}

@@ -1,0 +1,39 @@
+<div
+  class="form"
+>
+  <form
+    [formGroup]="modeForm"
+  >
+    <mat-radio-group
+      formControlName="mode"
+      class="smallRadio"
+      color="primary"
+      aria-label="Select an option"
+      fxLayout="row"
+      fxLayoutAlign="flex-left"
+      fxLayoutGap="1rem"
+    >
+
+      <mat-radio-button
+        value="Single"
+        fxFlex="1 1 auto"
+        >
+        <span class="spans">
+          Automatic Mode
+        </span>
+      </mat-radio-button>
+
+      <mat-radio-button
+      value="Keyboard"
+      fxFlex="1 1 auto"
+      >
+        <span class="spans">
+          Keyboard Mode
+        </span>
+      </mat-radio-button>
+
+    </mat-radio-group>
+  </form>
+
+  </div>
+

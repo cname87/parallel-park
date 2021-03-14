@@ -1,17 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>Parallel-Park</title>
   <meta charset="utf-8">
-  <title>ParallelPark</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    canvas {
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      border: 0;
+      overflow: hidden; /*  Disable scrollbars */
+      display: block;  /* No floating content on sides */
+    }
+  </style>
 </head>
 <body>
   <app-root></app-root>
   <canvas width="800" height="400" id="canvas">
   Sorry! Your browser does not support the canvas drawing element.
   </canvas>
-
 </body>
 </html>

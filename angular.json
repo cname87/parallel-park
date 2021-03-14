@@ -31,11 +31,12 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles/styles.scss",
+              "src/styles/themes.scss"
             ],
             "scripts": [
-              // "node_modules/zimjs/bundle.js"
-            ]
+            ],
+            "allowedCommonJsDependencies": ["createjs-module"]
           },
           "configurations": {
             "production": {
@@ -61,7 +62,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumError": "20kb"
                 }
               ]
             }
@@ -96,7 +97,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/styles/themes.scss"
             ],
             "scripts": [
               // "node_modules/zimjs/bundle.js"
