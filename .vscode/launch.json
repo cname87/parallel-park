@@ -30,7 +30,7 @@
       // tell vscode where to find scripts on the server
       "webRoot": "${workspaceFolder}/dist",
       "pathMapping": {
-        "/": "${workspaceFolder}/frontend/dist/",
+        "/": "${workspaceFolder}/dist/",
       },
       "sourceMapPathOverrides": {
         "webpack:///./*": "${workspaceFolder}/*",
@@ -40,27 +40,5 @@
       "showAsyncStacks": true,
       "sourceMaps": true,
     },
-    // Run current .ts file
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Run the currently opened .ts file",
-      "cwd": "${workspaceFolder}/backend",
-      "outputCapture": "std",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "runtimeArgs": [
-          "-r",
-          "ts-node/register"
-      ],
-      "args": [
-          "${file}",
-      ],
-      "env": {
-        "TS_NODE_PROJECT": "tsconfig.json",
-      },
-    },
-
-
   ],
 }

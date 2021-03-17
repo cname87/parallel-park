@@ -1,5 +1,6 @@
 # Exclude to avoid parsing error
 .eslintrc.js
+src/environments/environment.prod.ts
 # Don't lint any node_modules directories
 node_modules
 # Don't lint any build output directories

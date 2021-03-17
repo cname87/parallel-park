@@ -8,5 +8,5 @@
 /* import local custom theme - includes $theme variable */
 @import './main-theme.scss';
 
-/* style material componenets with imported theme */
+/* style material components with imported theme */
 @include angular-material-theme($theme);

@@ -58,3 +58,15 @@ $smallRadioSize: clamp(1rem, 2vw, 2rem);
     color:#ba68c8;
   }
 }
+
+/* Used in the three scenario menus */
+@mixin scenario-menu {
+  /* Fill the container element - better for flex */
+  width: 100%;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  font-size : $fontDefault;
+}
+
+/* Variable font used throughout */
+$fontDefault: clamp(0.5rem, 2.5vw, 1rem);

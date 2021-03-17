@@ -34,7 +34,7 @@
         "run",
         "--prefix",
         "${workspaceFolder}/",
-        "start"
+        "serve:dev"
       ],
       "group": {
         "kind": "build",
