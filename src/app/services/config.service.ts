@@ -93,10 +93,9 @@ export class ConfigService {
   /* time in milliseconds to turn the front wheel that is on the inner edge of the turning circle through 1 radian */
   msPerWheelRadian = 2.0;
 
+  /* Utility functions */
   RAD_TO_DEG = 180 / Math.PI;
   DEG_TO_RAD = Math.PI / 180;
-
-  /* Utility function to round a number */
   round(n: number, places = 6): number {
     return Math.round(Math.pow(10, places) * n) / Math.pow(10, places);
   }
@@ -106,14 +105,19 @@ export class ConfigService {
   defaultMinFromKerb = 200 / this.distScale;
   maxLegalKerbGap = 500 / this.distScale;
 
-  /* Park by Park3UsingRulesMediumAngle manoeuvre constants */
+  /* Park by Park3UsingRulesMinAngle manoeuvre constants */
   baseFrontCarOut = 2000 / this.distScale;
   /* Starting distance out from front car */
   baseGap = 500 / this.distScale;
+  /* MedAngle Manoeuvre: Move in by this amount */
   move2TurnMed = 400 / this.distScale;
+  /* MinAngle Manoeuvre: Aim at this point forward of the rear car */
   move2TurnMin = 1000 / this.distScale;
+  /* MedAngle: Reverse until this close to kerb */
   distFromKerbMed = 900 / this.distScale;
+  /* MinAngle: Reverse until this close to kerb */
   distFromKerbMin = 250 / this.distScale;
+  /* Reverse until this close to rear car */
   distFromRearCarMin = 250 / this.distScale;
 
   /* Custom car and street defaults */
@@ -136,7 +140,6 @@ export class ConfigService {
   /* Must be 0 as 0 is used to denote that a calculated value is used */
   minParkingSpace = 0;
   maxParkingSpace = 10000;
-
   /* Max wheel angle in degrees that avoids avoid calculation errors.  This is used to calculate allowable turning radii for a given wheelbase and front overhang. */
   maxWheelAngleAllowed = 45;
   /* Minimum allowed turning radius in mm calculated with wheelbase = 2300mm and front overhang = 300mm. */

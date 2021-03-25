@@ -210,20 +210,25 @@ export class ObjectsService {
   readonly modes: EMode[] = [EMode.Loop, EMode.Single, EMode.Keyboard];
 
   readonly manoeuvres: Array<[EManoeuvre, string]> = [
+    [EManoeuvre.Park2Rotate1StraightMinAngle, 'Minimum Angle Turn-In'],
     [
-      EManoeuvre.Park2Rotate1StraightMinAngle,
-      'Two Turns - Minimum Angle Turn-In',
+      EManoeuvre.Park3Rotate1StraightMinAngle,
+      'Minimum Angle with Shunt - Minimum Parking Space',
     ],
-    [EManoeuvre.Park3Rotate1StraightMinAngle, 'Three Turns - MINIMUM SPACE'],
     [
       EManoeuvre.Park2Rotate1StraightFixedStart,
-      'Two Turns - Fixed Location Start - Medium Angle Turn-In',
+      'Fixed Location Start - Medium Angle Turn-In',
     ],
-    [EManoeuvre.Park2Rotate0Straight, 'One Turn Only - No Straight Section'],
+    [EManoeuvre.Park2Rotate0Straight, 'One Turn Only - Maximum Angle Turn-In'],
     [
       EManoeuvre.Park3UsingRulesMinAngle,
       'Park By Rule - NOT using optimal calculations',
     ],
+    // Not used in the final application as was not useful.
+    // [
+    //   EManoeuvre.Park3UsingRulesMedAngle,
+    //   'Park By Rule 2 - NOT using optimal calculations',
+    // ],
   ];
 
   readonly cars: Array<[ECar, string]> = [

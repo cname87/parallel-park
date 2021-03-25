@@ -341,6 +341,7 @@ export class ManoeuvreService {
     }
     const parkingSpace = 2 * street.safetyGap + car.length + extraParkingSpace;
     this.logger.log(`Parking space: ${parkingSpace}`, LoggingLevel.TRACE);
+    console.log(`Parking space: ${parkingSpace * config.distScale} `);
     return parkingSpace;
   };
 
@@ -465,17 +466,20 @@ export class ManoeuvreService {
 
     Eliminate d3...
     1. d3 = (parkingSpaceLength - street.safetyGap – car.rearOverhang - 2 * car.centerRearAxleTurningRadius * Math.sin(alpha)) / Math.cos(alpha)
-    i.e. d3 = (c1 - 2c2Sin(a)) / Cos(a)
+    i.e. d3 = (c1 - c2Sin(a)) / Cos(a)
     2. d3 = (street.carFromKerb + street.frontCarWidth + street.safetyGap + excessSafetyGap - this.#getMinKerbDistance
     - 2 * car.centerRearAxleTurningRadius + (2 * car.centerRearAxleTurningRadius)Cos(a)) / Sin(a)
-    i.e. d3 = c3 + 2c2Cos(a)) / Sin(a)
+    i.e. d3 = (c3 + c2Cos(a)) / Sin(a)
 
-    => c1Sin(a) – c3Cos(a) – 2*c2 = 0
+    From 1. and 2. c1Sin(a) – c3Cos(a) – c2 = 0
 
-    This can be expressed as:
-    (c1**2 + c3**2)Sin2(a) – 2c1c2Sin(a) + (c2**2 - c3**2) = 0
+    => c1Sin(a) – c2  = c3Cos(a)
+    => c1**2Sin**2(a) – 2c1c2Sin(a) + c2**2 = c3**2Cos**2(a)
+    => c1**2Sin**2(a) – 2c1c2Sin(a) + c2**2 = c3**2(1 - Sin**2(a))
+    => (c1**2 + c3**2)Sin**2(a) – 2c1c2Sin(a) + (c2**2 - c3**2) = 0
 
-    => sin(a) = 2c1c2 +/- sqrt((c1c2)**2 – 4(c1**2+c3**2)(c2**2-c3**2)) / 2*(c1**2+c3**2)
+    => sin(a) = (2c1c2 +/- sqrt((2c1c2)**2 – 4(c1**2+c3**2)(c2**2-c3**2)))
+    / 2 *(c1**2+c3**2)
 
     */
 
