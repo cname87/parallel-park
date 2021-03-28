@@ -8,6 +8,7 @@ import {
   TScenario,
   TStreetSetup,
 } from '../shared/types';
+import { ConfigService } from './config.service';
 
 /**
  * Stores all the cars, streets and manoeuvres.
@@ -20,7 +21,7 @@ export class ObjectsService {
   //
   readonly scenarios: Array<TScenario> = [];
 
-  constructor() {
+  constructor(private config: ConfigService) {
     for (const street of this.streets) {
       for (const car of this.cars) {
         for (const manoeuvre of this.manoeuvres) {
@@ -143,8 +144,8 @@ export class ObjectsService {
     rearCarWidth: 1904,
     /* Same as 2005 VW T5 van */
     frontCarWidth: 1904,
-    carFromKerb: 250,
-    safetyGap: 250,
+    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
   };
 
@@ -153,8 +154,8 @@ export class ObjectsService {
     name: EStreet.Width_1852mm,
     rearCarWidth: 1852,
     frontCarWidth: 1852,
-    carFromKerb: 250,
-    safetyGap: 250,
+    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
   };
 
@@ -163,8 +164,8 @@ export class ObjectsService {
     name: EStreet.Width_1795mm,
     rearCarWidth: 1795,
     frontCarWidth: 1795,
-    carFromKerb: 250,
-    safetyGap: 250,
+    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
   };
 
@@ -173,8 +174,8 @@ export class ObjectsService {
     rearCarWidth: 1450,
     /* Same as 2020 Kia Picanto - narrowest car */
     frontCarWidth: 1595,
-    carFromKerb: 250,
-    safetyGap: 250,
+    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
   };
 
@@ -183,8 +184,8 @@ export class ObjectsService {
     rearCarWidth: 2073,
     /* Same as 2020 Landrover Discovery Sport */
     frontCarWidth: 2073,
-    carFromKerb: 250,
-    safetyGap: 250,
+    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
   };
 
@@ -193,8 +194,8 @@ export class ObjectsService {
     rearCarWidth: 2426,
     /* Same as 2020 VW Crafter - widest van */
     frontCarWidth: 2426,
-    carFromKerb: 250,
-    safetyGap: 250,
+    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
   };
 
@@ -202,8 +203,8 @@ export class ObjectsService {
     name: EStreet.Custom_Street,
     rearCarWidth: 1900,
     frontCarWidth: 1900,
-    carFromKerb: 250,
-    safetyGap: 250,
+    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
   };
 

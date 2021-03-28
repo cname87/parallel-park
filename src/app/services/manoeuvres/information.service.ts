@@ -67,7 +67,7 @@ export class InformationService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return {
           message:
-            'This manoeuvre is the same as the minimum angle manoeuvre but uses a shorter parking space as it reaches the rear car at an angle and then turns in. Note that all the other manoeuvres could be shortened by including this final turn in. (It also assumes the rear of the car cannot cross the kerb).',
+            'This manoeuvre is the same as the minimum angle manoeuvre but uses a shorter parking space as it reaches the rear car at an angle and then turns in',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -78,7 +78,7 @@ export class InformationService {
       case EManoeuvre.Park3UsingRulesMinAngle:
         return {
           message:
-            'Rule 1: Park 0.5m out from the front car and reverse until the rear bumper of the car is level with the rear bumper of the front car',
+            'Rule 1:  Reverse 0.6m out from the front car until the rear bumper of the car is level with the rear bumper of the front car',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -112,7 +112,7 @@ export class InformationService {
       case EManoeuvre.Park3UsingRulesMinAngle:
         return {
           message:
-            'Rule 2: Lock counterclockwise and turn in until your port side mirror lines up with a point 1 meter forward of the rear car',
+            'Rule 2: Lock counterclockwise and turn in until your port side mirror lines up with a point 1.25m forward of the rear car',
           snackConfig: {
             duration: 5000,
             horizontalPosition: 'center',
@@ -150,7 +150,7 @@ export class InformationService {
       case EManoeuvre.Park3UsingRulesMinAngle:
         return {
           message:
-            'Rule 3: Straighten the wheel and reverse until the front port corner is in front of the rear bumper of the front car by the required safety gap (e.g. 250mm), AND the car is within 0.5m of the kerb',
+            'Rule 3: Straighten the wheel and reverse until the front port corner is in front of the rear bumper of the front car by the required safety gap (0.3m) AND the car is within 0.4m of the kerb',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -188,7 +188,7 @@ export class InformationService {
       case EManoeuvre.Park3UsingRulesMinAngle:
         return {
           message:
-            'Rule 4: Lock clockwise and reverse until you are as close to the rear car as you find comfortable',
+            'Rule 4: Lock clockwise and reverse until you are 0.3m, (i.e. the safety gap), from the rear car',
           snackConfig: {
             duration: 5000,
             horizontalPosition: 'center',

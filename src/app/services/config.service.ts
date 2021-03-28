@@ -12,6 +12,11 @@ import { LoggingLevel, TButtonLabels, TButtonNames } from '../shared/types';
 })
 export class ConfigService {
   //
+
+  /**
+   * * Debug Settings
+   */
+
   /* This sets the logging level used - set to Error unless debugging */
   loggingLevel = LoggingLevel.ERROR;
   /* This sets whether to run in loop mode on start up - set to false unless testing */
@@ -19,6 +24,7 @@ export class ConfigService {
 
   /**
    * * Dimensions
+   *
    * Canvas Dimensions are set in index.html:
    * - Set width to 800 pixels and height to 400 pixels.
    * The canvas width represents 16m actual distance so therefore each pixel represents 16000 / 800 = 20mm.
@@ -47,7 +53,9 @@ export class ConfigService {
   defaultFrontCarLength = 5290 / this.distScale;
   defaultFrontCarWidth = 1904 / this.distScale;
   defaultCarFromKerb = 250 / this.distScale;
-  defaultSafetyGap = 250 / this.distScale;
+  /* My reversing beeper goes solid at ~300mm */
+  /* Note: Do not exceed this.maxSafetyGap */
+  defaultSafetyGap = 300 / this.distScale;
 
   /* The parking space gap */
   defaultExtraParkingSpace = 1000 / this.distScale;
@@ -77,7 +85,7 @@ export class ConfigService {
     this.defaultRearOverhang +
     this.defaultWheelbase +
     this.defaultFrontOverhang;
-  defaultCarOuterCornerStartFromPP = 2000 / this.distScale;
+  defaultCarOuterCornerStartFromPP = 1000 / this.distScale;
   /* Must be updated when front car width known */
   defaultFrontStarboardCornerFromTop =
     this.defaultCarFromKerb +
@@ -86,41 +94,52 @@ export class ConfigService {
     this.defaultSideOverhang +
     this.defaultCarOutFromSafetyOfFrontCar;
 
-  /* Car motion defaults */
-  defaultSpeed = 1000 / this.distScale;
-  rampStart = 0.25;
-  rampTicks = 100;
-  /* time in milliseconds to turn the front wheel that is on the inner edge of the turning circle through 1 radian */
-  msPerWheelRadian = 2.0;
+  /* Limits */
+  collisionBuffer = 1 / this.distScale;
+  defaultMinFromKerb = 200 / this.distScale;
+  maxLegalKerbGap = 500 / this.distScale;
 
-  /* Utility functions */
+  /**
+   * * Car motion defaults
+   */
+  /* Straight move speed in scaled mm per second - measured 5m in ~8s */
+  defaultSpeed = 675 / this.distScale;
+  rampStart = 0.25; // Starting speed = defaultSpeed / rampStart
+  rampTicks = 100; // Ramp up to full speed over rampTicks
+  /* Time in milliseconds to turn the front wheel that is on the inner edge of the turning circle through 1 radian */
+  /* Measured ~1.6 radians took 8s =>  5s per radian but using 3s as 5 too slow */
+  msPerWheelRadian = 3.0;
+
+  /**
+   * * Utility functions
+   */
   RAD_TO_DEG = 180 / Math.PI;
   DEG_TO_RAD = Math.PI / 180;
   round(n: number, places = 6): number {
     return Math.round(Math.pow(10, places) * n) / Math.pow(10, places);
   }
 
-  /* Size limits */
-  collisionBuffer = 1 / this.distScale;
-  defaultMinFromKerb = 200 / this.distScale;
-  maxLegalKerbGap = 500 / this.distScale;
-
-  /* Park by Park3UsingRulesMinAngle manoeuvre constants */
+  /**
+   * * Park by Park3UsingRulesMinAngle manoeuvre constants
+   */
+  /* Default front car out from kerb - not used in MinAngle manoeuvre */
   baseFrontCarOut = 2000 / this.distScale;
   /* Starting distance out from front car */
-  baseGap = 500 / this.distScale;
+  baseGap = 600 / this.distScale;
   /* MedAngle Manoeuvre: Move in by this amount */
   move2TurnMed = 400 / this.distScale;
   /* MinAngle Manoeuvre: Aim at this point forward of the rear car */
-  move2TurnMin = 1000 / this.distScale;
+  move2TurnMin = 1250 / this.distScale;
   /* MedAngle: Reverse until this close to kerb */
   distFromKerbMed = 900 / this.distScale;
   /* MinAngle: Reverse until this close to kerb */
-  distFromKerbMin = 250 / this.distScale;
+  distFromKerbMin = 400 / this.distScale;
   /* Reverse until this close to rear car */
-  distFromRearCarMin = 250 / this.distScale;
+  distFromRearCarMin = this.defaultSafetyGap / this.distScale;
 
-  /* Custom car and street defaults */
+  /**
+   * * Custom car and street defaults
+   */
   minWheelbaseForm = 2300;
   maxWheelbaseForm = 3500;
   minTurningRadiusForm = 4500;
@@ -132,7 +151,7 @@ export class ConfigService {
   minRearOverhangForm = 300;
   maxRearOverhangForm = 1200;
   minSafetyGap = 50;
-  maxSafetyGap = 250;
+  maxSafetyGap = 350; // Limited by VW hitting right size of canvas
   minFrontCarWidth = 1565;
   maxFrontCarWidth = 2250;
   minDistFromKerb = 0;
@@ -145,15 +164,22 @@ export class ConfigService {
   /* Minimum allowed turning radius in mm calculated with wheelbase = 2300mm and front overhang = 300mm. */
   minTurningRadiusAllowed = 3677;
 
+  /**
+   * * Error constants
+   */
   /* Distance from kerb above which a parking error is reported */
   errorDistFromKerb = 500 / this.distScale;
   /* Angle in rads above which an error is reported */
   errorParkAngle = 5 * this.DEG_TO_RAD;
 
-  /* Information message duration on ms */
+  /**
+   * * Information message duration on ms
+   */
   infoMessageDuration = 3000;
 
-  /* Manual mode run text for all buttons */
+  /**
+   * * Manual mode run text for all buttons
+   */
   manualModeRunTexts: Map<TButtonNames, TButtonLabels> = new Map([
     ['forward', 'Forward (f)'],
     ['reverse', 'Back (b)'],

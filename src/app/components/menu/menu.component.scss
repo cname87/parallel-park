@@ -1,5 +1,13 @@
+@import 'src/styles/styles.scss';
+
 div.mode * {
   min-width: 0;
+}
+
+a.link {
+  // width: 100%;
+  margin-top: 0.5rem;
+  font-size: $fontDefault;
 }
 
 div.selects * {

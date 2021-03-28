@@ -288,6 +288,12 @@ export class ManoeuvreService {
         });
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
+        return this.#getExtraParkingSpace3Rotate({
+          manoeuvre,
+          street,
+          car,
+          config,
+        });
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return this.#getExtraParkingSpace3Rotate({
           manoeuvre,
@@ -341,7 +347,6 @@ export class ManoeuvreService {
     }
     const parkingSpace = 2 * street.safetyGap + car.length + extraParkingSpace;
     this.logger.log(`Parking space: ${parkingSpace}`, LoggingLevel.TRACE);
-    console.log(`Parking space: ${parkingSpace * config.distScale} `);
     return parkingSpace;
   };
 
@@ -699,36 +704,35 @@ export class ManoeuvreService {
       const distFromKerb = config.distFromKerbMed;
       return carInUse.readRearPortAxleSide.y - distFromKerb < 0.1;
     };
-    /* Reverse until the car front port corner is level with the rear bumper of the front car + safety gap, and the rear port corner is within a given distance of the kerb */
+    /*
+    If the rear starboard corner gets closer to the rear car than the configured minimum distance then stop.
+    Otherwise reverse until the car front port corner is level with the rear bumper of the front car + safety gap and the rear port corner is within a given distance of the kerb.
+     */
     const move3ConditionMin = (carInUse: CarService, _tick: any) => {
       return (
-        carInUse.readFrontPortCorner.x -
+        carInUse.readRearStarboardCorner.x -
+          street.rearCarCorner.x -
+          street.safetyGap -
+          config.distFromRearCarMin <
+          1 ||
+        (carInUse.readFrontPortCorner.x -
           street.frontCarCorner.x +
           street.safetyGap <
           1 &&
-        (carInUse.readRearPortCorner.y - config.distFromKerbMin < 1 ||
-          carInUse.readRearStarboardCorner.x -
-            street.rearCarCorner.x -
-            street.safetyGap -
-            config.distFromRearCarMin <
-            1)
+          carInUse.readRearPortCorner.y - config.distFromKerbMin < 1)
       );
     };
 
-    /* Rotate in until the car touches the safety gap of the rear car or is horizontal */
-    const move4Condition = (carInUse: CarService, tick: unknown) => {
-      const collision = this.calc.checkCollision(carInUse, true);
-      if (collision && typeof tick === 'number') {
-        /* Clear collision */
-        do {
-          carInUse.readCarRotation -= tick;
-        } while (this.calc.checkCollision(carInUse, true));
-        {
-          carInUse.readCarRotation -= tick;
-        }
-      }
+    /* Rotate in until the car comes within the allowed distance of the rear car or is horizontal */
+    const move4Condition = (carInUse: CarService, _tick: unknown) => {
+      const tooClose =
+        carInUse.readRearStarboardCorner.x -
+          street.rearCarCorner.x -
+          street.safetyGap -
+          config.distFromRearCarMin <
+        1;
       const isHorizontal = Math.abs(carInUse.readCarRotation) < 0.001;
-      return collision || isHorizontal;
+      return tooClose || isHorizontal;
     };
 
     /* Stop turning wheels in center position if the car is horizontal */
@@ -1632,36 +1636,6 @@ export class ManoeuvreService {
   };
 
   /**
-   * @remarks
-   * For a car leaving a parked space...
-   *
-   * @returns The angle in radians through which the car rotates when it first moves forward.
-   */
-  #getLeaveMove1Angle = ({ street, car }: IParams): number => {
-    /**
-     * alpha = arccos((2r − (w + p)/2r)
-     * r = Turning radius to midpoint of rear axle
-     * w = width of front car
-     * p = Ending y distance out from front car
-     */
-    const excessGapAboveSafety = street.safetyGap;
-    return Math.acos(
-      (2 * car.centerRearAxleTurningRadius(ELock.Counterclockwise) -
-        (street.frontCarWidth + street.safetyGap + excessGapAboveSafety)) /
-        (2 * car.centerRearAxleTurningRadius(ELock.Counterclockwise)),
-    );
-  };
-
-  /**
-   * @remarks
-   * For a car leaving a parked space...
-   *
-   * @returns The angle in radians through which the car rotates on its second rotation.
-   */
-  #getLeaveMove2Angle = ({ manoeuvre, street, car, config }: IParams): number =>
-    this.#getLeaveMove1Angle({ manoeuvre, street, car, config });
-
-  /**
    *
    * @returns The set of data that defines a complete manoeuvre - see IManoeuvre description.
    */
@@ -1861,54 +1835,6 @@ export class ManoeuvreService {
             type: () => EMoveType.Steer,
             steeringWheelAngle: ELock.Center,
           } as TSteer,
-        };
-        break;
-      case EManoeuvre.Leave:
-        parkingSpaceLength = this.#getParkingSpace({
-          manoeuvre,
-          street,
-          car,
-          config,
-        });
-        startPosition = this.#getStartPosition({
-          manoeuvre,
-          street,
-          car,
-          config,
-        });
-        minKerbDistance = this.#getMinKerbDistance({
-          manoeuvre,
-          street,
-          car,
-          config,
-        });
-        movie = {
-          moveA: {
-            type: () => EMoveType.Steer,
-            steeringWheelAngle: ELock.Clockwise,
-          },
-          moveB: {
-            type: () => EMoveType.MoveArc,
-            fwdOrReverseFn: () => EDirection.Forward,
-            deltaPositionFn: () => 0,
-            deltaAngleFn: () =>
-              this.#getLeaveMove1Angle({ manoeuvre, street, car, config }),
-          },
-          moveC: {
-            type: () => EMoveType.Steer,
-            steeringWheelAngle: ELock.Counterclockwise,
-          },
-          moveD: {
-            type: () => EMoveType.MoveArc,
-            fwdOrReverseFn: () => EDirection.Forward,
-            deltaPositionFn: () => 0,
-            deltaAngleFn: () =>
-              this.#getLeaveMove2Angle({ manoeuvre, street, car, config }),
-          },
-          moveE: {
-            type: () => EMoveType.Steer,
-            steeringWheelAngle: ELock.Center,
-          },
         };
         break;
     }
