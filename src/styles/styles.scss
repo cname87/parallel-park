@@ -74,4 +74,11 @@ $smallRadioSize: clamp(1rem, 2vw, 2rem);
   margin-top: 0.1rem;
   margin-bottom: 0.1rem;
   font-size : $fontDefault;
+  background: $colorBackground; /* Default background color */
+  border-radius: 0.25rem; /* Rounded corners */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+  &:hover {
+    background-color: lighten($colorBackground, 10%); /* Lighter background on hover */
+  }
 }

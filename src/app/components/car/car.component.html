@@ -1,17 +1,21 @@
 <div>
-  <mat-form-field
-    [formGroup]="carForm"
-    appearance="outline"
-  >
-    <mat-label>Select a car to be parked</mat-label>
-    <mat-select
-      formControlName="car"
+  <form [formGroup]="carForm">
+    <mat-form-field
+      appearance="outline"
+      style="width: 100%;"
     >
-      <mat-option
-        *ngFor="let car of cars"
-        [value]="car[0]"
+      <mat-label>{{ message }}</mat-label>
+      <mat-select
+        formControlName="car"
       >
-        {{car[1]}}
-      </mat-option>
-    </mat-select>
-    <mat-hint>Select 'Custom' to set up custom car dimensions
+        <mat-option
+          *ngFor="let car of cars"
+          [value]="car[0]"
+        >
+          {{ car[1] }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>{{ hint }}</mat-hint>
+    </mat-form-field>
+  </form>
+</div>

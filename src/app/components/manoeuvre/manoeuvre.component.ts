@@ -30,6 +30,7 @@ import { ObjectsService } from '../../services/objects.service';
   selector: 'app-manoeuvre',
   templateUrl: './manoeuvre.component.html',
   styleUrls: ['./manoeuvre.component.scss'],
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -37,17 +38,16 @@ import { ObjectsService } from '../../services/objects.service';
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
   ],
 })
 export class ManoeuvreComponent implements OnInit {
   manoeuvres: Array<[EManoeuvre, string]>;
   manoeuvreForm!: FormGroup;
-  #manoeuvreInitialFormValue: IManoeuvreForm;
-  #manoeuvre$!: Observable<EManoeuvre>;
-  #manoeuvre!: IManoeuvre;
-  message = '';
-  hint = '';
+  private manoeuvreInitialFormValue: IManoeuvreForm;
+  private manoeuvre$!: Observable<EManoeuvre>;
+  private manoeuvre!: IManoeuvre;
+  public message = '';
+  public hint = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -57,27 +57,27 @@ export class ManoeuvreComponent implements OnInit {
     this.manoeuvres = this.objects.manoeuvres;
 
     /* Note that the select group formControlName is 'manoeuvre' */
-    this.#manoeuvreInitialFormValue = {
+    this.manoeuvreInitialFormValue = {
       manoeuvre: this.manoeuvres[0][0],
     };
   }
 
   ngOnInit(): void {
     this.manoeuvreForm = this.formBuilder.group(
-      this.#manoeuvreInitialFormValue,
+      this.manoeuvreInitialFormValue,
     );
-    this.#manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
-      startWith(this.#manoeuvreInitialFormValue),
+    this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
+      startWith(this.manoeuvreInitialFormValue),
       map((manoeuvreFormValue: IManoeuvreForm) => manoeuvreFormValue.manoeuvre),
       distinctUntilChanged(),
       shareReplay(1),
     );
-    this.#manoeuvre = {
+    this.manoeuvre = {
       manoeuvreForm: this.manoeuvreForm,
-      manoeuvre$: this.#manoeuvre$,
-      manoeuvreInitialFormValue: this.#manoeuvreInitialFormValue,
+      manoeuvre$: this.manoeuvre$,
+      manoeuvreInitialFormValue: this.manoeuvreInitialFormValue,
     };
-    this.data.setManoeuvre(this.#manoeuvre);
+    this.data.setManoeuvre(this.manoeuvre);
 
     /* Customise input heading and hint messages */
     this.data.getMode().mode$.subscribe((value: EMode) => {

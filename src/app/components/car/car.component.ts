@@ -13,7 +13,7 @@ import {
   shareReplay,
   startWith,
 } from 'rxjs/operators';
-import { ECar, ICar, ICarForm } from '../../shared/types';
+import { ECar, EMode, ICar, ICarForm } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
 
@@ -36,12 +36,14 @@ import { ObjectsService } from '../../services/objects.service';
   ],
 })
 export class CarComponent implements OnInit {
-  cars: Array<[ECar, string]>;
-  carForm!: FormGroup;
-  #carInitialFormValue: ICarForm;
-  #car$!: Observable<ECar>;
-  #car!: ICar;
-
+  public cars: Array<[ECar, string]>;
+  public carForm!: FormGroup;
+  private carInitialFormValue: ICarForm;
+  private car$!: Observable<ECar>;
+  private car!: ICar;
+  public message = '';
+  public hint = '';
+  
   constructor(
     private formBuilder: FormBuilder,
     private data: DataService,
@@ -49,23 +51,35 @@ export class CarComponent implements OnInit {
   ) {
     this.cars = this.objects.cars;
     /* Note that the select group formControlName is 'car' */
-    this.#carInitialFormValue = {
+    this.carInitialFormValue = {
       car: ECar.VW_T5_LWB_Van_2005,
     };
   }
 
   ngOnInit(): void {
-    this.carForm = this.formBuilder.group(this.#carInitialFormValue);
-    this.#car$ = this.carForm.valueChanges.pipe(
-      startWith(this.#carInitialFormValue),
+    this.carForm = this.formBuilder.group(this.carInitialFormValue);
+    this.car$ = this.carForm.valueChanges.pipe(
+      startWith(this.carInitialFormValue),
       map((carFormValue: ICarForm) => carFormValue.car),
       distinctUntilChanged(),
       shareReplay(1),
     );
-    this.#car = {
+    this.car = {
       carForm: this.carForm,
-      car$: this.#car$,
+      car$: this.car$,
     };
-    this.data.setCar(this.#car);
+    this.data.setCar(this.car);
+
+    /* Customise input heading and hint messages */
+    this.data.getMode().mode$.subscribe((value: EMode) => {
+      if (value === EMode.Keyboard) {
+        this.message = 'Select a car to park';
+        this.hint =
+          'Select a custom car to set custom dimensions';
+      } else {
+        this.message = 'Select a car to park';
+        this.hint = 'The set of available cars';
+      }
+    });
   }
 }

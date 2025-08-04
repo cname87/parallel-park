@@ -1,20 +1,21 @@
 <div>
-  <mat-form-field
-    [formGroup]="streetForm"
-    appearance="outline"
-  >
-    <mat-label>Select street dimensions</mat-label>
-    <mat-select
-      formControlName="street"
+  <form [formGroup]="streetForm">
+    <mat-form-field
+       appearance="outline"
+       style="width: 100%;"
     >
-      <mat-option
-        *ngFor="let street of streets"
-        [value]="street[0]"
+      <mat-label>{{ message }}</mat-label>
+      <mat-select
+        formControlName="street"
       >
-        {{street[1]}}
-      </mat-option>
-    </mat-select>
-    <mat-hint> {{ hint }}</mat-hint>
-  </mat-form-field>
+        <mat-option
+          *ngFor="let street of streets"
+          [value]="street[0]"
+        >
+          {{ street[1] }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>{{ hint }}</mat-hint>
+    </mat-form-field>
+  </form>
 </div>
-
