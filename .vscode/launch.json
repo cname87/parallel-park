@@ -22,18 +22,7 @@
       "runtimeArgs": [
         "--incognito",
         "--start-maximized",
-        "--new-window",
-        "--disable-popup-blocking", // necessary for window.open() to work
-        // To debug service workers - only for local debugging
-        "--disable-web-security", // necessary for CORS to work
-        "--disable-extensions", // necessary for CORS to work
-        "--disable-background-networking", // necessary for CORS to work
-        "--disable-default-apps", // necessary for CORS to work
-        "--disable-client-side-phishing-detection", // necessary for CORS to work
-        "--disable-component-update", // necessary for CORS to work
-        "--disable-sync", // necessary for CORS to work
-        "--disable-features=TranslateUI", // necessary for CORS to work
-        "--disable-popup-blocking", // necessary for CORS to work
+        "--new-window"
       ],
       "userDataDir": true,
       "url": "http://localhost:4200/",

@@ -6,11 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { MatHint, MatLabel, MatError } from '@angular/material/form-field';
 import { ConfigService } from '../../services/config.service';
 import { TButtonNames } from '../../shared/types';
 import { ButtonComponent } from '../button/button.component';
-import { f } from '@angular/material/form-field.d-e195lFUo';
 
 /**
  * Displays the manual mode button menu.

@@ -1,11 +1,11 @@
 import {
-  UniqueSelectionDispatcher
-} from "./chunk-3PTVV54W.js";
-import {
   CdkPortalOutlet,
   PortalModule,
   TemplatePortal
 } from "./chunk-PTS3RHTK.js";
+import {
+  UniqueSelectionDispatcher
+} from "./chunk-3PTVV54W.js";
 import {
   _StructuralStylesLoader
 } from "./chunk-3GRQOYQS.js";

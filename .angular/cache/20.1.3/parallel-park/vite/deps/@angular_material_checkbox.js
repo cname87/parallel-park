@@ -8,10 +8,10 @@ import {
 import {
   MatRipple
 } from "./chunk-OQWKYY4L.js";
+import "./chunk-FXBOGOIW.js";
 import {
   _StructuralStylesLoader
 } from "./chunk-3GRQOYQS.js";
-import "./chunk-FXBOGOIW.js";
 import {
   _animationsDisabled
 } from "./chunk-2KCSHZPL.js";

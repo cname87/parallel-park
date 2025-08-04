@@ -6,7 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { MatHint, MatLabel, MatError } from '@angular/material/form-field';
 import { MatRadioModule } from '@angular/material/radio';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -53,9 +52,11 @@ export class ModeComponent implements OnInit {
   ) {
     this.#runLoopTest = this.config.runLoopTest;
     /* Note that the radio group formControlName is 'mode' */
-    this.#runLoopTest === true
-      ? (this.#modeInitialFormValue = { mode: EMode.Loop })
-      : (this.#modeInitialFormValue = { mode: EMode.Single });
+    if (this.#runLoopTest === true) {
+      this.#modeInitialFormValue = { mode: EMode.Loop };
+    } else {
+      this.#modeInitialFormValue = { mode: EMode.Single };
+    }
   }
 
   ngOnInit(): void {
