@@ -447,8 +447,9 @@ export class AppComponent implements AfterViewInit {
         /* Disable menus if custom car or street entry form is invalid */
 
         if (
-          this.data.getCustomCar().customCarForm?.invalid ||
-          this.data.getCustomStreet().customStreetForm?.invalid
+          // Add ? as custom car and street are optional
+          this.data.getCustomCar()?.customCarForm?.invalid ||
+          this.data.getCustomStreet()?.customStreetForm?.invalid
         ) {
           invalid = true;
           this.data.getButton('main').disable();

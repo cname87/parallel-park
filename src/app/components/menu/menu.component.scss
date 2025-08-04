@@ -1,13 +1,21 @@
-@use 'src/styles/styles.scss' as *;
+@use 'src/styles/styles.scss' as styles;
 
 div.mode * {
   min-width: 0;
 }
 
 a.link {
-  // width: 100%;
+  font-size: clamp(0.65rem, 2vw, 1.3rem);
+  height: clamp(1.2rem, 2vw, 1.8rem);
   margin-top: 0.5rem;
-  font-size: $fontDefault;
+  text-decoration: underline;
+  color: styles.$colorPrimary;
+  transition: color 0.2s;
+}
+a.link:hover,
+a.link:focus {
+  color: styles.$colorAccent;
+  background-color: styles.$colorBackground;
 }
 
 div.selects * {

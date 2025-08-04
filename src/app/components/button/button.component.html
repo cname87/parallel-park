@@ -1,8 +1,10 @@
 <button
   mat-raised-button
+  type="button"
   [color]="buttonColor"
   [disabled]="isDisabled"
   (click)="onClick($event)"
+  [attr.aria-label]="buttonText"
 >
   {{ buttonText }}
 </button>

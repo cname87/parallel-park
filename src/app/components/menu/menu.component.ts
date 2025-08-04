@@ -32,7 +32,6 @@ import { StreetComponent } from '../street/street.component';
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
     ModeComponent,
     ButtonComponent,
     ManualModeComponent,
@@ -44,10 +43,10 @@ import { StreetComponent } from '../street/street.component';
 export class MenuComponent implements AfterViewInit {
   constructor(private data: DataService) {}
 
-  showScenarioForm: 'none' | 'block' = 'block';
-  showCustomCarForm: 'none' | 'block' = 'none';
-  showCustomStreetForm: 'none' | 'block' = 'none';
-  showManualMode = false;
+  public showScenarioForm: 'none' | 'block' = 'block';
+  public showCustomCarForm: 'none' | 'block' = 'none';
+  public showCustomStreetForm: 'none' | 'block' = 'none';
+  public showManualMode = false;
 
   /**
    * Sets up the various displays.

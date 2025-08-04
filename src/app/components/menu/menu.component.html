@@ -8,9 +8,12 @@
 <a
   class="link"
   fxFlex="0 1 auto"
-  href="https://github.com/cname87/parallel-park"
+  href="https://github.com/cname87/parallel-park/blob/master/README.md"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Open project README in new tab"
 >
-  SOURCE
+  README
 </a>
 
 <app-mode
@@ -21,7 +24,9 @@
 <app-button
   fxFlex="0 1 auto"
   buttonName='main'
-></app-button>
+>
+</app-button>
+
 </div>
 
 <div
@@ -34,17 +39,20 @@
   <app-manoeuvre
     fxFlex="0 1 40%"
     [ngStyle]="{'display': showScenarioForm}"
-  ></app-manoeuvre>
+  >
+  </app-manoeuvre>
 
   <app-car
     fxFlex="0 1 30%"
     [ngStyle]="{'display': showScenarioForm}"
-  ></app-car>
+  >
+  </app-car>
 
   <app-street
     fxFlex="0 1 30%"
     [ngStyle]="{'display': showScenarioForm}"
-></app-street>
+  >
+  </app-street>
 
 </div>
 
@@ -59,7 +67,8 @@
   <app-custom-car
     fxFlex="0 1 100%"
     [ngStyle]="{'display': showCustomCarForm}"
-  ></app-custom-car>
+  >
+  </app-custom-car>
 
 </div>
 

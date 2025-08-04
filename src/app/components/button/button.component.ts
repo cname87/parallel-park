@@ -43,15 +43,14 @@ export class ButtonComponent implements OnInit {
   buttonColor: ThemePalette;
   isDisabled!: boolean;
 
-  #buttonStatus = new BehaviorSubject<EButtonStatus>(EButtonStatus.Run);
-  #buttonStatus$ = this.#buttonStatus.asObservable();
+  private buttonStatus = new BehaviorSubject<EButtonStatus>(EButtonStatus.Run);
+  private buttonStatus$ = this.buttonStatus.asObservable();
 
-  #buttonClickSubject: Subject<EButtonStatus> = new Subject();
-  #buttonLastClick$: Observable<EButtonStatus> =
-    this.#buttonClickSubject.asObservable();
+  private buttonClickSubject: Subject<EButtonStatus> = new Subject();
+  private buttonLastClick$: Observable<EButtonStatus> =
+    this.buttonClickSubject.asObservable();
 
-  /* Manual mode run text for all buttons */
-  #textsRun = this.config.allButtonTexts;
+  private textsRun = this.config.allButtonTexts;
 
   /* Button can be enabled after ViewInit when the name has been passed in */
   constructor(
@@ -59,47 +58,48 @@ export class ButtonComponent implements OnInit {
     private data: DataService,
   ) {}
 
-  #enableRun = (): void => {
-    this.buttonText = this.#textsRun.get(this.buttonName);
+  private enableRun = (): void => {
+    this.buttonText = this.textsRun.get(this.buttonName);
     this.buttonColor = 'primary';
     this.isDisabled = false;
-    this.#buttonStatus.next(EButtonStatus.Run);
+    this.buttonStatus.next(EButtonStatus.Run);
   };
 
-  #enableReset = (): void => {
+  private enableReset = (): void => {
     this.buttonText = this.buttonName === 'main' ? 'RESET' : 'Stop';
     this.buttonColor = 'warn';
     this.isDisabled = false;
-    this.#buttonStatus.next(EButtonStatus.Reset);
+    this.buttonStatus.next(EButtonStatus.Reset);
   };
 
-  #disable = (): void => {
+  private disable = (): void => {
     this.buttonText = 'Wait';
     this.isDisabled = true;
-    this.#buttonStatus.next(EButtonStatus.Disabled);
+    this.buttonStatus.next(EButtonStatus.Disabled);
   };
 
-  onClick = (_event: MouseEvent): void => {
+  public onClick = (_event: MouseEvent): void => {
+    console.log('Button clicked:', this.buttonName);
     /* Report the button status when the button was clicked */
-    this.#buttonClickSubject.next(this.#buttonStatus.getValue());
+    this.buttonClickSubject.next(this.buttonStatus.getValue());
   };
 
   /* The object passed to subscribers */
-  #button: IButton = {
+  private button: IButton = {
     /* Marks the button 'Run' and enables the button */
-    enableRun: this.#enableRun,
+    enableRun: this.enableRun,
     /* Marks the button 'Reset' and enables the button */
-    enableReset: this.#enableReset,
+    enableReset: this.enableReset,
     /* Marks the button 'Wait' and disables the button */
-    disable: this.#disable,
+    disable: this.disable,
     /* Button status observable */
-    buttonStatus$: this.#buttonStatus$,
+    buttonStatus$: this.buttonStatus$,
     /* A click can be detected and the button status at the time of the click can be read from here */
-    buttonLastClick$: this.#buttonLastClick$,
+    buttonLastClick$: this.buttonLastClick$,
   };
 
   ngOnInit(): void {
-    this.#enableRun();
-    this.data.setButton(this.buttonName, this.#button);
+    this.enableRun();
+    this.data.setButton(this.buttonName, this.button);
   }
 }

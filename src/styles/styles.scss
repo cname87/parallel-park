@@ -3,6 +3,11 @@
 /* Variable font used throughout */
 $fontDefault: clamp(0.5rem, 2.5vw, 1rem);
 
+$colorPrimary: #1976d2; /* Example primary color */
+$colorWarn: #f44336; /* Example warn color */
+$colorAccent: #ff4081; /* Example accent color */
+$colorBackground: #e3e3e3; /* Example background color */
+
 body {
   height: 100%;
   width: 100%;

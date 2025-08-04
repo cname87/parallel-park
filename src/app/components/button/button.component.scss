@@ -1,4 +1,6 @@
-button.mat-raised-button {
+@use 'src/styles/styles.scss' as styles;
+
+button[mat-raised-button] {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,4 +16,11 @@ button.mat-raised-button {
   min-height: 0;
   padding-left: 1vw;
   padding-right: 1vw;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+button[mat-raised-button]:hover,
+button[mat-raised-button]:focus {
+  color: styles.$colorAccent;
+  background-color: styles.$colorBackground
 }
