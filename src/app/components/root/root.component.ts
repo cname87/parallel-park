@@ -56,7 +56,7 @@ export class AppComponent implements AfterViewInit {
   /* Stores the main button status when last clicked */
   private mainButtonLastClickStatus!: EButtonStatus;
   private selectedManoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
-  private carSetup = ECar.VW_T5_LWB_Van_2005;
+  private carSetup = ECar.Fiat_Ducato_MWB_Van_2025;
   private streetSetup = EStreet.Width_1904mm;
   private defaultScenario!: TScenario;
   private infoSnackRef!: MatSnackBarRef<TextOnlySnackBar>;
@@ -67,6 +67,17 @@ export class AppComponent implements AfterViewInit {
       setTimeout(() => resolve(), timeMs);
     });
   };
+
+  /**
+   * Utility to construct the current scenario object.
+   */
+  private getCurrentScenario(): TScenario {
+    return {
+      manoeuvre: this.selectedManoeuvre,
+      carSetup: this.carSetup,
+      streetSetup: this.streetSetup,
+    };
+  }
 
   /**
    * Sets up the screen including positioning the car in its pre-parked position and also creates a manoeuvre for a scenario.
@@ -89,8 +100,9 @@ export class AppComponent implements AfterViewInit {
     /* Print the grid */
     this.grid.createGrid();
 
-    /* Run the parking calculations getting a manoeuvre containing set of moves. The returned object contains the parking space length, a minimum kerb distance (if necessary), the start position and the set of moves. */
-
+    /* Run the parking calculations getting a manoeuvre containing set of moves.
+    The returned object contains the parking space length, a minimum kerb distance (if necessary), 
+    the start position and the set of moves. */
     const manoeuvre = this.manoeuvre.getManoeuvre({
       manoeuvre: scenario.manoeuvre,
       street: this.street,
@@ -98,7 +110,7 @@ export class AppComponent implements AfterViewInit {
       config: this.config,
     });
 
-    /* Update the parking space length if not already set.  (A custom street may have already set a value, e.g. for keyboard use). */
+    /* Update the parking space length if not already set. (A custom street may have already set a value, e.g. for keyboard use). */
     if (!this.street.parkingSpaceLength) {
       this.street.parkingSpaceLength = manoeuvre.parkingSpaceLength;
     }
@@ -120,8 +132,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   /**
-   * This is run a set of manoeuvres based on a list of supplied scenarios.
-   * @param scenarios An array of scenarios (as stored in objects).
+   * This runs a set of manoeuvres based on a list of supplied scenarios..
    */
   async runPlaylist(scenarios: TScenario[]): Promise<void> {
     /* Run the list of scenarios */
@@ -129,11 +140,11 @@ export class AppComponent implements AfterViewInit {
       /* Set form values to match scenario */
       this.data
         .getManoeuvre()
-        ?.manoeuvreForm.setValue({ manoeuvre: scenario.manoeuvre });
-      this.data.getCar()?.carForm.setValue({ car: scenario.carSetup });
+        .manoeuvreForm.setValue({ manoeuvre: scenario.manoeuvre });
+      this.data.getCar().carForm.setValue({ car: scenario.carSetup });
       this.data
         .getStreet()
-        ?.streetForm.setValue({ street: scenario.streetSetup });
+        .streetForm.setValue({ street: scenario.streetSetup });
       await this.runManoeuvre(scenario);
       /* Reset if the button clicked when status = Reset */
       if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
@@ -143,7 +154,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   /**
-   * @param scenario This runs one parking manoeuvre, i.e. feeds a set of moves to the move service to park the car.
+   * This runs one parking manoeuvre, i.e. feeds a set of moves to the move service to park the car.
    */
   async runManoeuvre(scenario: TScenario): Promise<void> {
     //
@@ -331,28 +342,28 @@ export class AppComponent implements AfterViewInit {
 
     /* Subscribe to track the selected parking manoeuvre, car and street setup */
     const manoeuvreService = this.data.getManoeuvre();
-    if (manoeuvreService?.manoeuvre$) {
+    if (manoeuvreService.manoeuvre$) {
       manoeuvreService.manoeuvre$
         .pipe(this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG))
         .subscribe((manoeuvre: EManoeuvre) => (this.selectedManoeuvre = manoeuvre));
     }
 
     const carService = this.data.getCar();
-    if (carService?.car$) {
+    if (carService.car$) {
       carService.car$
         .pipe(this.logger.tapLog('Car chosen:', LoggingLevel.DEBUG))
         .subscribe((car: ECar) => (this.carSetup = car));
     }
 
     const streetService = this.data.getStreet();
-    if (streetService?.street$) {
+    if (streetService.street$) {
       streetService.street$
         .pipe(this.logger.tapLog('Street chosen:', LoggingLevel.DEBUG))
         .subscribe((street: EStreet) => (this.streetSetup = street));
     }
 
     const modeService = this.data.getMode();
-    if (modeService?.mode$) {
+    if (modeService.mode$) {
       modeService.mode$
         .pipe(this.logger.tapLog('Mode chosen:', LoggingLevel.DEBUG))
         .subscribe((data: EMode) => {
@@ -371,11 +382,7 @@ export class AppComponent implements AfterViewInit {
     this.snack.trackMode();
 
     /* Read current scenario and set up starting default screen */
-    let scenario: TScenario = {
-      manoeuvre: this.selectedManoeuvre,
-      carSetup: this.carSetup,
-      streetSetup: this.streetSetup,
-    };
+    let scenario: TScenario = this.getCurrentScenario();
     this.setupScreen(scenario);
 
     /* It loops to here after each completed loop or selected parking manoeuvre and awaits a button click */
@@ -384,13 +391,9 @@ export class AppComponent implements AfterViewInit {
       /* Redraw screen here only if the Reset button was pressed during a manoeuvre i.e. leave the car 'parked' until the next button click otherwise */
       if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
         /* Dismiss any open info snackbar */
-        this.infoSnackRef?.dismiss();
+        this.infoSnackRef.dismiss();
 
-        scenario = {
-          manoeuvre: this.selectedManoeuvre,
-          carSetup: this.carSetup,
-          streetSetup: this.streetSetup,
-        };
+        scenario = this.getCurrentScenario();
         this.setupScreen(scenario);
       }
 
@@ -399,42 +402,38 @@ export class AppComponent implements AfterViewInit {
         // Defensive: getManoeuvre() may be undefined
         const manoeuvreService = this.data.getManoeuvre();
         if (
-          manoeuvreService?.manoeuvreForm &&
-          manoeuvreService?.manoeuvreInitialFormValue
+          manoeuvreService.manoeuvreForm &&
+          manoeuvreService.manoeuvreInitialFormValue
         ) {
           manoeuvreService.manoeuvreForm.setValue(
             manoeuvreService.manoeuvreInitialFormValue,
           );
         }
         const carService = this.data.getCar();
-        if (carService?.carForm) {
+        if (carService.carForm) {
           carService.carForm.setValue({
             car: ECar.VW_T5_LWB_Van_2005,
           });
         }
         const streetService = this.data.getStreet();
-        if (streetService?.streetForm) {
+        if (streetService.streetForm) {
           streetService.streetForm.setValue({
             street: EStreet.Width_1904mm,
           });
         }
         /* Repaint screen to the defaults */
-        scenario = {
-          manoeuvre: this.selectedManoeuvre,
-          carSetup: this.carSetup,
-          streetSetup: this.streetSetup,
-        };
+        scenario = this.getCurrentScenario();
         this.setupScreen(scenario);
         // Disable all form controls (except mode)
         this.data.getMode().modeForm.enable({ emitEvent: false });
-        manoeuvreService?.manoeuvreForm?.disable({ emitEvent: false });
-        carService?.carForm?.disable({ emitEvent: false });
-        streetService?.streetForm?.disable({ emitEvent: false });
+        manoeuvreService.manoeuvreForm.disable({ emitEvent: false });
+        carService.carForm.disable({ emitEvent: false });
+        streetService.streetForm.disable({ emitEvent: false });
       } else {
         this.data.getMode().modeForm.enable({ emitEvent: false });
-        this.data.getManoeuvre()?.manoeuvreForm?.enable({ emitEvent: false });
-        this.data.getCar()?.carForm?.enable({ emitEvent: false });
-        this.data.getStreet()?.streetForm?.enable({ emitEvent: false });
+        this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
+        this.data.getCar().carForm.enable({ emitEvent: false });
+        this.data.getStreet().streetForm.enable({ emitEvent: false });
       }
 
       /* Set button mode to 'Run' */
@@ -448,22 +447,22 @@ export class AppComponent implements AfterViewInit {
         /* Disable menus if custom car or street entry form is invalid */
 
         if (
-          this.data.getCustomCar()?.customCarForm?.invalid ||
-          this.data.getCustomStreet()?.customStreetForm?.invalid
+          this.data.getCustomCar().customCarForm?.invalid ||
+          this.data.getCustomStreet().customStreetForm?.invalid
         ) {
           invalid = true;
           this.data.getButton('main').disable();
           this.data.getMode().modeForm.disable({ emitEvent: false });
           this.data
             .getManoeuvre()
-            ?.manoeuvreForm?.disable({ emitEvent: false });
+            .manoeuvreForm.disable({ emitEvent: false });
           this.data.getCar().carForm.disable({ emitEvent: false });
           this.data.getStreet().streetForm.disable({ emitEvent: false });
         } else if (invalid === true) {
           invalid = false;
           this.data.getButton('main').enableRun();
           this.data.getMode().modeForm.enable({ emitEvent: false });
-          this.data.getManoeuvre()?.manoeuvreForm?.enable({ emitEvent: false });
+          this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
           this.data.getCar().carForm.enable({ emitEvent: false });
           this.data.getStreet().streetForm.enable({ emitEvent: false });
         }
@@ -471,9 +470,9 @@ export class AppComponent implements AfterViewInit {
 
       /* Disable all form controls */
       this.data.getMode().modeForm.disable({ emitEvent: false });
-      this.data.getManoeuvre()?.manoeuvreForm.disable({ emitEvent: false });
-      this.data.getCar()?.carForm.disable({ emitEvent: false });
-      this.data.getStreet()?.streetForm.disable({ emitEvent: false });
+      this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
+      this.data.getCar().carForm.disable({ emitEvent: false });
+      this.data.getStreet().streetForm.disable({ emitEvent: false });
 
       /* Set button to 'Reset' */
       this.data.getButton('main').enableReset();
@@ -484,11 +483,7 @@ export class AppComponent implements AfterViewInit {
       switch (this.mode) {
         case EMode.Keyboard:
           /* Read updated scenario */
-          scenario = {
-            manoeuvre: this.selectedManoeuvre,
-            carSetup: this.carSetup,
-            streetSetup: this.streetSetup,
-          };
+          scenario = this.getCurrentScenario();
           this.setupScreen(scenario);
           /* Enable keyboard moving */
           this.keyMove.runKeyboard();
@@ -506,11 +501,7 @@ export class AppComponent implements AfterViewInit {
           break;
         case EMode.Single:
           /* Read updated scenario */
-          scenario = {
-            manoeuvre: this.selectedManoeuvre,
-            carSetup: this.carSetup,
-            streetSetup: this.streetSetup,
-          };
+          scenario = this.getCurrentScenario();
           await this.runPlaylist([scenario]);
           break;
         default:
