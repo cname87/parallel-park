@@ -49,29 +49,29 @@ export class LoggerService {
     }
   };
 
-  tapLog = (message: string, level: LoggingLevel = LoggingLevel.DEBUG) => (
-    source: Observable<any>,
-  ): Observable<any> =>
-    source.pipe(
-      tap((val) => {
-        if (level >= this.#loggingLevel) {
-          switch (level) {
-            case LoggingLevel.TRACE:
-              console.log(`${message}\nValue: ${val}`);
-              break;
-            case LoggingLevel.DEBUG:
-              console.log(`${message}\nValue: ${val}`);
-              break;
-            case LoggingLevel.INFO:
-              console.log(`${message}\nValue: ${val}`);
-              break;
-            case LoggingLevel.ERROR:
-              console.error(`${message}\nValue: ${val}`);
-              break;
-            default:
-              break;
+  tapLog =
+    (message: string, level: LoggingLevel = LoggingLevel.DEBUG) =>
+    (source: Observable<any>): Observable<any> =>
+      source.pipe(
+        tap((val) => {
+          if (level >= this.#loggingLevel) {
+            switch (level) {
+              case LoggingLevel.TRACE:
+                console.log(`${message}\nValue: ${val}`);
+                break;
+              case LoggingLevel.DEBUG:
+                console.log(`${message}\nValue: ${val}`);
+                break;
+              case LoggingLevel.INFO:
+                console.log(`${message}\nValue: ${val}`);
+                break;
+              case LoggingLevel.ERROR:
+                console.error(`${message}\nValue: ${val}`);
+                break;
+              default:
+                break;
+            }
           }
-        }
-      }),
-    );
+        }),
+      );
 }

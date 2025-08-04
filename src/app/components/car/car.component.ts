@@ -25,7 +25,7 @@ import { ObjectsService } from '../../services/objects.service';
   selector: 'app-car',
   templateUrl: './car.component.html',
   styleUrls: ['./car.component.scss'],
-    standalone: true,
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -18,22 +18,22 @@ import { ConfigService } from './config.service';
   providedIn: 'root',
 })
 export class ObjectsService {
-  //
-  readonly scenarios: Array<TScenario> = [];
+  constructor(public config: ConfigService) {}
 
-  constructor(private config: ConfigService) {
+  get scenarios(): Array<TScenario> {
+    const scenarios: Array<TScenario> = [];
     for (const street of this.streets) {
       for (const car of this.cars) {
         for (const manoeuvre of this.manoeuvres) {
-          const scenario: TScenario = {
+          scenarios.push({
             manoeuvre: manoeuvre[0],
             carSetup: car[0],
             streetSetup: street[0],
-          };
-          this.scenarios.push(scenario);
+          });
         }
       }
     }
+    return scenarios;
   }
 
   /**
@@ -41,6 +41,19 @@ export class ObjectsService {
    * They are scaled immediately in the car service and within the program all distances are scaled.
    * See https://www.tyres.ie/tyres-calculator for tyre sizes.
    */
+
+  readonly Fiat_Ducato_MWB_Van_2025: TCarSetup = {
+    name: ECar.Fiat_Ducato_MWB_Van_2025,
+    minTurningRadius: 6250, // 12.5m turning circle
+    rearOverhang: 1015,
+    wheelbase: 3450,
+    frontOverhang: 948,
+    wheelToWheelWidth: 1800, // Front 1810, rear 1790
+    sideOverhang: 125, // Width 2050 => (2050 - 1800) / 2
+    wheelWidth: 225, // 225/75 R16 CP
+    wheelLength: 744,
+  };
+
   readonly VW_T5_LWB_Van_2005: TCarSetup = {
     name: ECar.VW_T5_LWB_Van_2005,
     minTurningRadius: 6600,
@@ -48,7 +61,7 @@ export class ObjectsService {
     wheelbase: 3400,
     frontOverhang: 894,
     wheelToWheelWidth: 1628,
-    sideOverhang: 138,
+    sideOverhang: 138, // Width 1904 => (1904 - 1628)
     wheelWidth: 215, // 215/65 R16
     wheelLength: 686,
   };
@@ -233,6 +246,7 @@ export class ObjectsService {
   ];
 
   readonly cars: Array<[ECar, string]> = [
+    [ECar.Fiat_Ducato_MWB_Van_2025, 'Fiat Ducato MWB Van 2025'],
     [ECar.VW_T5_LWB_Van_2005, 'VW T5 LWB Van 2005'],
     [ECar.Mercedes_E_Estate_2020, 'Mercedes E-Class Estate 2020'],
     [ECar.Mercedes_C_Saloon_2020, 'Mercedes C-Class Saloon 2020'],

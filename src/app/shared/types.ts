@@ -173,6 +173,7 @@ export const enum ECar {
   Hyundai_i10_2018 = 'Hyundai_i10_2018',
   Kia_Picanto_2020 = 'Kia_Picanto_2020',
   Custom_Car = 'Custom_Car',
+  Fiat_Ducato_MWB_Van_2025 = 'Fiat_Ducato_MWB_Van_2025',
 }
 
 export const enum EManoeuvre {

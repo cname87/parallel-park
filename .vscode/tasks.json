@@ -56,7 +56,7 @@
             "regexp": "(.*?)"
           },
           "endsPattern": {
-            "regexp": "Compiled | Failed to compile."
+            "regexp": "Application bundle generation complete.|Application bundle generation failed."
           }
         }
       }
@@ -92,12 +92,5 @@
       "group": "test",
       "problemMatcher": []
     },
-    // Terminate all tasks
-    {
-      "label": "Terminate All Tasks",
-      "command": "echo ${input:terminate}",
-      "type": "shell",
-      "problemMatcher": []
-    }
   ],
 }

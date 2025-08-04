@@ -558,9 +558,8 @@ export class MoveService {
     speed = this.config.msPerWheelRadian,
   }: TSteer): Promise<void> {
     /* Derive the required wheel angles */
-    const frontStarboardAngle = this.car.frontStarboardWheelAngle(
-      steeringWheelAngle,
-    );
+    const frontStarboardAngle =
+      this.car.frontStarboardWheelAngle(steeringWheelAngle);
     const frontPortAngle = this.car.frontPortWheelAngle(steeringWheelAngle);
 
     return new Promise<void>(async (resolve, _reject) => {

@@ -36,12 +36,10 @@ export class SnackbarService {
   #pauseSubject: Subject<MatSnackBarRef<TextOnlySnackBar>> = new Subject();
   #pause: boolean;
   #infoSubject: Subject<MatSnackBarRef<TextOnlySnackBar>> = new Subject();
-  public pause$: Observable<
-    MatSnackBarRef<TextOnlySnackBar>
-  > = this.#pauseSubject.asObservable();
-  public info$: Observable<
-    MatSnackBarRef<TextOnlySnackBar>
-  > = this.#infoSubject.asObservable();
+  public pause$: Observable<MatSnackBarRef<TextOnlySnackBar>> =
+    this.#pauseSubject.asObservable();
+  public info$: Observable<MatSnackBarRef<TextOnlySnackBar>> =
+    this.#infoSubject.asObservable();
   #buttonLastClickStatus = EButtonStatus.Reset;
   #mode = EMode.Keyboard;
 

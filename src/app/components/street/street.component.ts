@@ -25,7 +25,7 @@ import { ObjectsService } from '../../services/objects.service';
   selector: 'app-street',
   templateUrl: './street.component.html',
   styleUrls: ['./street.component.scss'],
-    imports: [
+  imports: [
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,

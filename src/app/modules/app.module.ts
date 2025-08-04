@@ -20,8 +20,7 @@ import { SnackbarService } from '../services/snackbar.service';
 import { ManualModeComponent } from '../components/manual-mode/manual-mode.component';
 
 @NgModule({
-  declarations: [
-  ],
+  declarations: [],
   imports: [
     AppComponent,
     BrowserModule,

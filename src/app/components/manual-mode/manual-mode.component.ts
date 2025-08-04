@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,6 +10,7 @@ import { MatHint, MatLabel, MatError } from '@angular/material/form-field';
 import { ConfigService } from '../../services/config.service';
 import { TButtonNames } from '../../shared/types';
 import { ButtonComponent } from '../button/button.component';
+import { f } from '@angular/material/form-field.d-e195lFUo';
 
 /**
  * Displays the manual mode button menu.
@@ -19,13 +21,14 @@ import { ButtonComponent } from '../button/button.component';
   styleUrls: ['./manual-mode.component.scss'],
   imports: [
     CommonModule,
+    FlexLayoutModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
     // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
-    ButtonComponent
+    ButtonComponent,
   ],
 })
 export class ManualModeComponent {

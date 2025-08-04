@@ -31,9 +31,7 @@ import { MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
   templateUrl: './root.component.html',
   styleUrls: ['./root.component.scss'],
   standalone: true,
-  imports: [
-    MenuComponent
-  ],
+  imports: [MenuComponent],
 })
 export class AppComponent implements AfterViewInit {
   constructor(
@@ -48,7 +46,9 @@ export class AppComponent implements AfterViewInit {
     private data: DataService,
     private logger: LoggerService,
     private snack: SnackbarService,
-  ) {}
+  ) {
+    this.#defaultScenario = this.objects.scenarios[0];
+  }
   /* Operation mode */
   #mode = EMode.Single;
   /* Detects main button click */
@@ -58,7 +58,7 @@ export class AppComponent implements AfterViewInit {
   #manoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
   #carSetup = ECar.VW_T5_LWB_Van_2005;
   #streetSetup = EStreet.Width_1904mm;
-  #defaultScenario: TScenario = this.objects.scenarios[0];
+  #defaultScenario!: TScenario;
   #infoSnackRef!: MatSnackBarRef<TextOnlySnackBar>;
 
   /* Utility function used to watch for button clicks */
@@ -129,11 +129,11 @@ export class AppComponent implements AfterViewInit {
       /* Set form values to match scenario */
       this.data
         .getManoeuvre()
-        .manoeuvreForm.setValue({ manoeuvre: scenario.manoeuvre });
-      this.data.getCar().carForm.setValue({ car: scenario.carSetup });
+        ?.manoeuvreForm.setValue({ manoeuvre: scenario.manoeuvre });
+      this.data.getCar()?.carForm.setValue({ car: scenario.carSetup });
       this.data
         .getStreet()
-        .streetForm.setValue({ street: scenario.streetSetup });
+        ?.streetForm.setValue({ street: scenario.streetSetup });
       await this.runManoeuvre(scenario);
       /* Reset if the button clicked when status = Reset */
       if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
@@ -330,28 +330,35 @@ export class AppComponent implements AfterViewInit {
       });
 
     /* Subscribe to track the selected parking manoeuvre, car and street setup */
-    this.data
-      .getManoeuvre()
-      .manoeuvre$.pipe(
-        this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG),
-      )
-      .subscribe((manoeuvre: EManoeuvre) => (this.#manoeuvre = manoeuvre));
-    this.data
-      .getCar()
-      .car$.pipe(this.logger.tapLog('Car chosen:', LoggingLevel.DEBUG))
-      .subscribe((car: ECar) => (this.#carSetup = car));
-    this.data
-      .getStreet()
-      .street$.pipe(this.logger.tapLog('Street chosen:', LoggingLevel.DEBUG))
-      .subscribe((street: EStreet) => (this.#streetSetup = street));
+    const manoeuvreService = this.data.getManoeuvre();
+    if (manoeuvreService?.manoeuvre$) {
+      manoeuvreService.manoeuvre$
+        .pipe(this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG))
+        .subscribe((manoeuvre: EManoeuvre) => (this.#manoeuvre = manoeuvre));
+    }
 
-    /* Subscribe to track the operation mode */
-    this.data
-      .getMode()
-      .mode$.pipe(this.logger.tapLog('Mode chosen:', LoggingLevel.DEBUG))
-      .subscribe((data: EMode) => {
-        this.#mode = data;
-      });
+    const carService = this.data.getCar();
+    if (carService?.car$) {
+      carService.car$
+        .pipe(this.logger.tapLog('Car chosen:', LoggingLevel.DEBUG))
+        .subscribe((car: ECar) => (this.#carSetup = car));
+    }
+
+    const streetService = this.data.getStreet();
+    if (streetService?.street$) {
+      streetService.street$
+        .pipe(this.logger.tapLog('Street chosen:', LoggingLevel.DEBUG))
+        .subscribe((street: EStreet) => (this.#streetSetup = street));
+    }
+
+    const modeService = this.data.getMode();
+    if (modeService?.mode$) {
+      modeService.mode$
+        .pipe(this.logger.tapLog('Mode chosen:', LoggingLevel.DEBUG))
+        .subscribe((data: EMode) => {
+          this.#mode = data;
+        });
+    }
 
     /* Subscribe to get latest info messages */
     this.snack.info$.subscribe((snackRef: MatSnackBarRef<TextOnlySnackBar>) => {
@@ -389,18 +396,28 @@ export class AppComponent implements AfterViewInit {
 
       /* Reset all if the loop mode is selected */
       if (this.#mode === EMode.Loop) {
-        /* Set car and street to defaults */
-        this.data
-          .getManoeuvre()
-          .manoeuvreForm.setValue(
-            this.data.getManoeuvre().manoeuvreInitialFormValue,
+        // Defensive: getManoeuvre() may be undefined
+        const manoeuvreService = this.data.getManoeuvre();
+        if (
+          manoeuvreService?.manoeuvreForm &&
+          manoeuvreService?.manoeuvreInitialFormValue
+        ) {
+          manoeuvreService.manoeuvreForm.setValue(
+            manoeuvreService.manoeuvreInitialFormValue,
           );
-        this.data.getCar().carForm.setValue({
-          car: ECar.VW_T5_LWB_Van_2005,
-        });
-        this.data.getStreet().streetForm.setValue({
-          street: EStreet.Width_1904mm,
-        });
+        }
+        const carService = this.data.getCar();
+        if (carService?.carForm) {
+          carService.carForm.setValue({
+            car: ECar.VW_T5_LWB_Van_2005,
+          });
+        }
+        const streetService = this.data.getStreet();
+        if (streetService?.streetForm) {
+          streetService.streetForm.setValue({
+            street: EStreet.Width_1904mm,
+          });
+        }
         /* Repaint screen to the defaults */
         scenario = {
           manoeuvre: this.#manoeuvre,
@@ -408,16 +425,16 @@ export class AppComponent implements AfterViewInit {
           streetSetup: this.#streetSetup,
         };
         this.setupScreen(scenario);
-        /* Disable all form controls (except mode) */
+        // Disable all form controls (except mode)
         this.data.getMode().modeForm.enable({ emitEvent: false });
-        this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
-        this.data.getCar().carForm.disable({ emitEvent: false });
-        this.data.getStreet().streetForm.disable({ emitEvent: false });
+        manoeuvreService?.manoeuvreForm?.disable({ emitEvent: false });
+        carService?.carForm?.disable({ emitEvent: false });
+        streetService?.streetForm?.disable({ emitEvent: false });
       } else {
         this.data.getMode().modeForm.enable({ emitEvent: false });
-        this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
-        this.data.getCar().carForm.enable({ emitEvent: false });
-        this.data.getStreet().streetForm.enable({ emitEvent: false });
+        this.data.getManoeuvre()?.manoeuvreForm?.enable({ emitEvent: false });
+        this.data.getCar()?.carForm?.enable({ emitEvent: false });
+        this.data.getStreet()?.streetForm?.enable({ emitEvent: false });
       }
 
       /* Set button mode to 'Run' */
@@ -431,20 +448,22 @@ export class AppComponent implements AfterViewInit {
         /* Disable menus if custom car or street entry form is invalid */
 
         if (
-          this.data.getCustomCar().customCarForm?.invalid ||
-          this.data.getCustomStreet().customStreetForm?.invalid
+          this.data.getCustomCar()?.customCarForm?.invalid ||
+          this.data.getCustomStreet()?.customStreetForm?.invalid
         ) {
           invalid = true;
           this.data.getButton('main').disable();
           this.data.getMode().modeForm.disable({ emitEvent: false });
-          this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
+          this.data
+            .getManoeuvre()
+            ?.manoeuvreForm?.disable({ emitEvent: false });
           this.data.getCar().carForm.disable({ emitEvent: false });
           this.data.getStreet().streetForm.disable({ emitEvent: false });
         } else if (invalid === true) {
           invalid = false;
           this.data.getButton('main').enableRun();
           this.data.getMode().modeForm.enable({ emitEvent: false });
-          this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
+          this.data.getManoeuvre()?.manoeuvreForm?.enable({ emitEvent: false });
           this.data.getCar().carForm.enable({ emitEvent: false });
           this.data.getStreet().streetForm.enable({ emitEvent: false });
         }
@@ -452,9 +471,9 @@ export class AppComponent implements AfterViewInit {
 
       /* Disable all form controls */
       this.data.getMode().modeForm.disable({ emitEvent: false });
-      this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
-      this.data.getCar().carForm.disable({ emitEvent: false });
-      this.data.getStreet().streetForm.disable({ emitEvent: false });
+      this.data.getManoeuvre()?.manoeuvreForm.disable({ emitEvent: false });
+      this.data.getCar()?.carForm.disable({ emitEvent: false });
+      this.data.getStreet()?.streetForm.disable({ emitEvent: false });
 
       /* Set button to 'Reset' */
       this.data.getButton('main').enableReset();

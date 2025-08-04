@@ -13,7 +13,6 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { EButtonStatus, IButton, TButtonNames } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ConfigService } from '../../services/config.service';
-import { M } from '@angular/material/ripple-loader.d-9me-KFSi';
 
 /**
  * Provides button functionality.
@@ -23,7 +22,7 @@ import { M } from '@angular/material/ripple-loader.d-9me-KFSi';
   selector: 'app-button',
   templateUrl: './button.component.html',
   styleUrls: ['./button.component.scss'],
-standalone: true,
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -49,13 +48,17 @@ export class ButtonComponent implements OnInit {
   #buttonStatus$ = this.#buttonStatus.asObservable();
 
   #buttonClickSubject: Subject<EButtonStatus> = new Subject();
-  #buttonLastClick$: Observable<EButtonStatus> = this.#buttonClickSubject.asObservable();
+  #buttonLastClick$: Observable<EButtonStatus> =
+    this.#buttonClickSubject.asObservable();
 
   /* Manual mode run text for all buttons */
   #textsRun = this.config.allButtonTexts;
 
   /* Button can be enabled after ViewInit when the name has been passed in */
-  constructor(private config: ConfigService, private data: DataService) {}
+  constructor(
+    private config: ConfigService,
+    private data: DataService,
+  ) {}
 
   #enableRun = (): void => {
     this.buttonText = this.#textsRun.get(this.buttonName);

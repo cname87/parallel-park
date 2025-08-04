@@ -48,10 +48,10 @@ export class CarService {
   private wheelLength = this.config.defaultWheelLength;
 
   /* Initial position - the car is initially positioned facing right on the canvas and parallel to the bottom edge */
-  private initialFrontStarboardCornerFromLeft = this.config
-    .defaultFrontStarboardCornerFromLeft;
-  private initialFrontStarboardCornerFromTop = this.config
-    .defaultFrontStarboardCornerFromTop;
+  private initialFrontStarboardCornerFromLeft =
+    this.config.defaultFrontStarboardCornerFromLeft;
+  private initialFrontStarboardCornerFromTop =
+    this.config.defaultFrontStarboardCornerFromTop;
 
   /* Shared canvas elements */
   public readonly carContainer = new createjs.Container();

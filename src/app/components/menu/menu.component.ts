@@ -1,5 +1,6 @@
 import { AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +13,9 @@ import { DataService } from '../../services/data.service';
 import { ModeComponent } from '../mode/mode.component';
 import { ButtonComponent } from '../button/button.component';
 import { ManualModeComponent } from '../manual-mode/manual-mode.component';
+import { ManoeuvreComponent } from '../manoeuvre/manoeuvre.component';
+import { CarComponent } from '../car/car.component';
+import { StreetComponent } from '../street/street.component';
 
 /**
  * This component displays the selection menus.
@@ -23,6 +27,7 @@ import { ManualModeComponent } from '../manual-mode/manual-mode.component';
   styleUrls: ['./menu.component.scss'],
   imports: [
     CommonModule,
+    FlexLayoutModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -32,6 +37,9 @@ import { ManualModeComponent } from '../manual-mode/manual-mode.component';
     ModeComponent,
     ButtonComponent,
     ManualModeComponent,
+    ManoeuvreComponent,
+    CarComponent,
+    StreetComponent,
   ],
 })
 export class MenuComponent implements AfterViewInit {
@@ -45,48 +53,60 @@ export class MenuComponent implements AfterViewInit {
   /**
    * Sets up the various displays.
    */
-
   ngAfterViewInit(): void {
     let buttonStatus: EButtonStatus;
     let mode: EMode;
     let car: ECar;
     let street: EStreet;
-    this.data.getMode().mode$.subscribe((value: EMode) => {
-      mode = value;
-      if (mode === EMode.Loop && buttonStatus === EButtonStatus.Run) {
-        this.showScenarioForm = 'block';
-        this.showCustomCarForm = 'none';
-        this.showCustomStreetForm = 'none';
-      }
-      if (mode === EMode.Single && buttonStatus === EButtonStatus.Run) {
-        this.showScenarioForm = 'block';
-      }
-      if (mode === EMode.Keyboard && buttonStatus === EButtonStatus.Run) {
-        this.showScenarioForm = 'block';
-      }
-    });
-    this.data.getCar().car$.subscribe((value: ECar) => {
-      car = value;
-      if (value === ECar.Custom_Car && buttonStatus === EButtonStatus.Run) {
-        this.showCustomCarForm = 'block';
-      } else {
-        this.showCustomCarForm = 'none';
-      }
-    });
-    this.data.getStreet().street$.subscribe((value: EStreet) => {
-      street = value;
-      if (
-        value === EStreet.Custom_Street &&
-        buttonStatus === EButtonStatus.Run
-      ) {
-        this.showCustomStreetForm = 'block';
-      } else {
-        this.showCustomStreetForm = 'none';
-      }
-    });
-    this.data
-      .getButton('main')
-      .buttonStatus$.subscribe((status: EButtonStatus) => {
+
+    const carObj = this.data.getCar();
+    if (carObj && carObj.car$) {
+      carObj.car$.subscribe((value: ECar) => {
+        car = value;
+        if (value === ECar.Custom_Car && buttonStatus === EButtonStatus.Run) {
+          this.showCustomCarForm = 'block';
+        } else {
+          this.showCustomCarForm = 'none';
+        }
+      });
+    }
+
+    const modeObj = this.data.getMode();
+    if (modeObj && modeObj.mode$) {
+      modeObj.mode$.subscribe((value: EMode) => {
+        mode = value;
+        if (mode === EMode.Loop && buttonStatus === EButtonStatus.Run) {
+          this.showScenarioForm = 'block';
+          this.showCustomCarForm = 'none';
+          this.showCustomStreetForm = 'none';
+        }
+        if (mode === EMode.Single && buttonStatus === EButtonStatus.Run) {
+          this.showScenarioForm = 'block';
+        }
+        if (mode === EMode.Keyboard && buttonStatus === EButtonStatus.Run) {
+          this.showScenarioForm = 'block';
+        }
+      });
+    }
+
+    const streetObj = this.data.getStreet();
+    if (streetObj && streetObj.street$) {
+      streetObj.street$.subscribe((value: EStreet) => {
+        street = value;
+        if (
+          value === EStreet.Custom_Street &&
+          buttonStatus === EButtonStatus.Run
+        ) {
+          this.showCustomStreetForm = 'block';
+        } else {
+          this.showCustomStreetForm = 'none';
+        }
+      });
+    }
+
+    const buttonObj = this.data.getButton('main');
+    if (buttonObj && buttonObj.buttonStatus$) {
+      buttonObj.buttonStatus$.subscribe((status: EButtonStatus) => {
         buttonStatus = status;
         if (status === EButtonStatus.Run) {
           this.showManualMode = false;
@@ -125,5 +145,6 @@ export class MenuComponent implements AfterViewInit {
           }
         }
       });
+    }
   }
 }
