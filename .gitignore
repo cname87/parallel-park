@@ -42,7 +42,8 @@ testem.log
 /typings
 
 # Angular CLI cache
-.angular/cache
+**/.angular/
+**/.angular/*
 
 # System Files
 .DS_Store

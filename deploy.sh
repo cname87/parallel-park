@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Runs a local production build, deletes the website static files on the GCP storage and uploads the local dist file to the GCP rtorage.
+# Runs a local production build, deletes the website static files on the GCP storage and uploads the local dist file to the GCP storage.
 
 npm run build:prod
 gsutil rm gs://parking.project-perform.com/**
