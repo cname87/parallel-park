@@ -47,22 +47,22 @@ export class AppComponent implements AfterViewInit {
     private logger: LoggerService,
     private snack: SnackbarService,
   ) {
-    this.#defaultScenario = this.objects.scenarios[0];
+    this.defaultScenario = this.objects.scenarios[0];
   }
   /* Operation mode */
-  #mode = EMode.Single;
+  private mode = EMode.Single;
   /* Detects main button click */
-  #isMainButtonClicked = false;
+  private isMainButtonClicked = false;
   /* Stores the main button status when last clicked */
-  #mainButtonLastClickStatus!: EButtonStatus;
-  #manoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
-  #carSetup = ECar.VW_T5_LWB_Van_2005;
-  #streetSetup = EStreet.Width_1904mm;
-  #defaultScenario!: TScenario;
-  #infoSnackRef!: MatSnackBarRef<TextOnlySnackBar>;
+  private mainButtonLastClickStatus!: EButtonStatus;
+  private selectedManoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
+  private carSetup = ECar.VW_T5_LWB_Van_2005;
+  private streetSetup = EStreet.Width_1904mm;
+  private defaultScenario!: TScenario;
+  private infoSnackRef!: MatSnackBarRef<TextOnlySnackBar>;
 
   /* Utility function used to watch for button clicks */
-  #runEventLoop = (timeMs = 0): Promise<void> => {
+  private runEventLoop = (timeMs = 0): Promise<void> => {
     return new Promise<void>((resolve) => {
       setTimeout(() => resolve(), timeMs);
     });
@@ -73,7 +73,7 @@ export class AppComponent implements AfterViewInit {
    *
    * @returns A manoeuvre, i.e. the set of moves to complete a parking manoeuvre.
    */
-  setupScreen(scenario: TScenario = this.#defaultScenario): IManoeuvre {
+  setupScreen(scenario: TScenario = this.defaultScenario): IManoeuvre {
     //
     /* Clear the screen */
     this.config.stage.removeAllChildren();
@@ -136,7 +136,7 @@ export class AppComponent implements AfterViewInit {
         ?.streetForm.setValue({ street: scenario.streetSetup });
       await this.runManoeuvre(scenario);
       /* Reset if the button clicked when status = Reset */
-      if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
+      if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
         break;
       }
     }
@@ -193,14 +193,14 @@ export class AppComponent implements AfterViewInit {
         const move = manoeuvre.movie[key];
         await this.mover.routeMove(move);
         /* Reset if the button clicked when status = Reset */
-        if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
+        if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
           break;
         }
       }
     }
 
     /* Test and report parking errors */
-    if (this.#mainButtonLastClickStatus !== EButtonStatus.Reset) {
+    if (this.mainButtonLastClickStatus !== EButtonStatus.Reset) {
       let parkingError = false;
       const manoeuvreInfo = () => {
         const currentLoggingLevel = this.logger.readLogginglevel();
@@ -299,10 +299,10 @@ export class AppComponent implements AfterViewInit {
 
     /* Put in a short delay between manoeuvres when in loop mode*/
     if (
-      this.#mode === EMode.Loop &&
-      this.#mainButtonLastClickStatus !== EButtonStatus.Reset
+      this.mode === EMode.Loop &&
+      this.mainButtonLastClickStatus !== EButtonStatus.Reset
     ) {
-      await this.#runEventLoop(1000);
+      await this.runEventLoop(1000);
     }
   }
 
@@ -312,7 +312,7 @@ export class AppComponent implements AfterViewInit {
   async ngAfterViewInit(): Promise<void> {
     //
     /* Avoids view error */
-    await this.#runEventLoop();
+    await this.runEventLoop();
 
     /* Subscribe to track the button status from the last click */
     this.data
@@ -324,9 +324,9 @@ export class AppComponent implements AfterViewInit {
         ),
       )
       .subscribe((status: EButtonStatus) => {
-        this.#mainButtonLastClickStatus = status;
+        this.mainButtonLastClickStatus = status;
         /* Reset this flag to false to detect a main button click */
-        this.#isMainButtonClicked = true;
+        this.isMainButtonClicked = true;
       });
 
     /* Subscribe to track the selected parking manoeuvre, car and street setup */
@@ -334,21 +334,21 @@ export class AppComponent implements AfterViewInit {
     if (manoeuvreService?.manoeuvre$) {
       manoeuvreService.manoeuvre$
         .pipe(this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG))
-        .subscribe((manoeuvre: EManoeuvre) => (this.#manoeuvre = manoeuvre));
+        .subscribe((manoeuvre: EManoeuvre) => (this.selectedManoeuvre = manoeuvre));
     }
 
     const carService = this.data.getCar();
     if (carService?.car$) {
       carService.car$
         .pipe(this.logger.tapLog('Car chosen:', LoggingLevel.DEBUG))
-        .subscribe((car: ECar) => (this.#carSetup = car));
+        .subscribe((car: ECar) => (this.carSetup = car));
     }
 
     const streetService = this.data.getStreet();
     if (streetService?.street$) {
       streetService.street$
         .pipe(this.logger.tapLog('Street chosen:', LoggingLevel.DEBUG))
-        .subscribe((street: EStreet) => (this.#streetSetup = street));
+        .subscribe((street: EStreet) => (this.streetSetup = street));
     }
 
     const modeService = this.data.getMode();
@@ -356,13 +356,13 @@ export class AppComponent implements AfterViewInit {
       modeService.mode$
         .pipe(this.logger.tapLog('Mode chosen:', LoggingLevel.DEBUG))
         .subscribe((data: EMode) => {
-          this.#mode = data;
+          this.mode = data;
         });
     }
 
     /* Subscribe to get latest info messages */
     this.snack.info$.subscribe((snackRef: MatSnackBarRef<TextOnlySnackBar>) => {
-      this.#infoSnackRef = snackRef;
+      this.infoSnackRef = snackRef;
     });
 
     /* Enable required tracking in the services */
@@ -372,9 +372,9 @@ export class AppComponent implements AfterViewInit {
 
     /* Read current scenario and set up starting default screen */
     let scenario: TScenario = {
-      manoeuvre: this.#manoeuvre,
-      carSetup: this.#carSetup,
-      streetSetup: this.#streetSetup,
+      manoeuvre: this.selectedManoeuvre,
+      carSetup: this.carSetup,
+      streetSetup: this.streetSetup,
     };
     this.setupScreen(scenario);
 
@@ -382,20 +382,20 @@ export class AppComponent implements AfterViewInit {
     while (true) {
       //
       /* Redraw screen here only if the Reset button was pressed during a manoeuvre i.e. leave the car 'parked' until the next button click otherwise */
-      if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
+      if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
         /* Dismiss any open info snackbar */
-        this.#infoSnackRef?.dismiss();
+        this.infoSnackRef?.dismiss();
 
         scenario = {
-          manoeuvre: this.#manoeuvre,
-          carSetup: this.#carSetup,
-          streetSetup: this.#streetSetup,
+          manoeuvre: this.selectedManoeuvre,
+          carSetup: this.carSetup,
+          streetSetup: this.streetSetup,
         };
         this.setupScreen(scenario);
       }
 
       /* Reset all if the loop mode is selected */
-      if (this.#mode === EMode.Loop) {
+      if (this.mode === EMode.Loop) {
         // Defensive: getManoeuvre() may be undefined
         const manoeuvreService = this.data.getManoeuvre();
         if (
@@ -420,9 +420,9 @@ export class AppComponent implements AfterViewInit {
         }
         /* Repaint screen to the defaults */
         scenario = {
-          manoeuvre: this.#manoeuvre,
-          carSetup: this.#carSetup,
-          streetSetup: this.#streetSetup,
+          manoeuvre: this.selectedManoeuvre,
+          carSetup: this.carSetup,
+          streetSetup: this.streetSetup,
         };
         this.setupScreen(scenario);
         // Disable all form controls (except mode)
@@ -441,10 +441,10 @@ export class AppComponent implements AfterViewInit {
       this.data.getButton('main').enableRun();
 
       /* Set to wait for the next button click */
-      this.#isMainButtonClicked = false;
+      this.isMainButtonClicked = false;
       let invalid = false;
       do {
-        await this.#runEventLoop();
+        await this.runEventLoop();
         /* Disable menus if custom car or street entry form is invalid */
 
         if (
@@ -467,7 +467,7 @@ export class AppComponent implements AfterViewInit {
           this.data.getCar().carForm.enable({ emitEvent: false });
           this.data.getStreet().streetForm.enable({ emitEvent: false });
         }
-      } while (this.#isMainButtonClicked === false);
+      } while (this.isMainButtonClicked === false);
 
       /* Disable all form controls */
       this.data.getMode().modeForm.disable({ emitEvent: false });
@@ -479,24 +479,24 @@ export class AppComponent implements AfterViewInit {
       this.data.getButton('main').enableReset();
 
       /* Allows menu changes take place */
-      await this.#runEventLoop();
+      await this.runEventLoop();
 
-      switch (this.#mode) {
+      switch (this.mode) {
         case EMode.Keyboard:
           /* Read updated scenario */
           scenario = {
-            manoeuvre: this.#manoeuvre,
-            carSetup: this.#carSetup,
-            streetSetup: this.#streetSetup,
+            manoeuvre: this.selectedManoeuvre,
+            carSetup: this.carSetup,
+            streetSetup: this.streetSetup,
           };
           this.setupScreen(scenario);
           /* Enable keyboard moving */
           this.keyMove.runKeyboard();
           /* Set to wait for the next button click */
-          this.#isMainButtonClicked = false;
+          this.isMainButtonClicked = false;
           do {
-            await this.#runEventLoop();
-          } while (this.#isMainButtonClicked === false);
+            await this.runEventLoop();
+          } while (this.isMainButtonClicked === false);
           /* Cancel keyboard operation */
           this.keyMove.cancelKeyboard();
           break;
@@ -507,9 +507,9 @@ export class AppComponent implements AfterViewInit {
         case EMode.Single:
           /* Read updated scenario */
           scenario = {
-            manoeuvre: this.#manoeuvre,
-            carSetup: this.#carSetup,
-            streetSetup: this.#streetSetup,
+            manoeuvre: this.selectedManoeuvre,
+            carSetup: this.carSetup,
+            streetSetup: this.streetSetup,
           };
           await this.runPlaylist([scenario]);
           break;
