@@ -1,4 +1,4 @@
-@import 'src/styles/styles.scss';
+@use 'src/styles/styles.scss' as *;
 
 .form * {
   min-width: 0;

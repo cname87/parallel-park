@@ -1,4 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { MatHint, MatLabel, MatError } from '@angular/material/form-field';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import {
@@ -18,6 +25,15 @@ import { ObjectsService } from '../../services/objects.service';
   selector: 'app-street',
   templateUrl: './street.component.html',
   styleUrls: ['./street.component.scss'],
+    imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule,
+    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
+  ],
 })
 export class StreetComponent implements OnInit {
   streets: Array<[EStreet, string]>;

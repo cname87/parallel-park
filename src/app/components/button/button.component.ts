@@ -1,9 +1,19 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { MatHint, MatLabel, MatError } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+
 import { ThemePalette } from '@angular/material/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { EButtonStatus, IButton, TButtonNames } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ConfigService } from '../../services/config.service';
+import { M } from '@angular/material/ripple-loader.d-9me-KFSi';
 
 /**
  * Provides button functionality.
@@ -13,6 +23,17 @@ import { ConfigService } from '../../services/config.service';
   selector: 'app-button',
   templateUrl: './button.component.html',
   styleUrls: ['./button.component.scss'],
+standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule,
+    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
+    MatButtonModule,
+  ],
 })
 export class ButtonComponent implements OnInit {
   //

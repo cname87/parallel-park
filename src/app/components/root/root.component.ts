@@ -1,3 +1,4 @@
+import { MenuComponent } from '../menu/menu.component';
 import { Component, AfterViewInit } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
 import { CarService } from '../../services/car.service';
@@ -29,6 +30,10 @@ import { MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
   selector: 'app-root',
   templateUrl: './root.component.html',
   styleUrls: ['./root.component.scss'],
+  standalone: true,
+  imports: [
+    MenuComponent
+  ],
 })
 export class AppComponent implements AfterViewInit {
   constructor(

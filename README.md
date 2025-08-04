@@ -115,7 +115,7 @@ Research consisted of a simple internet search.  The following are the key sourc
 
 1. The earliest reference that I could find is to work by Rebecca Hoyle (Professor of Mathematics) published in 2003. I could not find the original work online - her legacy appears to be various news articles playing on the fact that a woman is the author of a paper on the mathematics of parallel-parking, for example: <https://www.derstandard.at/story/1276633/it-takes-a-woman-to-work-out-how-to-park-perfectly>.
 
-2. Professor Simon Blackburn was commissioned in 2009 by Vauxhall Motors to produce a paper of the geometry on parellel-parking.  This paper outlines the basic mathematics involved. See <http://personal.rhul.ac.uk/uhah/058/perfect_parking.pdf>.
+2. Professor Simon Blackburn was commissioned in 2009 by Vauxhall Motors to produce a paper of the geometry on parallel-parking.  This paper outlines the basic mathematics involved. See <http://personal.rhul.ac.uk/uhah/058/perfect_parking.pdf>.
 
 3. Blackburn's paper triggered a Louisiana math teacher, Jerome White, to further optimize, reducing the required parking space to a practical minimum. Blackburn assumes the car swings in and reverses back until it is parallel with the kerb whereas White allows that the car reverses until it touches the rear car at an angle and then turns forward until it is parallel to the kerb. (Further reduction of the required parking space is possible if you allow multiple back and forth movements but the reduction is small and nobody wants to be shuffling back and forth in a very tight space).  White produced some nice handwritten diagrams and formulae - <http://www.talljerome.com/NOLA/parallelparking/index.html>.
 

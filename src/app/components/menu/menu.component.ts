@@ -1,7 +1,17 @@
 import { AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { MatHint, MatLabel, MatError } from '@angular/material/form-field';
 import { Component } from '@angular/core';
 import { EButtonStatus, ECar, EMode, EStreet } from '../../shared/types';
 import { DataService } from '../../services/data.service';
+import { ModeComponent } from '../mode/mode.component';
+import { ButtonComponent } from '../button/button.component';
+import { ManualModeComponent } from '../manual-mode/manual-mode.component';
 
 /**
  * This component displays the selection menus.
@@ -11,6 +21,18 @@ import { DataService } from '../../services/data.service';
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss'],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule,
+    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
+    ModeComponent,
+    ButtonComponent,
+    ManualModeComponent,
+  ],
 })
 export class MenuComponent implements AfterViewInit {
   constructor(private data: DataService) {}
