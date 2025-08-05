@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
+@use 'sass:color';
 /* Variable font used throughout */
 $fontDefault: clamp(0.5rem, 2.5vw, 1rem);
 
@@ -36,6 +37,11 @@ mat-form-field {
       min-height: 1.25em;
     }
   }
+}
+
+// Force dropdown panel background color for mat-form-field
+.mat-mdc-select-panel {
+  background-color: $colorBackground !important;
 }
 
 /* Make radio button scalable */
@@ -79,6 +85,6 @@ $smallRadioSize: clamp(1rem, 2vw, 2rem);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
   transition: background-color 0.3s ease; /* Smooth transition for background color */
   &:hover {
-    background-color: lighten($colorBackground, 10%); /* Lighter background on hover */
+    background-color: color.adjust($colorBackground, $lightness: 5%);
   }
 }

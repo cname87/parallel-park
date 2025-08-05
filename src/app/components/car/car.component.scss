@@ -1,5 +1,5 @@
 @use 'src/styles/styles.scss' as *;
 
-mat-form-field.mat-form-field {
-  @include scenario-menu;
+mat-form-field {
+    @include scenario-menu;
 }
