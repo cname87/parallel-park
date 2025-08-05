@@ -38,6 +38,7 @@ $theme: mat-light-theme((
   )
 ));
 @include angular-material-theme($theme);
+@include mat.form-field-theme($theme, 'secondary');
 
 /* Variable font used throughout */
 $fontDefault: clamp(0.5rem, 2.5vw, 1rem);

@@ -1,13 +1,17 @@
 import { enableProdMode } from '@angular/core';
-import { platformBrowser } from '@angular/platform-browser';
+import { bootstrapApplication } from '@angular/platform-browser';
 
-import { AppModule } from './app/modules/app.module';
+import { AppComponent } from './app/components/root/root.component';
 import { environment } from './environments/environment';
+import { SnackbarService } from './app/services/snackbar.service';
 
 if (environment.production) {
   enableProdMode();
 }
 
-platformBrowser()
-  .bootstrapModule(AppModule)
-  .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    SnackbarService,
+    // ...add other providers here if needed...
+  ],
+}).catch((err) => console.error(err));
