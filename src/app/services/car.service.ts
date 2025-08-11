@@ -38,20 +38,19 @@ import { ConfigService } from './config.service';
  */
 export class CarService {
   /* Car dimensions */
-  public minTurningRadius = this.config.defaultMinTurningRadius;
-  public rearOverhang = this.config.defaultRearOverhang;
-  public wheelbase = this.config.defaultWheelbase;
-  public frontOverhang = this.config.defaultFrontOverhang;
-  public wheelToWheelWidth = this.config.defaultWheelToWheelWidth;
-  public sideOverhang = this.config.defaultSideOverhang;
-  private wheelWidth = this.config.defaultWheelWidth;
-  private wheelLength = this.config.defaultWheelLength;
+  /* Car dimensions */
+  public minTurningRadius: number;
+  public rearOverhang: number;
+  public wheelbase: number;
+  public frontOverhang: number;
+  public wheelToWheelWidth: number;
+  public sideOverhang: number;
+  private wheelWidth: number;
+  private wheelLength: number;
 
   /* Initial position - the car is initially positioned facing right on the canvas and parallel to the bottom edge */
-  private initialFrontStarboardCornerFromLeft =
-    this.config.defaultFrontStarboardCornerFromLeft;
-  private initialFrontStarboardCornerFromTop =
-    this.config.defaultFrontStarboardCornerFromTop;
+  private initialFrontStarboardCornerFromLeft: number;
+  private initialFrontStarboardCornerFromTop: number;
 
   /* Shared canvas elements */
   public readonly carContainer = new createjs.Container();
@@ -61,7 +60,18 @@ export class CarService {
   private circleOfRotationShape = new createjs.Shape();
   private shadowCarShape = new createjs.Shape();
 
-  constructor(private config: ConfigService) {}
+  constructor(private config: ConfigService) {
+    this.minTurningRadius = config.defaultMinTurningRadius;
+    this.rearOverhang = config.defaultRearOverhang;
+    this.wheelbase = config.defaultWheelbase;
+    this.frontOverhang = config.defaultFrontOverhang;
+    this.wheelToWheelWidth = config.defaultWheelToWheelWidth;
+    this.sideOverhang = config.defaultSideOverhang;
+    this.wheelWidth = config.defaultWheelWidth;
+    this.wheelLength = config.defaultWheelLength;
+    this.initialFrontStarboardCornerFromLeft = config.defaultFrontStarboardCornerFromLeft;
+    this.initialFrontStarboardCornerFromTop = config.defaultFrontStarboardCornerFromTop;
+  }
 
   public get length(): number {
     return this.rearOverhang + this.wheelbase + this.frontOverhang;
