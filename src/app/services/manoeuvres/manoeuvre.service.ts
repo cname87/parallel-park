@@ -23,55 +23,110 @@ import { InformationService } from './information.service';
  * @packageDocumentation
  *
  * * Description:
- * The getManoeuvre method is the entry point to the module. It gets an IParams object and returns an IManoeuvre-type object - see descriptions below. The values for each move in the movie object are calculated using the other methods in the service.
+ * The getManoeuvre method is the entry point to the module. It gets an IParams
+ * object and returns an IManoeuvre-type object - see descriptions below. The
+ * values for each move in the movie object are calculated using the other
+ * methods in this service.
  *
- *  * * Glossary:
- * CoR: Center of Rotation. Each element of the car rotates in a circle around this center point.
- * OC: The front corner of the car that is on the outer side of the turning circle.
- * IC: The front corner of the car that is on the inner side of the turning circle.
+ *  * Glossary:
+ * CoR: Center of Rotation. Each element of the car rotates in a circle around
+ * this center point.
+ * OC: The front corner of the car that is on the outer side of the turning
+ * circle.
+ * IC: The front corner of the car that is on the inner side of the turning
+ * circle.
  * CA: The center of the rear axle of the car.
- * Rmin: Distance from the CoR to the OC at full steer angle. This is equal to the minimum turning radius of the car.
- * PP: The outer corner of the parked front car (that faces the parking space), with x and y values offset by the safety gap. This is the called the pivot point, even though not all parking manoeuvres pivot from here.
+ * Rmin: Distance from the CoR to the OC at full steer angle. This is equal
+ * to the minimum turning radius of the car.
+ * PP: The outer corner of the parked front car (that faces the parking space),
+ * with x and y values offset by the safety gap. This is the called the pivot
+ * point, even though not all parking manoeuvres pivot from here.
  *
  * * Example Park3Rotate1StraightMinAngle manoeuvre
- * This parking manoeuvre is one where the car first moves straight back to a pivot point, then turns in, moving back and swinging the front out (first turn-in) , then goes straight back to a second pivot point, then turns in, moving back and swinging the front in, then touches the rear car, (backed off by the safety gap), and finally moves forward whilst turning in to a parallel position. (The '3' refers to the 3 turning movements).
+ * This parking manoeuvre is one where the car first moves straight back to a
+ * pivot point, then turns in, moving back and swinging the front out
+ * (first turn-in) , then goes straight back to a second pivot point, then
+ * turns in, moving back and swinging the front in, then touches the rear car,
+ * (backed off by the safety gap), and finally moves forward whilst turning in
+ * to a parallel position. (The '3' refers to the 3 turning movements).
+ *
  * getManoeuvre first calls getParkingSpace.
- * For this specific manoeuvre, getExtraParkingSpace3Rotate is then called which calls getCollisionAngle to get the collision angle which is needed to calculate the parking space.
- * getCollisionAngle returns the angle the car is at when it touches the rear car. It uses a number of parameters including the kerb distance to calculate the angle. It can't call getMinKerbDistance as that would create a loop so an estimate for the kerb distance is used.  See the notes in getCollisionAngle for the estimate used.
+ *
+ * For this specific manoeuvre, getExtraParkingSpace3Rotate is then called
+ * which calls getCollisionAngle to get the collision angle which is needed to
+ * calculate the parking space.
+ *
+ * getCollisionAngle returns the angle the car is at when it touches the rear
+ * car. It uses a number of parameters including the kerb distance to calculate
+ * the angle. It can't call getMinKerbDistance as that would create a loop so
+ * an estimate for the kerb distance is used. See the notes in
+ * getCollisionAngle for the estimate used.
+ *
  * getManoeuvre then calls getStartPosition.
- * This calls getPivot and getStartRelativePosition which in turn calls getcarFromBumperMedToPivot and getCarSideToPivot. Both of these call getFirstTurnAngle. For this specific manoeuvre getFirstTurnAngle calls getFirstTurnAngle3R1SMin. This calls getCollisionAngle and gteMinKerbDistance.
- * getMinKerbDistance calculates the minimum required kerb distance to avoid the rear corner of the car swinging over the kerb. It needs to call getCollisionAngle.
+ *
+ * This calls getPivot and getStartRelativePosition which in turn calls
+ * getcarFromBumperMedToPivot and getCarSideToPivot. Both of these call
+ * getFirstTurnAngle.
+ *
+ * For this specific manoeuvre, getFirstTurnAngle calls
+ * getFirstTurnAngle3R1SMin. This calls getCollisionAngle and
+ * gteMinKerbDistance.
+ *
+ * getMinKerbDistance calculates the minimum required kerb distance to avoid
+ * the rear corner of the car swinging over the kerb. It needs to call
+ * getCollisionAngle.
+ *
  * getManoeuvre then calls getMinKerbDistance - see above.
+ *
  * getManoeuvre returns a set of moves which are later called by the move service.
  * Each second move is a steering move, i.e. it just moves the steering wheel.
- * moveB calls getMoveDist1. This again calls getStartRelativePosition and getcarFromBumperMedToPivot - see above.
+ * moveB calls getMoveDist1. This again calls getStartRelativePosition and
+ * getcarFromBumperMedToPivot - see above.
  * moveD calls getMove2Angle which calls getFirstTurnAngle - see above.
- * moveF calls getMove3 which does not need to call other methods. It also calls getmove3Condition which returns false.
- * moveH calls getMove4Angle. This subtracts getCollisionAngle from getMove2Angle (see above). It also calls getMove4Condition which returns false.
- * moveJ calls getMove5Angle which returns the collision angle by calling getCollisionAngle.
+ * moveF calls getMove3 which does not need to call other methods. It also calls
+ * getmove3Condition which returns false.
+ * moveH calls getMove4Angle. This subtracts getCollisionAngle from
+ * getMove2Angle (see above). It also calls getMove4Condition which returns
+ * false.
+ * moveJ calls getMove5Angle which returns the collision angle by calling
+ * getCollisionAngle.
  * moveL calls getMove6 which calls getExtraParkingSpace - see above.
  *
  * * Note on adding new move types
  *
- * See the final steer move, which is defined in getMove6, for the best way to add new moves.  This set up is very flexible i.e. a number of different moves types for different manoeuvres can be defined.
+ * See the final steer move, which is defined in getMove6, for the best way to
+ * add new moves.  This set up is very flexible i.e. a number of different
+ * moves types for different manoeuvres can be defined.
  */
 
 /**
- * This parameter object is passed in by an external call to the getManoeuvre function and is passed to all functions in this module.
+ * This parameter object is passed in by an external call to the getManoeuvre
+ * function and is passed to all functions in this module.
  *
  * @typeParam IParams - Parameter for all functions in this module
  *
  * The properties are as follows:
  *
- * @param manoeuvre - The manoeuvre is passed in to define the parking manoeuvre to be created.
+ * @param manoeuvre - The manoeuvre is passed in to define the parking
+ * manoeuvre to be created.
+ *
  * There are a number of manoeuvres:
+ *
  * * Park Manoeuvres:
- * - Park2Rotate1StraightMinAngle:  The car turns in, moves straight back so the OC is at the PP (i.e. turn in angle is minimum), and then rotates back to parallel in one turn.
- * - Park3Rotate1StraightMinAngle:  The car turns in, moves straight back so the OC is at the PP  (i.e. turn in angle is minimum), rotates back towards parallel and then takes a 2nd rotation forward to parallel.
- * - Park2Rotate0Straight: The car turns in and then rotates back to parallel without any straight move. The turn-in angle is large.
- * - Park2Rotate1StraightSetManual:  The car turns in, moves straight back, and then rotates back to parallel in one turn. The angle is set manually and is greater than the minimum (i.e. the car must rotate for the OC to reach the PP).
- * - Park2Rotate1StraightFixedStart:  The car turns in, moves straight back, and then rotates back to parallel in one turn. The starting point is set so the rear axle is at the PP an the turn in angle is then calculated - it will typically be greater than the minimum (i.e. the car must rotate for the OC to reach the PP).
- * - Park3UsingRulesMediumAngle:  Each move is not the result of an optimal calculation but rather rules (e.g.: move back until corner is 400mm from he kerb).
+ * - Park2Rotate1StraightMinAngle: The car turns in, moves straight back so
+ * the OC is at the PP (i.e. turn in angle is minimum), and then rotates back
+ * to parallel in one turn.
+ * - Park3Rotate1StraightMinAngle: The car turns in, moves straight back so
+ * the OC is at the PP  (i.e. turn in angle is minimum), rotates back towards
+ * parallel and then takes a 2nd rotation forward to parallel.
+ * - Park2Rotate0Straight: The car turns in and then rotates back to parallel
+ * without any straight move. The turn-in angle is large.
+ * - Park2Rotate1StraightSetManual: The car turns in, moves straight back, and
+ * then rotates back to parallel in one turn. The angle is set manually and is
+ * greater than the minimum.
+ * - Park3UsingRulesMediumAngle: Each move is not the result of an optimal
+ * calculation but rather rules (e.g.: move back until corner is 400mm from he kerb).
+ *
  * * Leave Manoeuvre:
  * - Used to define a manoeuvre to leave a parked position.
  * - The functions called by the moves have yet to be written.
@@ -88,16 +143,23 @@ interface IParams {
 }
 
 /**
- * This object is returned by the module's public method and allows one complete parking manoeuvre be drawn.
+ * This object is returned by the module's public method and allows one
+ * complete parking manoeuvre be drawn.
  *
- * @typeParam IManoeuvre - Manoeuvre object used to create one full parking manoeuvre.
+ * @typeParam IManoeuvre - Manoeuvre object used to create one full parking
+ * manoeuvre.
  *
  * The properties are as follows:
  *
- * @param parkingSpaceLength - The full length of the required parking space. Used to set up the parking space required for the manoeuvre.
- * @param startPosition - The point coordinates of the car OC when the manoeuvre starts. Used to set up the starting position of the car
- * @param minKerbDistance - The car should park this distance from the kerb. This is only used for information printouts. That is, it is not used in any manoeuvre calculations.
- * @param movie - The set of moves that are passed to the move service to draw the manoeuvre.
+ * @param parkingSpaceLength - The full length of the required parking space.
+ * Used to set up the parking space required for the manoeuvre.
+ * @param startPosition - The point coordinates of the car OC when the
+ * manoeuvre starts. Used to set up the starting position of the car
+ * @param minKerbDistance - The car should park this distance from the kerb.
+ * This is only used for information printouts. That is, it is not used in any
+ * manoeuvre calculations.
+ * @param movie - The set of moves that are passed to the move service to draw
+ * the manoeuvre.
  */
 export interface IManoeuvre {
   readonly parkingSpaceLength: number;
@@ -121,23 +183,30 @@ export class ManoeuvreService {
    * Returns the y-axis distance from the PP to the kerb.
    *
    * @remarks
-   * The PP is offset from the kerb (y-axis) by the front car's distance from kerb, its width, and the safety gap.
-   * @returns The distance in scaled mm that the the PP is out from the kerb
+   * The PP is offset from the kerb (y-axis) by the front car's distance from
+   * kerb, its width, and the safety gap.
+   * @returns The distance in scaled mm that the the PP is out from the kerb.
    *
    */
   private getPivotPointFromKerb = ({ street }: IParams): number => {
+    this.logger.log(`getPivotPointFromKerb called`, LoggingLevel.TRACE);
     return street.carFromKerb + street.frontCarWidth + street.safetyGap;
   };
 
   /**
-   * Returns the final turn-in angle for those manoeuvres that touch the rear car at an angle.
+   * Returns the final turn-in angle for those manoeuvres that touch the rear
+   * car at an angle.
    *
    * @remarks
-   * This applies only to those manoeuvres where the car reverses back until it touches the rear car before it is parallel and then rotates forward to the parked position. This returns a shorter parking space than a manoeuvre where the car rotates back all the way a parallel position.
+   * This applies only to those manoeuvres where the car reverses back until it
+   * touches the rear car before it is parallel and then rotates forward to the
+   * parked position. This returns a shorter parking space than a manoeuvre
+   * where the car rotates back all the way a parallel position.
    *
    * See {@link http://www.talljerome.com/NOLA/parallelparking/attempt3.html}
    *
-   * @returns The angle in radians that the the car is at when it touches the rear parked car.
+   * @returns The angle in radians that the the car is at when it touches the
+   * rear parked car.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -154,9 +223,16 @@ export class ManoeuvreService {
     const rb = car.farRearAxleSideTurningRadius(ELock.Counterclockwise);
     const rc =
       2 * car.farRearAxleSideTurningRadius(ELock.Counterclockwise) - car.width;
-    /* The minimum distance to the kerb is required but you can't call getMinKerbDistance as it calls this getCollisionAngle method resulting in an infinite loop, so an estimate is made.
-    If the estimated minimum kerb distance is bigger than the value returned by getMinKerbDistance then the car will cross the safety gap. Even if the safety gap is zero and the car collides with the rear car it will turn in and park albeit slightly off parallel.
-     If the estimated minimum kerb distance is smaller than the value returned by getMinKerbDistance then the car will collide with the kerb and the parking parking attempt will fail.
+    /* The minimum distance to the kerb is required but you can't call
+    getMinKerbDistance as it calls this getCollisionAngle method resulting in
+    an infinite loop, so an estimate is made.
+    If the estimated minimum kerb distance is bigger than the value returned by
+    getMinKerbDistance then the car will cross the safety gap. Even if the
+    safety gap is zero and the car collides with the rear car it will turn in
+    and park albeit slightly off parallel.
+    If the estimated minimum kerb distance is smaller than the value returned
+    by getMinKerbDistance then the car will collide with the kerb and the
+    parking parking attempt will fail.
     So go for a relatively large value e.g. 400mm.
     */
     const minKerbDistance = 400 / config.distScale;
@@ -195,16 +271,24 @@ export class ManoeuvreService {
    * Returns the extra parking space for certain manoeuvres.
    *
    * @remarks
-   * This is used by all manoeuvres where the final pull-in is one turn, i.e. tye car does NOT touch the rear car (out by the safety gap) at an angle and then execute the final pull-in.
+   * This is used by all manoeuvres where the final pull-in is one turn, i.e.
+   * the car does NOT touch the rear car (out by the safety gap) at an angle
+   * and then execute the final pull-in.
    *
    * * Theory
    * Consider the car to be positioned with the OC to be at the PP.
    * Consider the triangle formed by:
-   * - a line from the CoR to the OC (which is the minimum turning radius, Rmin)
-   * - a line from the CoR towards the position of the rear axle when the car was parked parallel to the kerb before movement to a point offset from the kerb by the same amount that the car outer corner is offset from the kerb by the front car.
-   * - a line from the PP parallel to the kerb which is equal to the distance from the rear axle to the front car bumper + the extra parking space.
+   * - a line from the CoR to the OC (which is the minimum turning radius,
+   * Rmin)
+   * - a line from the CoR towards the position of the rear axle when the car
+   * was parked parallel to the kerb before movement to a point offset from the
+   * kerb by the same amount that the car outer corner is offset from the kerb
+   * by the front car.
+   * - a line from the PP parallel to the kerb which is equal to the distance
+   * from the rear axle to the front car bumper + the extra parking space.
    *
-   * @returns The extra parking space above safety gaps and the car length, in scaled mm, for certain manoeuvres.
+   * @returns The extra parking space above safety gaps and the car length, in
+   * scaled mm, for certain manoeuvres.
    */
   private getExtraParkingSpace2Rotate = ({
     manoeuvre,
@@ -212,6 +296,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
+    this.logger.log(`getExtraParkingSpace2Rotate called`, LoggingLevel.TRACE);
     const lineToCarCorner = Math.pow(car.minTurningRadius, 2);
     const centreOfRotationFromKerb =
       this.getMinKerbDistance({ manoeuvre, street, car, config }) +
@@ -235,12 +320,15 @@ export class ManoeuvreService {
    * Returns the extra parking space for certain manoeuvres.
    *
    * @remarks
-   * This is used by the manoeuvre where the car touches the rear car (out by the safety gap) at an angle and then executes the final pull-in, i.e. where the pull-in consists of 2 turns.
+   * This is used by the manoeuvre where the car touches the rear car (out by
+   * the safety gap) at an angle and then executes the final pull-in, i.e.
+   * where the pull-in consists of 2 turns.
    *
    * * Theory
    * See {@link http://www.talljerome.com/NOLA/parallelparking/attempt3.html}
    *
-   * @returns The extra parking space above safety gaps and the car length, in scaled mm, for a particular manoeuvre.
+   * @returns The extra parking space above safety gaps and the car length, in
+   * scaled mm, for a particular manoeuvre.
    */
   private getExtraParkingSpace3Rotate = ({
     manoeuvre,
@@ -318,11 +406,18 @@ export class ManoeuvreService {
    * Returns the total parking space.
    *
    * @remarks
-   * Adds the fore and rear safety gaps and the car length to the extra car space.
+   * Adds the fore and rear safety gaps and the car length to the extra car
+   * space.
    *
-   * @returns The parking space, in scaled mm, including safety gaps, car length and the extra space required.
+   * @returns The parking space, in scaled mm, including safety gaps, car
+   * length and the extra space required.
    */
-  private getParkingSpace = ({ manoeuvre, street, car, config }: IParams): number => {
+  private getParkingSpace = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): number => {
     this.logger.log(`getParkingSpace called`, LoggingLevel.TRACE);
 
     let extraParkingSpace = 0;
@@ -355,10 +450,14 @@ export class ManoeuvreService {
    *
    * @remarks
    * * Theory
-   * Consider the angle formed by the line from the CoR to the rear axle and the line from the CoR to the OC when the car is parked parallel to the kerb.
-   * Consider the angle formed by the same first line but with the second line moved to the position of the OC when the OC is at the PP.
+   * Consider the angle formed by the line from the CoR to the rear axle and
+   * the line from the CoR to the OC when the car is parked parallel to the
+   * kerb.
+   * Consider the angle formed by the same first line but with the second line
+   * moved to the position of the OC when the OC is at the PP.
    *
-   * @returns The angle in radians of the first turn in for a particular manoeuvre.
+   * @returns The angle in radians of the first turn in for a particular
+   * manoeuvre.
    */
   private getFirstTurnAngle2R1SMin = ({
     manoeuvre,
@@ -366,13 +465,17 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    /* Consider the angle formed by the by the line from the CoR to the rear axle but with the second line moved to the position of the OC when the OC is at the PP. */
+    this.logger.log(`getFirstTurnAngle2R1SMin called`, LoggingLevel.TRACE);
+    /* Consider the angle formed by the by the line from the CoR to the rear
+    axle but with the second line moved to the position of the OC when the OC
+    is at the PP. */
     const angleYToPP = Math.asin(
       (car.rearAxleToFront +
         this.getExtraParkingSpace2Rotate({ manoeuvre, street, car, config })) /
         car.minTurningRadius,
     );
-    /* Consider the angle formed by the line from the CoR to the rear axle and the line from the CoR to the OC when the car is parked parallel to the kerb. */
+    /* Consider the angle formed by the line from the CoR to the rear axle and
+    the line from the CoR to the OC when the car is parked parallel to the kerb. */
     const angleYToOCParked = Math.asin(
       car.rearAxleToFront / car.minTurningRadius,
     );
@@ -384,9 +487,11 @@ export class ManoeuvreService {
    * Returns the first turn in angle for a particular manoeuvre.
    *
    * @remarks
-   * This applies to the manoeuvre requiring 2 final turn-ins (as opposed to the 1 used by other manoeuvres).
+   * This applies to the manoeuvre requiring 2 final turn-ins (as opposed to
+   * the 1 used by other manoeuvres).
    *
-   * @returns The angle in radians of the first turn in for a particular manoeuvre.
+   * @returns The angle in radians of the first turn in for a particular
+   * manoeuvre.
    */
   private getFirstTurnAngle3R1SMin = ({
     manoeuvre,
@@ -396,7 +501,8 @@ export class ManoeuvreService {
   }: IParams): number => {
     this.logger.log(`getTurnAngle3R1SMin called`, LoggingLevel.TRACE);
 
-    /* Calculate the angle between the vertical y-axis to a line from CoR to the PP.
+    /* Calculate the angle between the vertical y-axis to a line from CoR to
+    the PP.
     tan(angleYToPP) = (rc * Sin(alpha) + n) / (rc * Cos(alpha) - m) */
     const rc =
       2 * car.farRearAxleSideTurningRadius(ELock.Counterclockwise) - car.width;
@@ -412,7 +518,9 @@ export class ManoeuvreService {
     const angleYToPP = Math.atan(
       (rc * Math.sin(alpha) + n) / (rc * Math.cos(alpha) - m),
     );
-    /* Consider the angle formed by the line from the CoR to the rear axle and the line from the CoR to the OC when the car is parked parallel to the kerb. */
+    /* Consider the angle formed by the line from the CoR to the rear axle and
+    the line from the CoR to the OC when the car is parked parallel to the
+    kerb. */
     const angleYToOCParked = Math.asin(
       car.rearAxleToFront / car.minTurningRadius,
     );
@@ -423,9 +531,11 @@ export class ManoeuvreService {
   /**
    * Returns the first turn in angle for a particular manoeuvre.
    *
-   * @returns The angle in radians of the first turn in for a particular manoeuvre.
+   * @returns The angle in radians of the first turn in for a particular
+   * manoeuvre.
    */
   private getFirstTurnAngle2R0S = ({ street, car }: IParams): number => {
+    this.logger.log(`getFirstTurnAngle2R0S called`, LoggingLevel.TRACE);
     /**
      * alpha = arccos((2r − (w + p)/2r)
      * r = Turning radius to midpoint of rear axle
@@ -443,9 +553,11 @@ export class ManoeuvreService {
   /**
    * Returns the first turn in angle for a particular manoeuvre.
    *
-   * @returns The angle in radians of the first turn in for a particular manoeuvre.
+   * @returns The angle in radians of the first turn in for a particular
+   * manoeuvre.
    * @throws Error
-   * Thrown if the calculated angle is greater than 45 degrees or less than 0 degrees.
+   * Thrown if the calculated angle is greater than 45 degrees or less than 0
+   * degrees.
    */
   private getFirstTurnAngle2R1SMinFixedStart = ({
     manoeuvre,
@@ -453,27 +565,38 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    /* Solve 2 equations with two unknowns - angle (alpha) and straight distance moved (d3)...
+    this.logger.log(
+      `getFirstTurnAngle2R1SMinFixedStart called`,
+      LoggingLevel.TRACE,
+    );
+    /* Solve 2 equations with two unknowns - angle (alpha) and straight
+    distance moved (d3)...
 
-    1. Car rear axle x position after movement + x-axis movement  = defined position of rear axle at start (opposite rear bumper of front car):
+    1. Car rear axle x position after movement + x-axis movement  = defined
+    position of rear axle at start (opposite rear bumper of front car):
 
     street.rearCarCorner.x + street.safetyGap + car.rearOverhang +
     2 * car.centerRearAxleTurningRadius * Math.sin(alpha) +
     d3 * Math.cos(alpha) +
     = street.rearCarCorner.x + parkingSpaceLength
 
-    2. Car side y position after movement + y-axis movement = defined position of side at start (an extra safety gap outside the front car safety gap):
+    2. Car side y position after movement + y-axis movement = defined position
+    of side at start (an extra safety gap outside the front car safety gap):
 
     this.getMinKerbDistance +
     2 * car.centerRearAxleTurningRadius * (1 - Math.cos(alpha)) +
     d3 * Math.sin(alpha)
-    = street.carFromKerb + street.frontCarWidth + street.safetyGap + excessSafetyGap
+    = street.carFromKerb + street.frontCarWidth + street.safetyGap +
+    excessSafetyGap
 
     Eliminate d3...
-    1. d3 = (parkingSpaceLength - street.safetyGap – car.rearOverhang - 2 * car.centerRearAxleTurningRadius * Math.sin(alpha)) / Math.cos(alpha)
+    1. d3 = (parkingSpaceLength - street.safetyGap – car.rearOverhang
+    - 2 * car.centerRearAxleTurningRadius * Math.sin(alpha)) / Math.cos(alpha)
     i.e. d3 = (c1 - c2Sin(a)) / Cos(a)
-    2. d3 = (street.carFromKerb + street.frontCarWidth + street.safetyGap + excessSafetyGap - this.getMinKerbDistance
-    - 2 * car.centerRearAxleTurningRadius + (2 * car.centerRearAxleTurningRadius)Cos(a)) / Sin(a)
+    2. d3 = (street.carFromKerb + street.frontCarWidth
+    + street.safetyGap + excessSafetyGap - this.getMinKerbDistance
+    - 2 * car.centerRearAxleTurningRadius
+    + (2 * car.centerRearAxleTurningRadius)Cos(a)) / Sin(a)
     i.e. d3 = (c3 + c2Cos(a)) / Sin(a)
 
     From 1. and 2. c1Sin(a) – c3Cos(a) – c2 = 0
@@ -545,7 +668,8 @@ export class ManoeuvreService {
   /**
    * Returns the first turn in angle for all manoeuvres.
    *
-   * @returns The angle in radians that the car rotates on it's first rotation from it's starting position parallel to the x-axis.
+   * @returns The angle in radians that the car rotates on it's first rotation
+   * from it's starting position parallel to the x-axis.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -578,7 +702,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightSetManual:
         /**
          * Note: Set manually.
-         * Only certain values are valid - roughly between the value for a 2RotateMin1Straight and 2Rotate0Straight.
+         * Only certain values are valid - roughly between the value for a
+         * 2RotateMin1Straight and 2Rotate0Straight.
          */
         return 32.31 * config.DEG_TO_RAD;
       case EManoeuvre.Park2Rotate1StraightFixedStart:
@@ -590,7 +715,8 @@ export class ManoeuvreService {
         });
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        /* Return a large angle as the rotation will be limited by the supplied condition function */
+        /* Return a large angle as the rotation will be limited by the supplied
+        condition function */
         return Math.PI / 2;
       case EManoeuvre.Leave:
         /* Not used in a Leave manoeuvre yet */
@@ -601,7 +727,9 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The distance travelled by the car, in scaled mm, in the x and y directions, when the car (starting parallel to the x-axis) rotates first in one direction and then in the opposite direction by the same angle.
+   * @returns The distance travelled by the car, in scaled mm, in the x and y
+   * directions, when the car (starting parallel to the x-axis) rotates first
+   * in one direction and then in the opposite direction by the same angle.
    */
   private getDistFrom2Turns = ({
     manoeuvre,
@@ -609,6 +737,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TPoint => {
+    this.logger.log(`getDistFrom2Turns called`, LoggingLevel.TRACE);
     /* deltaX = 2r(sin(alpha)) */
     const x =
       2 *
@@ -626,8 +755,9 @@ export class ManoeuvreService {
   };
 
   /**
-   *
-   * @returns A set of distances and condition functions used by the manoeuvre Park3UsingRulesMediumAngle, that is defined by 'rules' as opposed to optimal calculations.
+   *   * @returns A set of distances and condition functions used by the manoeuvre
+   * Park3UsingRulesMediumAngle, that is defined by 'rules' as opposed to
+   * optimal calculations.
    */
   private getRules = ({
     manoeuvre,
@@ -649,12 +779,17 @@ export class ManoeuvreService {
     move6SteerCondition: TCondition;
     move6Condition: TCondition;
   } => {
+    this.logger.log(`getRules called`, LoggingLevel.TRACE);
+    
     const baseFrontCarOut = config.baseFrontCarOut;
     const baseGap = config.baseGap;
     const adjustForFrontCarWidthFactor =
       street.frontCarWidth + street.carFromKerb <= baseFrontCarOut ? 0.5 : 1;
 
-    /* Always park at a fixed distance out from the kerb, or else a fixed distance out from the front car if the front car is more than a base distance out from the kerb. The idea is to always park where you park for a typical front car */
+    /* Always park at a fixed distance out from the kerb, or else a fixed
+    distance out from the front car if the front car is more than a base
+    distance out from the kerb. The idea is to always park where you park for a
+    typical front car */
     const carSideOutMed = Math.max(
       baseFrontCarOut + baseGap,
       street.carFromKerb + street.frontCarWidth + baseGap,
@@ -663,27 +798,39 @@ export class ManoeuvreService {
     /* Always park at a fixed distance out from the from the front car */
     const carSideOutMin = street.carFromKerb + street.frontCarWidth + baseGap;
 
-    /* The starting bumper x-position stays constant in absolute terms for front cars nearer to the kerb than the base, but this is equivalent to the car moving to the right with respect to the rear of the front car for front cars less than the base width (as narrower front cars result in a smaller car space) */
-    /* The starting bumper x-position moves forward with respect to the rear of the front car for front cars wider than the base width (as wider front cars allow you start the straight move in closer to the front car outer corner for the same turned-in angle as you can move in more to clear the corner) */
+    /* The starting bumper x-position stays constant in absolute terms for
+    front cars nearer to the kerb than the base, but this is equivalent to the
+    car moving to the right with respect to the rear of the front car for front
+    cars less than the base width (as narrower front cars result in a smaller
+    car space) */
+    /* The starting bumper x-position moves forward with respect to the rear of
+    the front car for front cars wider than the base width (as wider front cars
+    allow you start the straight move in closer to the front car outer corner
+    for the same turned-in angle as you can move in more to clear the corner)
+    */
     const differenceFromBase =
       baseFrontCarOut - (street.frontCarWidth + street.carFromKerb);
     const adjustment = adjustForFrontCarWidthFactor * differenceFromBase;
     const carFromBumperMed =
       -car.rearOverhang + street.safetyGap + Math.abs(adjustment);
 
-    /* The starting bumper x-position is level with the rear bumper of the front car */
+    /* The starting bumper x-position is level with the rear bumper of the
+    front car */
     const carFromBumperMin = street.safetyGap;
 
-    /* Rotate until rear axle side has moved in by a fixed amount. (This is equivalent to a rotation of about 30 degrees). The idea is to know how to rotate through this distance and not have to adjust angles for different situations */
+    /* Rotate until rear axle side has moved in by a fixed amount. (This is
+    equivalent to a rotation of about 30 degrees). The idea is to know how to
+    rotate through this distance and not have to adjust angles for different
+    situations */
     const move2ConditionMed = (carInUse: CarService, _tick: any) => {
       const move2Turn = config.move2TurnMed;
       const start =
-        this.getStartPosition({ manoeuvre, street, car, config }).y -
-        car.width;
+        this.getStartPosition({ manoeuvre, street, car, config }).y - car.width;
       return start - carInUse.readRearPortAxleSide.y >= move2Turn;
     };
 
-    /* Rotate until passenger side is lined up with a point a fixed distance forward from the rear car front bumper. */
+    /* Rotate until passenger side is lined up with a point a fixed distance
+    forward from the rear car front bumper. */
     const move2ConditionMin = (carInUse: CarService, _tick: any) => {
       const fontCarBumperX = street.rearCarCorner.x;
       const distFromFrontBumper = config.move2TurnMin;
@@ -699,14 +846,19 @@ export class ManoeuvreService {
     };
 
     /* Reverse until the rear port axle is a fixed distance from the kerb */
-    /* NOTE:  This can be expressed as a distance from the rear port corner but this varies with the rear overhang of the car. Eg it is 300mm for the VW T5 but 500mm for the Hyundai i10 */
+    /* NOTE:  This can be expressed as a distance from the rear port corner but
+    this varies with the rear overhang of the car. Eg it is 300mm for the VW T5
+    but 500mm for the Hyundai i10 */
     const move3ConditionMed = (carInUse: CarService, _tick: any) => {
       const distFromKerb = config.distFromKerbMed;
       return carInUse.readRearPortAxleSide.y - distFromKerb < 0.1;
     };
     /*
-    If the rear starboard corner gets closer to the rear car than the configured minimum distance then stop.
-    Otherwise reverse until the car front port corner is level with the rear bumper of the front car + safety gap and the rear port corner is within a given distance of the kerb.
+    If the rear starboard corner gets closer to the rear car than the configured
+    minimum distance then stop.
+    Otherwise reverse until the car front port corner is level with the rear
+    bumper of the front car + safety gap and the rear port corner is within a
+    given distance of the kerb.
      */
     const move3ConditionMin = (carInUse: CarService, _tick: any) => {
       return (
@@ -723,7 +875,8 @@ export class ManoeuvreService {
       );
     };
 
-    /* Rotate in until the car comes within the allowed distance of the rear car or is horizontal */
+    /* Rotate in until the car comes within the allowed distance of the rear
+    car or is horizontal */
     const move4Condition = (carInUse: CarService, _tick: unknown) => {
       const tooClose =
         carInUse.readRearStarboardCorner.x -
@@ -743,7 +896,8 @@ export class ManoeuvreService {
         : false;
     };
 
-    /* Rotate in until the car touches the safety gap of the rear car or is horizontal */
+    /* Rotate in until the car touches the safety gap of the rear car or is
+    horizontal */
     const move5Condition = (carInUse: CarService, tick: unknown) => {
       const collision = this.calc.checkCollision(carInUse, true);
       if (collision && typeof tick === 'number') {
@@ -790,7 +944,8 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The x-axis distance, in unscaled mm, from the rear bumper of the car to the PP just before the car rotates in.
+   * @returns The x-axis distance, in unscaled mm, from the rear bumper of the
+   * car to the PP just before the car rotates in.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -806,13 +961,25 @@ export class ManoeuvreService {
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-        /* It calculates by adding the distance the IC is forward in the x-axis direction before rotating, to the distance the IC moves in the x-axis direction when the car rotates back to being parallel with the x-axis, and then subtracting the length of the car.*/
+        /* It calculates by adding the distance the IC is forward in the x-axis
+        direction before rotating, to the distance the IC moves in the x-axis
+        direction when the car rotates back to being parallel with the x-axis,
+        and then subtracting the length of the car.*/
 
-        /* This is the distance that the car corner, that is closest to the front parked car, is forward (in the x-axis direction) from the parked car just after it has turned and is about to reverse, i.e. when its rear axle is at the PP.*/
+        /* This is the distance that the car corner, that is closest to the
+        front parked car, is forward (in the x-axis direction) from the parked
+        car just after it has turned and is about to reverse, i.e. when its
+        rear axle is at the PP.*/
         const cornerFwdXFromPivot =
           car.rearAxleToFront *
           Math.cos(this.getFirstTurnAngle({ manoeuvre, street, car, config }));
-        /* This is the angle between the CoR and the IC when the car has returned to be parallel to the x-axis. (Angles are measured positive in the clockwise direction which is the case throughout this application). This can be derived by looking at the car when parallel to the x-axis. The angle between the x-axis and a line from the CoR to the IC is (PI/2 - alpha) where alpha is the angle formed by a line from the rear axle to the COR and a line from the CoR to the IC.*/
+        /* This is the angle between the CoR and the IC when the car has
+        returned to be parallel to the x-axis. (Angles are measured positive in
+        he clockwise direction which is the case throughout this application).
+        This can be derived by looking at the car when parallel to the x-axis.
+        The angle between the x-axis and a line from the CoR to the IC is
+        (PI/2 - alpha) where alpha is the angle formed by a line from the rear
+        axle to the COR and a line from the CoR to the IC.*/
         const endAngleRads =
           1.5 * Math.PI -
           Math.atan(
@@ -826,9 +993,11 @@ export class ManoeuvreService {
           car,
           config,
         });
-        /* The turned angle is added to the end angle as the starting angle is further clockwise than the end angle */
+        /* The turned angle is added to the end angle as the starting angle is
+        further clockwise than the end angle */
         const startAngleRads = endAngleRads + turnedAngleRads;
-        /* Formula to find the Y direction move for a chord (where the angles are with respect to the x-axis). */
+        /* Formula to find the Y direction move for a chord (where the angles
+        are with respect to the x-axis). */
         const distMovedXDuringTurn =
           car.frontInnerCornerTurningRadius(ELock.Counterclockwise) *
           (Math.cos(endAngleRads) - Math.cos(startAngleRads));
@@ -837,7 +1006,8 @@ export class ManoeuvreService {
         return cornerFwdXFromPivot - distMovedXDuringTurn - distOCToRearBumper;
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        /* This is the x-axis position of the rear bumper after moving from the parked position to the point where it begins rotating in */
+        /* This is the x-axis position of the rear bumper after moving from the
+        parked position to the point where it begins rotating in */
         const distRearBumperX =
           street.rearCarCorner.x +
           street.safetyGap +
@@ -867,7 +1037,8 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The y-axis distance from the side of the car to the side of the front parked car just before the car rotates in.
+   * @returns The y-axis distance from the side of the car to the side of the
+   * front parked car just before the car rotates in.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -883,15 +1054,27 @@ export class ManoeuvreService {
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-        /* It calculates by adding the distance the IC is out in the y-axis direction before rotating, to the distance the IC moves in the y-axis direction when the car rotates back to being parallel with the x-axis. */
-        /* This is the distance that the car corner, that is closest to the front parked car, is out (in the y-axis direction) from the parked car just after it has turned and is about to reverse, i.e. when its rear axle is at the PP. */
+        /* It calculates by adding the distance the IC is out in the y-axis
+        direction before rotating, to the distance the IC moves in the y-axis
+        direction when the car rotates back to being parallel with the x-axis.
+        */
+        /* This is the distance that the car corner, that is closest to the
+        front parked car, is out (in the y-axis direction) from the parked car
+        just after it has turned and is about to reverse, i.e. when its rear
+        axle is at the PP. */
         const cornerOutYFromFrontCar =
           car.rearAxleToFront *
             Math.sin(
               this.getFirstTurnAngle({ manoeuvre, street, car, config }),
             ) +
           street.safetyGap;
-        /* This is the angle between the CoR and the IC when the car has returned to be parallel to the x-axis. (Angles are measured positive in the clockwise direction which is the case throughput this application). This can be derived by looking at the car when parallel to the x-axis. The angle between the x-axis and a line from the CoR to the IC is PI/2 - a where a is the angle fromed by a line from the rear axle to the COR and a line from the CoR to the IC. */
+        /* This is the angle between the CoR and the IC when the car has
+        returned to be parallel to the x-axis. (Angles are measured positive in
+        the clockwise direction which is the case throughout this application).
+        This can be derived by looking at the car when parallel to the x-axis.
+        The angle between the x-axis and a line from the CoR to the IC is PI/2 
+        - where a is the angle fromed by a line from the rear axle to the COR
+        and a line from the CoR to the IC. */
         const endAngleRads =
           1.5 * Math.PI -
           Math.atan(
@@ -905,9 +1088,11 @@ export class ManoeuvreService {
           car,
           config,
         });
-        /* The turned angle is added to the end angle as the starting angle is further clockwise than the end angle */
+        /* The turned angle is added to the end angle as the starting angle is
+        further clockwise than the end angle */
         const startAngleRads = endAngleRads + turnedAngleRads;
-        /* Formula to find the Y direction move for a chord (where the angles are with respect to the a-axis). */
+        /* Formula to find the Y direction move for a chord (where the angles
+        are with respect to the a-axis). */
         const distMovedYDuringTurn =
           car.frontInnerCornerTurningRadius(ELock.Counterclockwise) *
           (Math.sin(endAngleRads) - Math.sin(startAngleRads));
@@ -949,9 +1134,15 @@ export class ManoeuvreService {
   /**
    * @returns A point containing the unscaled x/y coordinates of the PP.
    */
-  private getPivot = ({ manoeuvre, street, car, config }: IParams): TPoint => {
+  private getPivot = ({
+    manoeuvre,
+    street,
+    car,
+    config }: IParams): TPoint => {
+    this.logger.log(`getPivot called`, LoggingLevel.TRACE);
     return {
-      /* The PP is offset from the x-axis by the rear car and the parking space less a safety gap. */
+      /* The PP is offset from the x-axis by the rear car and the parking space
+      less a safety gap. */
       x:
         street.rearCarFromLeft +
         street.rearCarLength +
@@ -962,7 +1153,8 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns A point containing the scaled x/y coordinates of the OC when the car first starts.
+   * @returns A point containing the scaled x/y coordinates of the OC when the
+   * car first starts.
    */
   private getStartRelativePosition = ({
     manoeuvre,
@@ -979,15 +1171,21 @@ export class ManoeuvreService {
         this.getcarFromBumperMedToPivot({ manoeuvre, street, car, config }) +
         car.length +
         startGap,
-      y:
-        car.width + this.getCarSideToPivot({ manoeuvre, street, car, config }),
+      y: car.width + this.getCarSideToPivot({ manoeuvre, street, car, config }),
     };
   };
 
   /**
-   * @returns A point containing the scaled x/y coordinates of the OC when the car first starts.
+   * @returns A point containing the scaled x/y coordinates of the OC when the
+   * car first starts.
    */
-  private getStartPosition = ({ manoeuvre, street, car, config }: IParams): TPoint => {
+  private getStartPosition = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): TPoint => {
+    this.logger.log(`getStartPosition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
@@ -999,12 +1197,10 @@ export class ManoeuvreService {
         const value = {
           x:
             this.getPivot({ manoeuvre, street, car, config }).x +
-            this.getStartRelativePosition({ manoeuvre, street, car, config })
-              .x,
+            this.getStartRelativePosition({ manoeuvre, street, car, config }).x,
           y:
             this.getPivot({ manoeuvre, street, car, config }).y +
-            this.getStartRelativePosition({ manoeuvre, street, car, config })
-              .y,
+            this.getStartRelativePosition({ manoeuvre, street, car, config }).y,
         };
         this.logger.log(`Starting position x: ${value.x}`, LoggingLevel.TRACE);
         this.logger.log(`Starting position y: ${value.y}`, LoggingLevel.TRACE);
@@ -1025,18 +1221,26 @@ export class ManoeuvreService {
   };
 
   /**
-   * Returns the required minimum distance from the kerb that the car has to park at in order to avoid touching the kerb.
+   * Returns the required minimum distance from the kerb that the car has to
+   * park at in order to avoid touching the kerb.
    *
    * @remarks
-   * Used in the Park3Rotate1StraightMinAngle manoeuvre to set a minimum distance from kerb so the rear car corner does not touch the kerb.
-   * NOTE: You could set up so a collision is only detected when the rear wheel (not the corner) touches the kerb and then the formula below must be edited and the minimum distance would be much shorter.
+   * Used in the Park3Rotate1StraightMinAngle manoeuvre to set a minimum
+   * distance from kerb so the rear car corner does not touch the kerb.
+   * NOTE: You could set up so a collision is only detected when the rear wheel
+   * (not the corner) touches the kerb and then the formula below must be
+   * edited and the minimum distance would be much shorter.
    *
    * Theory for the 3 move manoeuvre
    * See {@link http://www.talljerome.com/NOLA/parallelparking/attempt3.html}
    *
-   * @param collisionAngle - getCollisionAngle calls this method, which in turn calls getCollisionAngle. To avoid an infinite loop an approximate angle is passed in from getCollisionAngle (only) which is used in this method instead of calling getCollisionAngle.
+   * @param collisionAngle - getCollisionAngle calls this method, which in turn
+   * calls getCollisionAngle. To avoid an infinite loop an approximate angle is
+   * passed in from getCollisionAngle (only) which is used in this method
+   * instead of calling getCollisionAngle.
    *
-   * @returns The minimum distance, in scaled units, from the kerb at which the car parks in order that its rear corner (NOT wheel) not to touch the kerb.
+   * @returns The minimum distance, in scaled units, from the kerb at which the
+   * car parks in order that its rear corner (NOT wheel) not to touch the kerb.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -1062,7 +1266,9 @@ export class ManoeuvreService {
     const minDefault = config.defaultMinFromKerb;
 
     /* Calculate the maximum allowed taking advantage of a very wide front car:
-    When the car is being parked, only require the car to turn in so it's outer side is level with the front car. This allows a large kerb size under certain circumstances but limit it to half the legal maximum. */
+    When the car is being parked, only require the car to turn in so it's outer
+    side is level with the front car. This allows a large kerb size under
+    certain circumstances but limit it to half the legal maximum. */
     let maxDerivedFromFrontCar = Math.max(
       minDefault,
       street.carFromKerb + street.frontCarWidth - car.width,
@@ -1072,7 +1278,8 @@ export class ManoeuvreService {
       maxDerivedFromFrontCar,
     );
 
-    /* Calculate a minimum kerb gap size to avoid the rear corner crossing the kerb */
+    /* Calculate a minimum kerb gap size to avoid the rear corner crossing the
+    kerb */
     let minDerivedFromTurnIn = 0;
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -1080,7 +1287,9 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Leave:
-        /* The rear corner will swing out further than the rear tyre, on the outer side of the turn circle, by an amount equal to the difference of the rear corner and the rear side at the rear-axle turning circles */
+        /* The rear corner will swing out further than the rear tyre, on the
+        outer side of the turn circle, by an amount equal to the difference of
+        the rear corner and the rear side at the rear-axle turning circles */
         minDerivedFromTurnIn =
           car.rearOuterCornerTurningRadius(ELock.Counterclockwise) -
           car.farRearAxleSideTurningRadius(ELock.Counterclockwise) +
@@ -1115,7 +1324,12 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMove1Dist = ({ manoeuvre, street, car, config }: IParams): number => {
+  private getMove1Dist = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): number => {
     this.logger.log(`getMove1Dist called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
@@ -1144,12 +1358,19 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The angle in radians through which the car rotates when it first turns in.
+   * @returns The angle in radians through which the car rotates when it first
+   * turns in.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMove2Angle = ({ manoeuvre, street, car, config }: IParams): number => {
+  private getMove2Angle = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): number => {
+    this.logger.log(`getMove2Angle called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1178,6 +1399,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
+    this.logger.log(`getMove2Condition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1218,15 +1440,25 @@ export class ManoeuvreService {
   };
 
   /**
-   *
    * @remarks
-   * At one stage I could return a rotation or a straight move as move 3. The idea was to allow a small rotation in move 3 but I couldn't find any useful manoeuvre requiring such a rotation so now getMove3 only returns straight moves. I'm leaving getmove3 as it's structured in case I want to bring that functionality back.
-   * @returns The distance in unscaled units the car moves straight back after its first rotation.
+   * At one stage I could return a rotation or a straight move as move 3. The
+   * idea was to allow a small rotation in move 3 but I couldn't find any
+   * useful manoeuvre requiring such a rotation so now getMove3 only returns
+   * straight moves. I'm leaving getmove3 as it's structured in case I want to
+   * bring that functionality back.
+   * @returns The distance in unscaled units the car moves straight back after
+   * its first rotation.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMove3 = ({ manoeuvre, street, car, config }: IParams): TMoveStraight => {
+  private getMove3 = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): TMoveStraight => {
+    this.logger.log(`getMove3 called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
@@ -1289,6 +1521,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
+    this.logger.log(`getmove3Condition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1310,12 +1543,19 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The angle in radians through which the car rotates on its second rotation.
+   * @returns The angle in radians through which the car rotates on its second
+   * rotation.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMove4Angle = ({ manoeuvre, street, car, config }: IParams): number => {
+  private getMove4Angle = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): number => {
+    this.logger.log(`getMove4Angle called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1340,9 +1580,6 @@ export class ManoeuvreService {
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
-   *
-   * @throws Error
-   * Thrown if an invalid manoeuvre is passed in.
    */
   private getMove4Condition = ({
     manoeuvre,
@@ -1350,6 +1587,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
+    this.logger.log(`getMove4Condition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1359,8 +1597,12 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config })
-          .move4Condition;
+        return this.getRules({
+          manoeuvre,
+          street,
+          car,
+          config
+        }).move4Condition;
       case EManoeuvre.Leave:
         return () => false;
       default:
@@ -1375,6 +1617,7 @@ export class ManoeuvreService {
    * Thrown if an invalid manoeuvre is passed in.
    */
   private getMove5Steer = ({ manoeuvre }: IParams): number => {
+    this.logger.log(`getMove5Steer called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1403,6 +1646,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
+    this.logger.log(`getMove5SteerCondition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1422,12 +1666,19 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The angle in radians through which the car rotates on its third rotation.
+   * @returns The angle in radians through which the car rotates on its third
+   * rotation.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMove5Angle = ({ manoeuvre, street, car, config }: IParams): number => {
+  private getMove5Angle = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): number => {
+    this.logger.log(`getMove5Angle called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1439,7 +1690,8 @@ export class ManoeuvreService {
         return this.getCollisionAngle({ manoeuvre, street, car, config });
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        /* Return a large angle as the rotation will be limited by the condition */
+        /* Return a large angle as the rotation will be limited by the
+        condition */
         return Math.PI / 2;
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1458,6 +1710,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
+    this.logger.log(`getMove5Condition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1467,8 +1720,12 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config })
-          .move5Condition;
+        return this.getRules({
+          manoeuvre,
+          street,
+          car,
+          config
+        }).move5Condition;
       case EManoeuvre.Leave:
         return () => false;
       default:
@@ -1477,7 +1734,9 @@ export class ManoeuvreService {
   };
 
   /**
-   * This is used in a steering move (type = EMoveType.Steer) to set the target setting of the steering wheel, i.e. the steering wheel is rotated from the ending position of the last move to this new position.
+   * This is used in a steering move (type = EMoveType.Steer) to set the target
+   * setting of the steering wheel, i.e. the steering wheel is rotated from the
+   * ending position of the last move to this new position.
    *
    * @remarks The steering wheel movement can be stopped by a steering condition.
    *
@@ -1487,6 +1746,7 @@ export class ManoeuvreService {
    * Thrown if an invalid manoeuvre is passed in.
    */
   private getMove6Steer = ({ manoeuvre }: IParams): ELock => {
+    this.logger.log(`getMove6Steer called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1504,9 +1764,12 @@ export class ManoeuvreService {
   };
 
   /**
-   * This condition can stop the steering wheel movement e.g. stops the steering wheel on the center position rather than move all the way clockwise or anticlockwise.
+   * This condition can stop the steering wheel movement e.g. stops the
+   * steering wheel on the center position rather than move all the way
+   * clockwise or anticlockwise.
    *
-   * @remarks The condition function is tested by the move every tick and the move will stop when it returns true.
+   * @remarks The condition function is tested by the move every tick and the
+   * move will stop when it returns true.
    *
    * @returns The condition function that halts the related move.
    *
@@ -1519,6 +1782,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
+    this.logger.log(`getMove6SteerCondition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1548,6 +1812,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
+    this.logger.log(`getMove6Condition called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1557,8 +1822,7 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config })
-          .move6Condition;
+        return this.getRules({ manoeuvre, street, car, config }).move6Condition;
       case EManoeuvre.Leave:
         return () => false;
       default:
@@ -1569,7 +1833,11 @@ export class ManoeuvreService {
   /**
    * @returns A move, which could be a straight move or an arc move.
    *
-   * @remarks For most manoeuvres, the move is a straight move and moves the distance in unscaled units that positions the car as it finally moves forward or reverse into the middle of the parking space.  For the Park3UsingRulesMediumAngle manoeuvre it might be a final reverse rotation to the horizontal position.
+   * @remarks For most manoeuvres, the move is a straight move and moves the
+   * distance in unscaled units that positions the car as it finally moves
+   * forward or reverse into the middle of the parking space.  For the
+   * Park3UsingRulesMediumAngle manoeuvre it might be a final reverse rotation
+   * to the horizontal position.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -1580,6 +1848,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TMoveStraight | TMoveArc => {
+    this.logger.log(`getMove6 called`, LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1637,9 +1906,15 @@ export class ManoeuvreService {
 
   /**
    *
-   * @returns The set of data that defines a complete manoeuvre - see IManoeuvre description.
+   * @returns The set of data that defines a complete manoeuvre - see
+   * IManoeuvre description.
    */
-  public getManoeuvre({ manoeuvre, street, car, config }: IParams): IManoeuvre {
+  public getManoeuvre({
+    manoeuvre,
+    street,
+    car,
+    config
+  }: IParams): IManoeuvre {
     this.logger.log(`getManoeuvre called`, LoggingLevel.TRACE);
 
     let parkingSpaceLength = 0;

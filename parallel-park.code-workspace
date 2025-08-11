@@ -271,6 +271,7 @@
     "editor.renderWhitespace": "all",
     "editor.smoothScrolling": false,
     "editor.tabSize": 2,
+    "editor.wordWrapColumn": 80,
     "editor.wordWrap": "wordWrapColumn",
 
     "eslint.workingDirectories": [ "./", "./frontend", "./backend"],
