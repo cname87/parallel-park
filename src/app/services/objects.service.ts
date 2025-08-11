@@ -18,7 +18,86 @@ import { ConfigService } from './config.service';
   providedIn: 'root',
 })
 export class ObjectsService {
-  constructor(public config: ConfigService) {}
+
+  public Width_1904mm: TStreetSetup;
+  public Width_1852mm: TStreetSetup;
+  public Width_1795mm: TStreetSetup;
+  public Width_1595mm: TStreetSetup;
+  public Width_2073mm: TStreetSetup;
+  public Width_2426mm: TStreetSetup;
+  public Custom_Street: TStreetSetup;
+
+  constructor(public config: ConfigService) {
+
+    this.Width_1904mm = {
+      name: EStreet.Width_1904mm,
+      rearCarWidth: 1904,
+      /* Same as 2005 VW T5 van */
+      frontCarWidth: 1904,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingSpace: 0,
+    };
+
+    this.Width_1852mm = {
+      /* Same as 2020 Mercedes E Class Estate */
+      name: EStreet.Width_1852mm,
+      rearCarWidth: 1852,
+      frontCarWidth: 1852,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingSpace: 0,
+    };
+
+    this.Width_1795mm = {
+      /* Same as 2020 Hyundai i30 */
+      name: EStreet.Width_1795mm,
+      rearCarWidth: 1795,
+      frontCarWidth: 1795,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingSpace: 0,
+    };
+
+    this.Width_1595mm = {
+      name: EStreet.Width_1595mm,
+      rearCarWidth: 1450,
+      /* Same as 2020 Kia Picanto - narrowest car */
+      frontCarWidth: 1595,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingSpace: 0,
+    };
+
+    this.Width_2073mm = {
+      name: EStreet.Width_2073mm,
+      rearCarWidth: 2073,
+      /* Same as 2020 Landrover Discovery Sport */
+      frontCarWidth: 2073,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingSpace: 0,
+    };
+
+    this.Width_2426mm = {
+      name: EStreet.Width_2426mm,
+      rearCarWidth: 2426,
+      /* Same as 2020 VW Crafter - widest van */
+      frontCarWidth: 2426,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingSpace: 0,
+    };
+
+    this.Custom_Street = {
+      name: EStreet.Custom_Street,
+      rearCarWidth: 1000,
+      frontCarWidth: 1000,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingSpace: 0,
+    };
+  }
 
   get scenarios(): Array<TScenario> {
     const scenarios: Array<TScenario> = [];
@@ -150,75 +229,6 @@ export class ObjectsService {
     sideOverhang: 138,
     wheelWidth: 215,
     wheelLength: 686,
-  };
-
-  readonly Width_1904mm: TStreetSetup = {
-    name: EStreet.Width_1904mm,
-    rearCarWidth: 1904,
-    /* Same as 2005 VW T5 van */
-    frontCarWidth: 1904,
-    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    parkingSpace: 0,
-  };
-
-  readonly Width_1852mm: TStreetSetup = {
-    /* Same as 2020 Mercedes E Class Estate */
-    name: EStreet.Width_1852mm,
-    rearCarWidth: 1852,
-    frontCarWidth: 1852,
-    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    parkingSpace: 0,
-  };
-
-  readonly Width_1795mm: TStreetSetup = {
-    /* Same as 2020 Hyundai i30 */
-    name: EStreet.Width_1795mm,
-    rearCarWidth: 1795,
-    frontCarWidth: 1795,
-    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    parkingSpace: 0,
-  };
-
-  readonly Width_1595mm: TStreetSetup = {
-    name: EStreet.Width_1595mm,
-    rearCarWidth: 1450,
-    /* Same as 2020 Kia Picanto - narrowest car */
-    frontCarWidth: 1595,
-    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    parkingSpace: 0,
-  };
-
-  readonly Width_2073mm: TStreetSetup = {
-    name: EStreet.Width_2073mm,
-    rearCarWidth: 2073,
-    /* Same as 2020 Landrover Discovery Sport */
-    frontCarWidth: 2073,
-    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    parkingSpace: 0,
-  };
-
-  readonly Width_2426mm: TStreetSetup = {
-    name: EStreet.Width_2426mm,
-    rearCarWidth: 2426,
-    /* Same as 2020 VW Crafter - widest van */
-    frontCarWidth: 2426,
-    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    parkingSpace: 0,
-  };
-
-  Custom_Street: TStreetSetup = {
-    name: EStreet.Custom_Street,
-    rearCarWidth: 1000,
-    frontCarWidth: 1000,
-    carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-    safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    parkingSpace: 0,
   };
 
   readonly modes: EMode[] = [EMode.Loop, EMode.Single, EMode.Keyboard];

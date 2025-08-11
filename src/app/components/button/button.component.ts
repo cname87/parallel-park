@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { ThemePalette } from '@angular/material/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { EButtonStatus, IButton, TButtonNames } from '../../shared/types';
+import { EButtonStatus, IButton, TButtonLabels, TButtonNames } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ConfigService } from '../../services/config.service';
 
@@ -50,13 +50,15 @@ export class ButtonComponent implements OnInit {
   private buttonLastClick$: Observable<EButtonStatus> =
     this.buttonClickSubject.asObservable();
 
-  private textsRun = this.config.allButtonTexts;
+  private textsRun: Map<TButtonNames, TButtonLabels>; // = this.config.allButtonTexts;
 
   /* Button can be enabled after ViewInit when the name has been passed in */
   constructor(
     private config: ConfigService,
     private data: DataService,
-  ) {}
+  ) {
+      this.textsRun = this.config.allButtonTexts;
+  }
 
   private enableRun = (): void => {
     this.buttonText = this.textsRun.get(this.buttonName);
