@@ -20,25 +20,6 @@ body {
 /* Workaround for https://github.com/angular/material2/issues/4580.
 Note: Global style, as material elements, e.g. mat-form-field, are part of Angular Material and has its own encapsulation which component styles can't override */
 
-/* Customize mat-form-field */
-mat-form-field {
-
-  .mat-form-field {
-    &-underline {
-      position: static;
-    }
-
-    &-wrapper {
-      padding-bottom: 0;
-    }
-
-    &-subscript-wrapper {
-      position: static;
-      min-height: 1.25em;
-    }
-  }
-}
-
 // Force dropdown panel background color for mat-form-field
 .mat-mdc-select-panel {
   background-color: $colorBackground !important;
@@ -63,6 +44,13 @@ $smallRadioSize: clamp(1rem, 2vw, 2rem);
   width: 20px;
   left: calc(50% - $smallRadioSize);
   top: calc(50% - $smallRadioSize);
+}
+
+// Customize spacing between mat-select dropdown options
+.mat-mdc-option {
+  min-height: 10px; // Adjust height as needed
+  padding-top: 5px; // Adjust vertical padding as needed
+  padding-bottom: 5px;
 }
 
 /* The Snackbar call passes in 'snackBar' as a custom class */

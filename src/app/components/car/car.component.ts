@@ -52,7 +52,7 @@ export class CarComponent implements OnInit {
     this.cars = this.objects.cars;
     /* Note that the select group formControlName is 'car' */
     this.carInitialFormValue = {
-      car: ECar.VW_T5_LWB_Van_2005,
+      car: ECar.Fiat_Ducato_MWB_Van_2025,
     };
   }
 

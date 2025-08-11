@@ -226,7 +226,7 @@ export class InformationService {
       case EManoeuvre.Park3UsingRulesMinAngle:
         return {
           message:
-            'Rule 4: Lock counterclockwise and move forward until you are parallel to the kerb',
+            'Rule 5: Lock counterclockwise and move forward until you are parallel to the kerb',
           snackConfig: {
             duration: 5000,
             horizontalPosition: 'center',

@@ -97,7 +97,7 @@ export class ObjectsService {
     wheelbase: 2650,
     frontOverhang: 950,
     wheelToWheelWidth: 1549,
-    sideOverhang: 123,
+    sideOverhang: 123,  // 1795mm total width
     wheelWidth: 195, // 195/65 R15
     wheelLength: 634,
   };
@@ -214,8 +214,8 @@ export class ObjectsService {
 
   Custom_Street: TStreetSetup = {
     name: EStreet.Custom_Street,
-    rearCarWidth: 1900,
-    frontCarWidth: 1900,
+    rearCarWidth: 1000,
+    frontCarWidth: 1000,
     carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
     safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     parkingSpace: 0,
@@ -251,9 +251,10 @@ export class ObjectsService {
     [ECar.Mercedes_E_Estate_2020, 'Mercedes E-Class Estate 2020'],
     [ECar.Mercedes_C_Saloon_2020, 'Mercedes C-Class Saloon 2020'],
     [ECar.Hyundai_i30_2020, 'Hyundai i30 2020'],
+    [ECar.Hyundai_i10_2018, 'Hyundai i10 2018'],
     [ECar.Seat_Ibiza_2018, 'Seat Ibiza 2018'],
     [ECar.Kia_Picanto_2020, 'Kia Picanto 2020'],
-    [ECar.Custom_Car, 'Set Up a Custom Car'],
+    [ECar.Custom_Car, 'Custom Car'],
   ];
 
   readonly streets: Array<[EStreet, string]> = [
@@ -261,6 +262,8 @@ export class ObjectsService {
     [EStreet.Width_1852mm, 'Front Car Width: 1852mm'],
     [EStreet.Width_1795mm, 'Front Car Width: 1795mm'],
     [EStreet.Width_1595mm, 'Front Car Width: 1595mm'],
-    [EStreet.Custom_Street, 'Set up a Custom Street'],
+    [EStreet.Width_2073mm, 'Front Car Width: 2073mm'],
+    [EStreet.Width_2426mm, 'Front Car Width: 2426mm'],
+    [EStreet.Custom_Street, 'Custom Front Car Width'],
   ];
 }
