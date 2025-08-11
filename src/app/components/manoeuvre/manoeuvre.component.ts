@@ -63,9 +63,7 @@ export class ManoeuvreComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.manoeuvreForm = this.formBuilder.group(
-      this.manoeuvreInitialFormValue,
-    );
+    this.manoeuvreForm = this.formBuilder.group(this.manoeuvreInitialFormValue);
     this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
       startWith(this.manoeuvreInitialFormValue),
       map((manoeuvreFormValue: IManoeuvreForm) => manoeuvreFormValue.manoeuvre),

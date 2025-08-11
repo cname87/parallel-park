@@ -77,7 +77,7 @@ export class StreetComponent implements OnInit {
         this.hint = "Select 'Custom' to set up a custom front car width";
       } else {
         this.message = 'Select a front car width';
-        this.hint = "The set of available front car widths";
+        this.hint = 'The set of available front car widths';
       }
     });
   }

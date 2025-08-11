@@ -97,7 +97,7 @@ export class ObjectsService {
     wheelbase: 2650,
     frontOverhang: 950,
     wheelToWheelWidth: 1549,
-    sideOverhang: 123,  // 1795mm total width
+    sideOverhang: 123, // 1795mm total width
     wheelWidth: 195, // 195/65 R15
     wheelLength: 634,
   };

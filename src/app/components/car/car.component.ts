@@ -43,7 +43,7 @@ export class CarComponent implements OnInit {
   private car!: ICar;
   public message = '';
   public hint = '';
-  
+
   constructor(
     private formBuilder: FormBuilder,
     private data: DataService,
@@ -74,8 +74,7 @@ export class CarComponent implements OnInit {
     this.data.getMode().mode$.subscribe((value: EMode) => {
       if (value === EMode.Keyboard) {
         this.message = 'Select a car to park';
-        this.hint =
-          'Select a custom car to set custom dimensions';
+        this.hint = 'Select a custom car to set custom dimensions';
       } else {
         this.message = 'Select a car to park';
         this.hint = 'The set of available cars';

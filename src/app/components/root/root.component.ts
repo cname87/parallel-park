@@ -282,7 +282,8 @@ export class AppComponent implements AfterViewInit {
         this.config.errorDistFromKerb
       ) {
         this.logger.log(
-          `Park Fail:\nDistance from kerb to front port corner is ${this.config.round(
+          `Park Fail:\nDistance from kerb to front port corner is ' +
+          ${this.config.round(
             this.car.readFrontPortCorner.y * this.config.distScale,
             0,
           )}mm`,
@@ -295,7 +296,8 @@ export class AppComponent implements AfterViewInit {
         this.config.errorDistFromKerb
       ) {
         this.logger.log(
-          `Park Fail:\nDistance from kerb to rear port corner is ${this.config.round(
+          `Park Fail:\nDistance from kerb to rear port corner is ' +
+          ${this.config.round(
             this.car.readRearPortCorner.y * this.config.distScale,
             0,
           )}mm`,
@@ -345,7 +347,9 @@ export class AppComponent implements AfterViewInit {
     if (manoeuvreService.manoeuvre$) {
       manoeuvreService.manoeuvre$
         .pipe(this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG))
-        .subscribe((manoeuvre: EManoeuvre) => (this.selectedManoeuvre = manoeuvre));
+        .subscribe(
+          (manoeuvre: EManoeuvre) => (this.selectedManoeuvre = manoeuvre),
+        );
     }
 
     const carService = this.data.getCar();
@@ -454,9 +458,7 @@ export class AppComponent implements AfterViewInit {
           invalid = true;
           this.data.getButton('main').disable();
           this.data.getMode().modeForm.disable({ emitEvent: false });
-          this.data
-            .getManoeuvre()
-            .manoeuvreForm.disable({ emitEvent: false });
+          this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
           this.data.getCar().carForm.disable({ emitEvent: false });
           this.data.getStreet().streetForm.disable({ emitEvent: false });
         } else if (invalid === true) {

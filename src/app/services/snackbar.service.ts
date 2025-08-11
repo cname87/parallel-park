@@ -75,7 +75,8 @@ export class SnackbarService {
   private addMouseEvents() {
     this.config.stage.on('stagemousedown', (event: unknown) => {
       const eventTyped = event as { stageX: number; stageY: number };
-      const message = `The canvas was paused by a click at X: ${this.config.round(
+      const message = `The canvas was paused by a click at X: ' +
+      ${this.config.round(
         (eventTyped.stageX * this.config.distScale) / 1000,
         1,
       )}m  Y: ${this.config.round(

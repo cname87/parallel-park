@@ -88,7 +88,6 @@ export class InformationService {
         };
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Leave:
         return {
           message: '',
         };
@@ -126,7 +125,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Leave:
         return {
           message: '',
         };
@@ -164,7 +162,6 @@ export class InformationService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Leave:
         return {
           message: '',
         };
@@ -202,7 +199,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Leave:
         return {
           message: '',
         };
@@ -240,7 +236,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Leave:
         return {
           message: '',
         };

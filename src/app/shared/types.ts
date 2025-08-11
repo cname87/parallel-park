@@ -177,22 +177,31 @@ export const enum ECar {
 }
 
 export const enum EManoeuvre {
-  /* Rotate in and then rotate to straight */
+  /* 2 rotations / no straight reverse
+  - Reverse to where you can rotate out and then rotate in to parked */
   Park2Rotate0Straight = 'Park2Rotate0Straight',
-  /* Rotate in from a fixed starting position then */
+  /* Fixed start position / 2 rotations / 1 straight reverse
+  - Start from a fixed position, then rotate out, reverse, and rotate in to
+  parked */
   Park2Rotate1StraightFixedStart = 'Park2Rotate1StraightFixedStart',
-  /* Rotate in so port corner touches front car corner and then rotate to straight */
+  /* 2 rotations / 1 straight reverse
+  - Reverse to where you can rotate in so that the car left front corner
+  touches the   front car rear outside corner (outside the minimum gap), and
+  then rotate in to parked */
   Park2Rotate1StraightMinAngle = 'Park2Rotate1StraightMinAngle',
-  /* Rotate in and then rotate to straight with the moves written in manually */
+  /* 2 rotations / 1 straight reverse
+  - Reverse to a given position, rotate in to a given angle, reverse by a given
+  amount, and then rotate in to parked */
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
   /* Rotate in using rules and collision conditions rather than optimally calculated angles and distances - medium angle of approach */
   Park3UsingRulesMediumAngle = 'Park3UsingRulesMediumAngle',
   /* Rotate in using rules and collision conditions rather than optimally calculated angles and distances - mimimum angle of approach */
   Park3UsingRulesMinAngle = 'Park3UsingRulesMinAngle',
-  /* Rotate in so port corner touches front car corner and then rotate in so car hits the back car, then rotate forward to straight */
+  /* 3 rotations / 1 straight reverse
+  - Reverse to where you can rotate in so that the car left front corner
+  touches the front car rear outside corner (outside the minimum gap), and then
+  rotate in   so the car hits the back car, then rotate forward to parked */
   Park3Rotate1StraightMinAngle = 'Park3Rotate1StraightMinAngle',
-  /* Start from parked */
-  Leave = 'Leave',
 }
 
 export const enum EStreet {
