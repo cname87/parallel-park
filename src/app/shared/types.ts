@@ -193,15 +193,18 @@ export const enum EManoeuvre {
   - Reverse to a given position, rotate in to a given angle, reverse by a given
   amount, and then rotate in to parked */
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
-  /* Rotate in using rules and collision conditions rather than optimally calculated angles and distances - medium angle of approach */
-  Park3UsingRulesMediumAngle = 'Park3UsingRulesMediumAngle',
-  /* Rotate in using rules and collision conditions rather than optimally calculated angles and distances - mimimum angle of approach */
-  Park3UsingRulesMinAngle = 'Park3UsingRulesMinAngle',
-  /* 3 rotations / 1 straight reverse
+    /* 3 rotations / 1 straight reverse
   - Reverse to where you can rotate in so that the car left front corner
   touches the front car rear outside corner (outside the minimum gap), and then
   rotate in   so the car hits the back car, then rotate forward to parked */
   Park3Rotate1StraightMinAngle = 'Park3Rotate1StraightMinAngle',
+  /* Rotate in using rules and collision conditions rather than optimally
+  calculated angles and distances - medium angle of approach */
+  Park3UsingRulesMediumAngle = 'Park3UsingRulesMediumAngle',
+  /* Rotate in using rules and collision conditions rather than optimally
+  calculated angles and distances - mimimum angle of approach */
+  Park3UsingRulesMinAngle = 'Park3UsingRulesMinAngle',
+
 }
 
 export const enum EStreet {

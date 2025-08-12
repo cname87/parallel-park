@@ -248,11 +248,14 @@ export class ObjectsService {
       EManoeuvre.Park3UsingRulesMinAngle,
       'Park By Rule - NOT using optimal calculations',
     ],
-    // Not used in the final application as was not useful.
-    // [
-    //   EManoeuvre.Park3UsingRulesMedAngle,
-    //   'Park By Rule 2 - NOT using optimal calculations',
-    // ],
+    [
+      EManoeuvre.Park3UsingRulesMediumAngle,
+      'Park By Rule 2 - NOT using optimal calculations',
+    ],
+    [
+      EManoeuvre.Park3UsingRulesMinAngle,
+      'Park By Rule 3 - NOT using optimal calculations',
+    ],
   ];
 
   readonly cars: Array<[ECar, string]> = [
