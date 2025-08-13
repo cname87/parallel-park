@@ -7,7 +7,6 @@ import {
   EMoveType,
   ERotateDirection,
   LoggingLevel,
-  TMove,
   TMoveArc,
   TMoveStraight,
   TPoint,
@@ -670,7 +669,9 @@ export class MoveService {
     });
   }
 
-  public async routeMove(move: TMove): Promise<void> {
+  public async routeMove(
+    move: TMoveStraight | TMoveArc | TSteer,
+  ): Promise<void> {
     if (move.message) {
       this.snack.open(move.message);
     }

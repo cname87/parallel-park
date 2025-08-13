@@ -7,7 +7,6 @@ import {
   EMoveType,
   LoggingLevel,
   TButtonNames,
-  TMove,
   TMoveArc,
   TMoveStraight,
   TPoint,
@@ -55,12 +54,12 @@ export class ManualMoveService {
     steeringWheelAngle: ELock.Center,
   };
 
-  #steerCounterlockwise: TMove = {
+  #steerCounterlockwise: TSteer = {
     type: () => EMoveType.Steer,
     steeringWheelAngle: ELock.Counterclockwise,
   };
 
-  #steerClockwise: TMove = {
+  #steerClockwise: TSteer = {
     type: () => EMoveType.Steer,
     steeringWheelAngle: ELock.Clockwise,
   };

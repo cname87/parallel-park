@@ -20,6 +20,7 @@ import {
   EStreet,
   LoggingLevel,
   TScenario,
+  TMove,
 } from '../../shared/types';
 import { MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 
@@ -101,7 +102,7 @@ export class AppComponent implements AfterViewInit {
     this.grid.createGrid();
 
     /* Run the parking calculations getting a manoeuvre containing set of moves.
-    The returned object contains the parking space length, a minimum kerb distance (if necessary), 
+    The returned object contains the parking space length, a minimum kerb distance (if necessary),
     the start position and the set of moves. */
     const manoeuvre = this.manoeuvre.getManoeuvre({
       manoeuvre: scenario.manoeuvre,
@@ -201,7 +202,7 @@ export class AppComponent implements AfterViewInit {
     /* Run the parking manoeuvre */
     for (const key in manoeuvre.movie) {
       if (Object.prototype.hasOwnProperty.call(manoeuvre.movie, key)) {
-        const move = manoeuvre.movie[key];
+        const move: TMove = manoeuvre.movie[key];
         await this.mover.routeMove(move);
         /* Reset if the button clicked when status = Reset */
         if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {

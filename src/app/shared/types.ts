@@ -193,7 +193,7 @@ export const enum EManoeuvre {
   - Reverse to a given position, rotate in to a given angle, reverse by a given
   amount, and then rotate in to parked */
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
-    /* 3 rotations / 1 straight reverse
+  /* 3 rotations / 1 straight reverse
   - Reverse to where you can rotate in so that the car left front corner
   touches the front car rear outside corner (outside the minimum gap), and then
   rotate in   so the car hits the back car, then rotate forward to parked */
@@ -204,7 +204,6 @@ export const enum EManoeuvre {
   /* Rotate in using rules and collision conditions rather than optimally
   calculated angles and distances - mimimum angle of approach */
   Park3UsingRulesMinAngle = 'Park3UsingRulesMinAngle',
-
 }
 
 export const enum EStreet {
@@ -232,7 +231,7 @@ export const enum EMoveType {
 export type TCondition = (car: CarService, tick?: unknown) => boolean;
 
 export type TMoveStraight = {
-  type: (car: CarService) => EMoveType.MoveStraight | EMoveType.MoveArc;
+  type: (car: CarService) => EMoveType.MoveStraight;
   fwdOrReverseFn: (car: CarService) => EDirection;
   deltaAngleFn?: (car: CarService) => number;
   deltaPositionFn: (car: CarService) => number;
@@ -242,10 +241,20 @@ export type TMoveStraight = {
 };
 
 export type TMoveArc = {
-  type: (car: CarService) => EMoveType.MoveStraight | EMoveType.MoveArc;
+  type: (car: CarService) => EMoveType.MoveArc;
   fwdOrReverseFn: (car: CarService) => EDirection;
   deltaAngleFn: (car: CarService) => number;
   deltaPositionFn?: (car: CarService) => number;
+  condition?: (car: CarService) => TCondition;
+  message?: ISnackOpen;
+  speed?: number;
+};
+
+export type TMoveStraightOrArc = {
+  type: (carInUse: CarService) => EMoveType.MoveStraight | EMoveType.MoveArc;
+  fwdOrReverseFn: (car: CarService) => EDirection;
+  deltaAngleFn: (car: CarService) => number;
+  deltaPositionFn: (car: CarService) => number;
   condition?: (car: CarService) => TCondition;
   message?: ISnackOpen;
   speed?: number;
@@ -259,7 +268,24 @@ export type TSteer = {
   speed?: number;
 };
 
-export type TMove = TMoveStraight | TMoveArc | TSteer;
+export type TMove = TSteer | TMoveStraight | TMoveArc | TMoveStraightOrArc;
+
+export type TMovie = {
+  moveA: TSteer;
+  moveB: TMoveStraight;
+  moveC: TSteer;
+  moveD: TMoveArc;
+  moveE: TSteer;
+  moveF: TMoveStraight | TMoveArc;
+  moveG: TSteer;
+  moveH: TMoveArc;
+  moveI: TSteer;
+  moveJ: TMoveArc;
+  moveK: TSteer;
+  moveL: TMoveStraight | TMoveArc;
+  moveM: TSteer;
+  [key: string]: TSteer | TMoveStraight | TMoveArc;
+};
 
 export enum LoggingLevel {
   TRACE,

@@ -14,16 +14,24 @@ import { ConfigService } from './config.service';
  */
 
 /**
- * Motes:
- * * All distances within the application are scaled by a scaling factor and are converted to and from real-world distances for output and input.
- * All external distances in millimeters.
- * The scaling factor converts the distance in mm to the equivalent number of pixels.  See the note in the config component for the scaling factor value.
- * The reference x-axis is the top of the canvas with the positive direction towards the right.
- * The reference y-axis is the left side of the canvas with the positive direction towards the bottom.
+ * Notes:
+ * All distances within the application are scaled by a scaling factor and are
+ * converted to and from real-world distances for output and input.
+ * All distances are in millimeters. The scaling factor converts the distance
+ * in mm to the equivalent number of pixels. See the note in the config
+ * component for the scaling factor value.
+ * The reference x-axis is the top of the canvas with the positive direction
+ * towards the right.
+ * The reference y-axis is the left side of the canvas with the positive
+ * direction towards the bottom.
  * The (0,0) origin is the top left hand corner of the canvas.
- * * All angles within the application are in radians.  Angles are converted to degrees for all input and output.
- * A shape rotates around a center of rotation. The initial line from the center of rotation to the shape reference point is 0 degrees and a rotation clockwise is positive, and counterclockwise is negative.  For the car set up parallel to the x-axis, you could translate this to angles being measured with respect to the x-axis with a positive angle as the car rotates clockwise.
- * We set the reference point of the car shape to be the front starboard corner.
+ * All angles within the application are in radians.  Angles are converted to
+ * degrees for all input and output.
+ * A shape rotates around a center of rotation. The initial line from the
+ * center of rotation to the shape reference point is 0 degrees and a rotation
+ * clockwise is positive, and counterclockwise is negative.
+ * We set the reference point of the car shape to be the front starboard
+ * corner.
  * In the names below:
  * - Outer means on the outside (far side) of the turning circle.
  * - Inner means on the inside (near side) of the turning circle.
