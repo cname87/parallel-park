@@ -351,7 +351,7 @@
     "typescript.surveys.enabled": false,
       /* added so VSCode typescript matches version in use */
     "typescript.tsdk": "./node_modules/typescript/lib",
-    
+
     "vsicons.projectDetection.autoReload": true,
     "vsicons.dontShowNewVersionMessage": true,
 
@@ -360,7 +360,7 @@
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.iconTheme": "material-icon-theme",
     "workbench.settings.openDefaultSettings": true,
-    "workbench.sideBar.location": "right",
+    "workbench.sideBar.location": "left",
 
     "window.zoomLevel": 0,
     "files.watcherExclude": {

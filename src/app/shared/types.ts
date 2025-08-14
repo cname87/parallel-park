@@ -176,27 +176,29 @@ export const enum ECar {
   Fiat_Ducato_MWB_Van_2025 = 'Fiat_Ducato_MWB_Van_2025',
 }
 
+/* so that the car left front corner
+  touches the front car rear outside corner (outside the minimum gap), */
+
 export const enum EManoeuvre {
   /* 2 rotations / no straight reverse
-  - Reverse to where you can rotate out and then rotate in to parked */
+  - Reverse, then rotate out and rotate in to parked
+  with no straight reverse */
   Park2Rotate0Straight = 'Park2Rotate0Straight',
   /* Fixed start position / 2 rotations / 1 straight reverse
   - Start from a fixed position, then rotate out, reverse, and rotate in to
   parked */
   Park2Rotate1StraightFixedStart = 'Park2Rotate1StraightFixedStart',
   /* 2 rotations / 1 straight reverse
-  - Reverse to where you can rotate in so that the car left front corner
-  touches the   front car rear outside corner (outside the minimum gap), and
-  then rotate in to parked */
+  - Reverse, rotate out by a minimum angle, then reverse, and then rotate in to
+  parked */
   Park2Rotate1StraightMinAngle = 'Park2Rotate1StraightMinAngle',
   /* 2 rotations / 1 straight reverse
-  - Reverse to a given position, rotate in to a given angle, reverse by a given
-  amount, and then rotate in to parked */
+  - Reverse to a given position, rotate out by a given angle, reverse by a
+  given amount, and then rotate in to parked */
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
   /* 3 rotations / 1 straight reverse
-  - Reverse to where you can rotate in so that the car left front corner
-  touches the front car rear outside corner (outside the minimum gap), and then
-  rotate in   so the car hits the back car, then rotate forward to parked */
+  - Reverse, rotate out, reverse straight, rotate in until the car hits the
+  rear car, and then rotate in and forward to parked */
   Park3Rotate1StraightMinAngle = 'Park3Rotate1StraightMinAngle',
   /* Rotate in using rules and collision conditions rather than optimally
   calculated angles and distances - medium angle of approach */
