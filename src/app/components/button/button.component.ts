@@ -9,7 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { ThemePalette } from '@angular/material/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { EButtonStatus, IButton, TButtonLabels, TButtonNames } from '../../shared/types';
+import {
+  EButtonStatus,
+  IButton,
+  TButtonLabels,
+  TButtonNames,
+} from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ConfigService } from '../../services/config.service';
 
@@ -57,7 +62,7 @@ export class ButtonComponent implements OnInit {
     private config: ConfigService,
     private data: DataService,
   ) {
-      this.textsRun = this.config.allButtonTexts;
+    this.textsRun = this.config.allButtonTexts;
   }
 
   private enableRun = (): void => {
@@ -81,7 +86,6 @@ export class ButtonComponent implements OnInit {
   };
 
   public onClick = (_event: MouseEvent): void => {
-    console.log('Button clicked:', this.buttonName);
     /* Report the button status when the button was clicked */
     this.buttonClickSubject.next(this.buttonStatus.getValue());
   };

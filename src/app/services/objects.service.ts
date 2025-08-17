@@ -18,7 +18,6 @@ import { ConfigService } from './config.service';
   providedIn: 'root',
 })
 export class ObjectsService {
-
   public Width_1904mm: TStreetSetup;
   public Width_1852mm: TStreetSetup;
   public Width_1795mm: TStreetSetup;
@@ -28,7 +27,6 @@ export class ObjectsService {
   public Custom_Street: TStreetSetup;
 
   constructor(public config: ConfigService) {
-
     this.Width_1904mm = {
       name: EStreet.Width_1904mm,
       rearCarWidth: 1904,
@@ -235,26 +233,26 @@ export class ObjectsService {
 
   readonly manoeuvres: Array<[EManoeuvre, string]> = [
     [EManoeuvre.Park2Rotate1StraightMinAngle, 'Minimum Angle Turn-In'],
+    [EManoeuvre.Park2Rotate0Straight, 'One Turn Only - Maximum Angle Turn-In'],
+    [
+      EManoeuvre.Park2Rotate1StraightFixedStart,
+      'Fixed Location Start - Medium Angle Turn-In',
+    ],
     [
       EManoeuvre.Park3Rotate1StraightMinAngle,
       'Minimum Angle with Shunt - Minimum Parking Space',
     ],
     [
-      EManoeuvre.Park2Rotate1StraightFixedStart,
-      'Fixed Location Start - Medium Angle Turn-In',
+      EManoeuvre.Park2Rotate1StraightSetManual,
+      'Park By a Manual set of conditions',
     ],
-    [EManoeuvre.Park2Rotate0Straight, 'One Turn Only - Maximum Angle Turn-In'],
     [
       EManoeuvre.Park3UsingRulesMinAngle,
-      'Park By Rule - NOT using optimal calculations',
+      'Park By Rule 1 - NOT using optimal calculations',
     ],
     [
       EManoeuvre.Park3UsingRulesMediumAngle,
       'Park By Rule 2 - NOT using optimal calculations',
-    ],
-    [
-      EManoeuvre.Park3UsingRulesMinAngle,
-      'Park By Rule 3 - NOT using optimal calculations',
     ],
   ];
 

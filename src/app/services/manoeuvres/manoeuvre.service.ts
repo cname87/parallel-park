@@ -8,7 +8,7 @@ import {
   TCondition,
   LoggingLevel,
   TMoveStraight,
-  TMoveArc,
+  TMoveFirstSteerrc,
   TSteer,
   TMoveStraightOrArc,
   TMovie,
@@ -102,36 +102,25 @@ import { InformationService } from './information.service';
  *
  * getManoeuvre then creates a set of moves which are returned in a movie
  * object, and are used by the move service to create the manoeuvre. A move can
- * be one of 4 types TSteer, TMoveStraight, TMoveArc or TMoveStraightOrArc. See
+ * be one of 4 types TSteer, TMoveStraight, TMoveFirstSteerrc or TMoveStraightOrArc. See
  * types.ts for definitions.
  *
  * Each second move is a steering move, i.e. it just moves the steering wheel.
- * - moveA sets the steering wheel to the center.
+ * - moveFirstSteer sets the steering wheel to the center.
  * - moveB calls getMoveDist1 to get the distance to move.
  * -- getMoveDist1 calls getStartRelativePosition and
  * getCarFromBumperMedToPivot - see above.
  * - moveC sets the steering wheel counter-clockwise.
  * - moveD calls getMoveDAngle to get the angle to turn.
  * -- getMoveDAngle calls getFirstTurnAngle as above.
- * - moveD also calls getMoveDCondition which can set a condition to stop the
- * turn by returning true.  For this manoeuvre, it returns false, i.e., it is
- * not used.
  * -moveE calls getMoveESteer to get the steering angle.  It simply returns to
  * center the wheel.
  * - moveF calls getMoveF which simply returns to reverse a certain distance.
- * - MoveF also calls getmoveFCondition which can set a condition to stop the
- * turn by returning true. For this manoeuvre, it returns false, i.e., it is
- * not used.
  * - moveG turns the steering wheel clockwise.
  * - moveH calls getMoveHAngle to get the angle to be turned.
  * -- getMoveHAngle subtracts getCollisionAngle from getMoveDAngle (see above).
- * -- getMoveHAngle also calls getMoveHCondition which returns
- * false, i.e. is not used.
  * - moveI calls getMoveISteer to get the steering angle. It sets the steering
  * angle to counter-clockwise.
- * - MoveI also calls getmove5SteerCondition which can set a condition to stop
- * the turn by returning true. For this manoeuvre, it returns false, i.e., it
- * is not used.
  * moveJ calls getMoveJAngle to get the angle to turn.
  * -- getMoveJAngle which returns the collision angle by calling
  * getCollisionAngle.
@@ -140,6 +129,10 @@ import { InformationService } from './information.service';
  * moveL calls getMoveL which returns a move object directing the car to
  * reverse by an amount set by a call to getExtraParkingSpace.
  *
+ Note that many moves call getMoveXCondition which can set a condition to stop the move by returning true.  For this manoeuvre they all return false
+ i.e. they're not used.
+ Note that many moves also call getMoveXMessage to provide a message to be printed on the screen during the move.
+
  * * Note on adding new move types
  *
  * See moveL which calls getMoveL for the best way to add new moves. getMoveL
@@ -261,9 +254,9 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightMinAngle:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
         return 0;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
         return angle;
@@ -764,6 +757,7 @@ export class ManoeuvreService {
       2 *
       car.centerRearAxleTurningRadius(ELock.Counterclockwise) *
       Math.sin(this.getFirstTurnAngle({ manoeuvre, street, car, config }));
+    /* deltaY = 2r(1 - cos(alpha)) */
     const y =
       2 *
       car.centerRearAxleTurningRadius(ELock.Counterclockwise) *
@@ -1003,7 +997,7 @@ export class ManoeuvreService {
          * Only certain values are valid - roughly between the value for a
          * 2RotateMin1Straight and 2Rotate0Straight.
          */
-        return 32.31 * config.DEG_TO_RAD;
+        return 20.0 * config.DEG_TO_RAD; // Old value = 32.31
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         return this.getFirstTurnAngle2R1SMinFixedStart({
           manoeuvre,
@@ -1023,7 +1017,7 @@ export class ManoeuvreService {
 
   /**
    * @returns The x-axis distance, in unscaled mm, from the rear bumper of the
-   * car to the PP just before the car rotates in.
+   * car to a y-axis line through the PP just before the car rotates in.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -1083,7 +1077,6 @@ export class ManoeuvreService {
         const distOCToRearBumper = car.length;
         return cornerFwdXFromPivot - distMovedXDuringTurn - distOCToRearBumper;
       case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
         /* This is the x-axis position of the rear bumper after moving from the
         parked position to the point where it begins rotating in */
         const distRearBumperX =
@@ -1100,8 +1093,11 @@ export class ManoeuvreService {
           distRearBumperX - this.getPivot({ manoeuvre, street, car, config }).x
         );
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-        /* Position rear axle at the front car rear corner */
+        /* Position the rear axle at the front car rear corner */
         return -car.rearOverhang + street.safetyGap;
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        /* Position the rear side alongside the front car rear side */
+        return street.safetyGap;
       case EManoeuvre.Park3UsingRulesMinAngle:
         /* Position rear bumper at the front car rear bumper */
         return this.getRules({ manoeuvre, street, car, config })
@@ -1115,8 +1111,7 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The y-axis distance from the side of the car to the side of the
-   * front parked car PP just before the car rotates in.
+   * @returns The y-axis distance from the inner side of the parking car to the x-axis line drawn through the PP of the front parked car, before the parking car moves off.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -1178,7 +1173,6 @@ export class ManoeuvreService {
         const distPivotYToCar = street.safetyGap;
         return cornerOutYFromFrontCar - distMovedYDuringTurn - distPivotYToCar;
       case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
         /* This is the distance the car side is at in the y-axis direction,
         i.e. the distance from the kerb and the distance moved */
         const distSideY =
@@ -1192,6 +1186,7 @@ export class ManoeuvreService {
             );
         return distSideY - this.getPivot({ manoeuvre, street, car, config }).y;
       case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
         /* Position one safety gap out from the PP */
         return street.safetyGap;
       case EManoeuvre.Park3UsingRulesMediumAngle:
@@ -1295,14 +1290,6 @@ export class ManoeuvreService {
         this.logger.log(`Starting position x: ${value.x}`, LoggingLevel.TRACE);
         this.logger.log(`Starting position y: ${value.y}`, LoggingLevel.TRACE);
         return value;
-        return {
-          x:
-            street.rearCarFromLeft +
-            street.rearCarLength +
-            street.safetyGap +
-            car.length,
-          y: street.carFromKerb + car.width,
-        };
 
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1433,10 +1420,10 @@ export class ManoeuvreService {
    * its first rotation.
    *
    * @remarks
-   * At one stage I could return a rotation or a straight move as move 3. The
-   * idea was to allow a small rotation in move 3 but I couldn't find any
+   * At one stage I could return a rotation or a straight move as moveF. The
+   * idea was to allow a small rotation in moveF but I couldn't find any
    * useful manoeuvre requiring such a rotation so now getMoveF only returns
-   * straight moves. I'm leaving getmove3 in place in case I want to
+   * straight moves. I'm leaving getMoveF in place in case I want to
    * bring that functionality back.
    *
    * @throws Error
@@ -1604,10 +1591,10 @@ export class ManoeuvreService {
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         return ELock.Center;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
         return ELock.Counterclockwise;
@@ -1662,10 +1649,10 @@ export class ManoeuvreService {
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         return 0;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
         return this.getCollisionAngle({ manoeuvre, street, car, config });
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
@@ -1825,7 +1812,6 @@ export class ManoeuvreService {
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         return {
           type: () => EMoveType.MoveStraight,
@@ -1840,6 +1826,13 @@ export class ManoeuvreService {
           deltaPositionFn: () =>
             this.getExtraParkingSpace({ manoeuvre, street, car, config }) / 2,
         };
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        /* Don't reverse for the manual manoeuvre */
+        return {
+          type: () => EMoveType.MoveStraight,
+          fwdOrReverseFn: () => EDirection.Reverse,
+          deltaPositionFn: () => 0,
+        };
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
         const midPoint =
@@ -1852,7 +1845,7 @@ export class ManoeuvreService {
           type: (carInUse: CarService) => {
             return Math.abs(carInUse.readCarRotation) < 0.01
               ? EMoveType.MoveStraight
-              : EMoveType.MoveArc;
+              : EMoveType.MoveFirstSteerrc;
           },
           fwdOrReverseFn: () => EDirection.Reverse,
           /* Return a large angle as the condition will stop the rotation */
@@ -1910,10 +1903,10 @@ export class ManoeuvreService {
           config,
         });
         movie = {
-          moveA: {
+          moveFirstSteer: {
             type: () => EMoveType.Steer,
             steeringWheelAngle: ELock.Center,
-            message: this.info.getMoveAMessage({
+            message: this.info.getMoveFirstSteerMessage({
               manoeuvre,
               street,
               car,
@@ -1938,7 +1931,7 @@ export class ManoeuvreService {
             }),
           },
           moveD: {
-            type: () => EMoveType.MoveArc,
+            type: () => EMoveType.MoveFirstSteerrc,
             fwdOrReverseFn: () => EDirection.Reverse,
             deltaPositionFn: () => 0,
             deltaAngleFn: () =>
@@ -1993,7 +1986,7 @@ export class ManoeuvreService {
             }),
           },
           moveH: {
-            type: () => EMoveType.MoveArc,
+            type: () => EMoveType.MoveFirstSteerrc,
             fwdOrReverseFn: () => EDirection.Reverse,
             deltaPositionFn: () => 0,
             deltaAngleFn: () =>
@@ -2029,7 +2022,7 @@ export class ManoeuvreService {
             }),
           },
           moveJ: {
-            type: () => EMoveType.MoveArc,
+            type: () => EMoveType.MoveFirstSteerrc,
             fwdOrReverseFn: () => EDirection.Forward,
             deltaPositionFn: () => 0,
             deltaAngleFn: () =>
@@ -2068,7 +2061,7 @@ export class ManoeuvreService {
               .deltaPositionFn,
             condition: this.getMoveL({ manoeuvre, street, car, config })
               .condition,
-          } as TMoveStraight | TMoveArc,
+          } as TMoveStraight | TMoveFirstSteerrc,
           moveM: {
             type: () => EMoveType.Steer,
             steeringWheelAngle: ELock.Center,

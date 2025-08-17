@@ -27,8 +27,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveAMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveAMessage called`, LoggingLevel.TRACE);
+  getMoveFirstSteerMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMoveFirstSteerMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -67,7 +67,7 @@ export class InformationService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return {
           message:
-            'This manoeuvre is the same as the minimum angle manoeuvre but uses a shorter parking space as it reaches the rear car at an angle and then turns in',
+            'This manoeuvre starts turning early and enters the parking space at a minimum angle. It reaches the rear car at an angle and then turns in',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -78,7 +78,7 @@ export class InformationService {
       case EManoeuvre.Park3UsingRulesMinAngle:
         return {
           message:
-            'Rule 1:  Reverse 0.6m out from the front car until the rear bumper of the car is level with the rear bumper of the front car',
+            'Rule 1: Reverse 0.6m out from the front car until the rear bumper of the car is level with the rear bumper of the front car',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -87,9 +87,19 @@ export class InformationService {
           pause: false,
         };
       case EManoeuvre.Park2Rotate1StraightSetManual:
+        return {
+          message:
+            'Condition 1: Start 0.5m out from the front car and reverse until the rear bumper of your car is level with the rear bumper of the front car',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
       case EManoeuvre.Park3UsingRulesMediumAngle:
         return {
-          message: '',
+          message: 'TBC',
         };
       default:
         throw new Error('Unexpected manoeuvre');

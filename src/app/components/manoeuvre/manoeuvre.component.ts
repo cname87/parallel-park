@@ -81,8 +81,7 @@ export class ManoeuvreComponent implements OnInit {
     this.data.getMode().mode$.subscribe((value: EMode) => {
       if (value === EMode.Keyboard) {
         this.message = 'Select a manoeuvre, which sets the parking space width';
-        this.hint =
-          'Select a custom street to set a custom parking space width';
+        this.hint = 'The set of possible parking manoeuvres';
       } else {
         this.message = 'Select a parking manoeuvre';
         this.hint = 'The set of possible parking manoeuvres';

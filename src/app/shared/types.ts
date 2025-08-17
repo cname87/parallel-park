@@ -180,32 +180,30 @@ export const enum ECar {
   touches the front car rear outside corner (outside the minimum gap), */
 
 export const enum EManoeuvre {
+  /* 2 rotations / 1 straight reverse
+  - Reverse, rotate out by a minimum angle, then reverse straight, and then rotate in to parked */
+  Park2Rotate1StraightMinAngle = 'Park2Rotate1StraightMinAngle',
   /* 2 rotations / no straight reverse
-  - Reverse, then rotate out and rotate in to parked
-  with no straight reverse */
+  - Reverse, then rotate out and rotate in to parked with no straight reverse */
   Park2Rotate0Straight = 'Park2Rotate0Straight',
   /* Fixed start position / 2 rotations / 1 straight reverse
   - Start from a fixed position, then rotate out, reverse, and rotate in to
   parked */
   Park2Rotate1StraightFixedStart = 'Park2Rotate1StraightFixedStart',
-  /* 2 rotations / 1 straight reverse
-  - Reverse, rotate out by a minimum angle, then reverse, and then rotate in to
-  parked */
-  Park2Rotate1StraightMinAngle = 'Park2Rotate1StraightMinAngle',
-  /* 2 rotations / 1 straight reverse
-  - Reverse to a given position, rotate out by a given angle, reverse by a
-  given amount, and then rotate in to parked */
-  Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
   /* 3 rotations / 1 straight reverse
   - Reverse, rotate out, reverse straight, rotate in until the car hits the
   rear car, and then rotate in and forward to parked */
   Park3Rotate1StraightMinAngle = 'Park3Rotate1StraightMinAngle',
-  /* Rotate in using rules and collision conditions rather than optimally
-  calculated angles and distances - medium angle of approach */
-  Park3UsingRulesMediumAngle = 'Park3UsingRulesMediumAngle',
+  /* 2 rotations / 1 straight reverse
+  - Reverse to a given position, rotate out by a given angle, reverse by a
+  given amount, and then rotate in to parked */
+  Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
   /* Rotate in using rules and collision conditions rather than optimally
   calculated angles and distances - mimimum angle of approach */
   Park3UsingRulesMinAngle = 'Park3UsingRulesMinAngle',
+  /* Rotate in using rules and collision conditions rather than optimally
+  calculated angles and distances - medium angle of approach */
+  Park3UsingRulesMediumAngle = 'Park3UsingRulesMediumAngle',
 }
 
 export const enum EStreet {
@@ -226,7 +224,7 @@ export type TScenario = {
 
 export const enum EMoveType {
   MoveStraight = 'moveStraight',
-  MoveArc = 'moveArc',
+  MoveFirstSteerrc = 'moveFirstSteerrc',
   Steer = 'steer',
 }
 
@@ -242,8 +240,8 @@ export type TMoveStraight = {
   speed?: number;
 };
 
-export type TMoveArc = {
-  type: (car: CarService) => EMoveType.MoveArc;
+export type TMoveFirstSteerrc = {
+  type: (car: CarService) => EMoveType.MoveFirstSteerrc;
   fwdOrReverseFn: (car: CarService) => EDirection;
   deltaAngleFn: (car: CarService) => number;
   deltaPositionFn?: (car: CarService) => number;
@@ -253,7 +251,7 @@ export type TMoveArc = {
 };
 
 export type TMoveStraightOrArc = {
-  type: (carInUse: CarService) => EMoveType.MoveStraight | EMoveType.MoveArc;
+  type: (carInUse: CarService) => EMoveType.MoveStraight | EMoveType.MoveFirstSteerrc;
   fwdOrReverseFn: (car: CarService) => EDirection;
   deltaAngleFn: (car: CarService) => number;
   deltaPositionFn: (car: CarService) => number;
@@ -270,23 +268,23 @@ export type TSteer = {
   speed?: number;
 };
 
-export type TMove = TSteer | TMoveStraight | TMoveArc | TMoveStraightOrArc;
+export type TMove = TSteer | TMoveStraight | TMoveFirstSteerrc | TMoveStraightOrArc;
 
 export type TMovie = {
-  moveA: TSteer;
+  moveFirstSteer: TSteer;
   moveB: TMoveStraight;
   moveC: TSteer;
-  moveD: TMoveArc;
+  moveD: TMoveFirstSteerrc;
   moveE: TSteer;
-  moveF: TMoveStraight | TMoveArc;
+  moveF: TMoveStraight | TMoveFirstSteerrc;
   moveG: TSteer;
-  moveH: TMoveArc;
+  moveH: TMoveFirstSteerrc;
   moveI: TSteer;
-  moveJ: TMoveArc;
+  moveJ: TMoveFirstSteerrc;
   moveK: TSteer;
-  moveL: TMoveStraight | TMoveArc;
+  moveL: TMoveStraight | TMoveFirstSteerrc;
   moveM: TSteer;
-  [key: string]: TSteer | TMoveStraight | TMoveArc;
+  [key: string]: TSteer | TMoveStraight | TMoveFirstSteerrc;
 };
 
 export enum LoggingLevel {

@@ -77,8 +77,12 @@ export class CarService {
     this.sideOverhang = config.defaultSideOverhang;
     this.wheelWidth = config.defaultWheelWidth;
     this.wheelLength = config.defaultWheelLength;
-    this.initialFrontStarboardCornerFromLeft = config.defaultFrontStarboardCornerFromLeft;
-    this.initialFrontStarboardCornerFromTop = config.defaultFrontStarboardCornerFromTop;
+
+    this.initialFrontStarboardCornerFromLeft =
+      config.defaultFrontStarboardCornerFromLeft;
+
+    this.initialFrontStarboardCornerFromTop =
+      config.defaultFrontStarboardCornerFromTop;
   }
 
   public get length(): number {
@@ -206,7 +210,7 @@ export class CarService {
   /**
    * @returns: The absolute position of the front starboard corner of the car on the canvas.
    * A localToGlobal function is used to translate coordinates from the car container (which may be rotated) to the canvas coordinates.
-   * NOTE: The carContainer and carShape need to be both set together before using this  i.e. if you are updating the center of rotation by updating the carContainer reference point with a compensating change to the the carShape reference point then both must be updated before using this.
+   * NOTE: The carContainer and carShape need to be both set together before using this, i.e. if you are updating the center of rotation by updating the carContainer reference point with a compensating change to the the carShape reference point then both must be updated before using this.
    */
   public get readFrontStarboardCorner(): TPoint {
     if (!this.carContainer) {
