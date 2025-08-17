@@ -224,7 +224,7 @@ export type TScenario = {
 
 export const enum EMoveType {
   MoveStraight = 'moveStraight',
-  MoveFirstSteerrc = 'moveFirstSteerrc',
+  MoveArc = '  moveArc',
   Steer = 'steer',
 }
 
@@ -240,8 +240,8 @@ export type TMoveStraight = {
   speed?: number;
 };
 
-export type TMoveFirstSteerrc = {
-  type: (car: CarService) => EMoveType.MoveFirstSteerrc;
+export type TMoveArc = {
+  type: (car: CarService) => EMoveType.MoveArc;
   fwdOrReverseFn: (car: CarService) => EDirection;
   deltaAngleFn: (car: CarService) => number;
   deltaPositionFn?: (car: CarService) => number;
@@ -251,7 +251,7 @@ export type TMoveFirstSteerrc = {
 };
 
 export type TMoveStraightOrArc = {
-  type: (carInUse: CarService) => EMoveType.MoveStraight | EMoveType.MoveFirstSteerrc;
+  type: (carInUse: CarService) => EMoveType.MoveStraight | EMoveType.MoveArc;
   fwdOrReverseFn: (car: CarService) => EDirection;
   deltaAngleFn: (car: CarService) => number;
   deltaPositionFn: (car: CarService) => number;
@@ -268,23 +268,23 @@ export type TSteer = {
   speed?: number;
 };
 
-export type TMove = TSteer | TMoveStraight | TMoveFirstSteerrc | TMoveStraightOrArc;
+export type TMove = TSteer | TMoveStraight | TMoveArc | TMoveStraightOrArc;
 
 export type TMovie = {
   moveFirstSteer: TSteer;
   moveB: TMoveStraight;
   moveC: TSteer;
-  moveD: TMoveFirstSteerrc;
+  moveD: TMoveArc;
   moveE: TSteer;
-  moveF: TMoveStraight | TMoveFirstSteerrc;
+  moveF: TMoveStraight | TMoveArc;
   moveG: TSteer;
-  moveH: TMoveFirstSteerrc;
+  moveH: TMoveArc;
   moveI: TSteer;
-  moveJ: TMoveFirstSteerrc;
+  moveJ: TMoveArc;
   moveK: TSteer;
-  moveL: TMoveStraight | TMoveFirstSteerrc;
+  moveL: TMoveStraight | TMoveArc;
   moveM: TSteer;
-  [key: string]: TSteer | TMoveStraight | TMoveFirstSteerrc;
+  [key: string]: TSteer | TMoveStraight | TMoveArc;
 };
 
 export enum LoggingLevel {

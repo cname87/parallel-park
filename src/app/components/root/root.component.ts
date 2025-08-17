@@ -88,7 +88,7 @@ export class AppComponent implements AfterViewInit {
   setupScreen(scenario: TScenario = this.defaultScenario): IManoeuvre {
     //
     /* Clear the screen */
-    this.config.stage.removeFirstSteerllChildren();
+    this.config.stage.removeAllChildren();
     this.config.stage.update();
 
     /* Modify the car instance to contain the properties of a chosen car */

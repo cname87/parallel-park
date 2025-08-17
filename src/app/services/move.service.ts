@@ -7,7 +7,7 @@ import {
   EMoveType,
   ERotateDirection,
   LoggingLevel,
-  TMoveFirstSteerrc,
+  TMoveArc,
   TMoveStraight,
   TPoint,
   TSteer,
@@ -83,8 +83,8 @@ export class MoveService {
     eventObjOrMove: any,
     resolve: (value: void | PromiseLike<void>) => void,
   ) => {
-    createjs.Ticker.removeFirstSteerllEventListeners('tick');
-    createjs.Ticker.removeFirstSteerllEventListeners('stop');
+    createjs.Ticker.removeAllEventListeners('tick');
+    createjs.Ticker.removeAllEventListeners('stop');
 
     /* Used by manual move service to know that move stopped */
     this.#stopMoveCalled.next(true);
@@ -105,7 +105,7 @@ export class MoveService {
           )} degrees`,
         );
         break;
-      case 'moveFirstSteerrc':
+      case '  moveArc':
         this.logger.log(`Rotation move stopped at:`);
         this.logger.log(
           `Car Rotation: ${this.config.round(
@@ -348,14 +348,14 @@ export class MoveService {
    * @param speed The speed of the move along the arc in mm per second. It defaults to the value set in the config service.
    * @returns A promise that resolves when the move is complete OR the car collides with the canvas edge or collides with one of the two parked cars, OR the supplied condition returns true.
    */
-  public async moveFirstSteerrc({
+  public async moveArc({
     fwdOrReverseFn,
     deltaAngleFn,
     deltaPositionFn = () => 0,
     condition = (_car: CarService) => (_carInUse: CarService, _tick?: any) =>
       false,
     speed = this.config.defaultSpeed,
-  }: TMoveFirstSteerrc): Promise<void> {
+  }: TMoveArc): Promise<void> {
     /* When wheels are straight, e.g. for a keyboard call, the call is passed to a move straight call */
     if (
       this.car.readFrontStarboardWheelRotation === 0 ||
@@ -486,7 +486,7 @@ export class MoveService {
           this.config.stage.update();
 
           /* Console debug */
-          // this.logger.log(`moveFirstSteerrc loop`);
+          // this.logger.log(`  moveArc loop`);
           // this.logger.log(
           //   `Start angle: ${startAngle * this.config.RAD_TO_DEG} degrees`,
           // );
@@ -531,7 +531,7 @@ export class MoveService {
             complete ||
             this.#buttonLastClickStatus === EButtonStatus.Reset
           ) {
-            const resolveReturned = this.stop('moveFirstSteerrc', resolve);
+            const resolveReturned = this.stop('  moveArc', resolve);
             resolveReturned();
           }
         },
@@ -670,7 +670,7 @@ export class MoveService {
   }
 
   public async routeMove(
-    move: TMoveStraight | TMoveFirstSteerrc | TSteer,
+    move: TMoveStraight | TMoveArc | TSteer,
   ): Promise<void> {
     if (move.message) {
       this.snack.open(move.message);
@@ -678,8 +678,8 @@ export class MoveService {
     switch (move.type(this.car)) {
       case EMoveType.Steer:
         return await this.steerWheel(move as TSteer);
-      case EMoveType.MoveFirstSteerrc:
-        return await this.moveFirstSteerrc(move as TMoveFirstSteerrc);
+      case EMoveType.MoveArc:
+        return await this.moveArc(move as TMoveArc);
       case EMoveType.MoveStraight:
         return await this.moveStraight(move as TMoveStraight);
       default:

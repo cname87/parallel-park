@@ -8,7 +8,7 @@ import {
   TCondition,
   LoggingLevel,
   TMoveStraight,
-  TMoveFirstSteerrc,
+  TMoveArc,
   TSteer,
   TMoveStraightOrArc,
   TMovie,
@@ -102,7 +102,7 @@ import { InformationService } from './information.service';
  *
  * getManoeuvre then creates a set of moves which are returned in a movie
  * object, and are used by the move service to create the manoeuvre. A move can
- * be one of 4 types TSteer, TMoveStraight, TMoveFirstSteerrc or TMoveStraightOrArc. See
+ * be one of 4 types TSteer, TMoveStraight,   TMoveArc or TMoveStraightOrArc. See
  * types.ts for definitions.
  *
  * Each second move is a steering move, i.e. it just moves the steering wheel.
@@ -1845,7 +1845,7 @@ export class ManoeuvreService {
           type: (carInUse: CarService) => {
             return Math.abs(carInUse.readCarRotation) < 0.01
               ? EMoveType.MoveStraight
-              : EMoveType.MoveFirstSteerrc;
+              : EMoveType.MoveArc;
           },
           fwdOrReverseFn: () => EDirection.Reverse,
           /* Return a large angle as the condition will stop the rotation */
@@ -1931,7 +1931,7 @@ export class ManoeuvreService {
             }),
           },
           moveD: {
-            type: () => EMoveType.MoveFirstSteerrc,
+            type: () => EMoveType.MoveArc,
             fwdOrReverseFn: () => EDirection.Reverse,
             deltaPositionFn: () => 0,
             deltaAngleFn: () =>
@@ -1986,7 +1986,7 @@ export class ManoeuvreService {
             }),
           },
           moveH: {
-            type: () => EMoveType.MoveFirstSteerrc,
+            type: () => EMoveType.MoveArc,
             fwdOrReverseFn: () => EDirection.Reverse,
             deltaPositionFn: () => 0,
             deltaAngleFn: () =>
@@ -2022,7 +2022,7 @@ export class ManoeuvreService {
             }),
           },
           moveJ: {
-            type: () => EMoveType.MoveFirstSteerrc,
+            type: () => EMoveType.MoveArc,
             fwdOrReverseFn: () => EDirection.Forward,
             deltaPositionFn: () => 0,
             deltaAngleFn: () =>
@@ -2061,7 +2061,7 @@ export class ManoeuvreService {
               .deltaPositionFn,
             condition: this.getMoveL({ manoeuvre, street, car, config })
               .condition,
-          } as TMoveStraight | TMoveFirstSteerrc,
+          } as TMoveStraight | TMoveArc,
           moveM: {
             type: () => EMoveType.Steer,
             steeringWheelAngle: ELock.Center,
