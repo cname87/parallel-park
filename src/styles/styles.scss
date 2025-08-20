@@ -54,11 +54,9 @@ $smallRadioSize: clamp(1rem, 2vw, 2rem);
 }
 
 /* The Snackbar call passes in 'snackBar' as a custom class */
-.mat-snack-bar-container.snackBar{
-  max-width: 100%;
-  button {
-    color:#ba68c8;
-  }
+.snackBar .mat-mdc-snack-bar-actions {
+  max-width: 100%; /* Ensure actions don't overflow */
+  color: $colorAccent;
 }
 
 /* Used in the three scenario menus */
