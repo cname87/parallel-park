@@ -366,13 +366,14 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightMinAngle:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
         return this.getExtraParkingSpace2Rotate({
           manoeuvre,
           street,
           car,
           config,
         });
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        return 75;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
@@ -490,7 +491,6 @@ export class ManoeuvreService {
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         /* The rear corner will swing out further than the rear tyre, on the
         outer side of the turn circle, by an amount equal to the difference of
@@ -500,6 +500,8 @@ export class ManoeuvreService {
           car.farRearAxleSideTurningRadius(ELock.Counterclockwise) +
           buffer;
         break;
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        return 10;
       case EManoeuvre.Park3UsingRulesMinAngle:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:

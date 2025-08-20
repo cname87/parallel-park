@@ -42,7 +42,7 @@ export class ConfigService {
   FPS = 100;
 
   /**
-   * Default distances are expressed in real-world distances divided by the scaling factor.  Thus, they can be entered with reference to real-world distances but they are stored in sacled distances.
+   * Default distances are expressed in real-world distances divided by the scaling factor. Thus, they can be entered with reference to real-world distances but they are stored in sacled distances.
    * Within the program all distances are scaled.
    */
 
