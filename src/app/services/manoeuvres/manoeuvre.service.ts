@@ -187,12 +187,24 @@ export interface IManoeuvre {
   providedIn: 'root',
 })
 export class ManoeuvreService {
+  setManualExtraParkingSpace: number;
+  setManualMinKerbDistance: number;
+  setManualFirstTurnAngle: number;
+  setManualStartDistFromRearToPivot: number;
+  setManualStartDistSideToPivot: number;
   //
   constructor(
     private calc: CalculationService,
     private logger: LoggerService,
     private info: InformationService,
-  ) {}
+  ) {
+    /* Unscaled distances in mm for the SetManual manoeuvre */
+    this.setManualExtraParkingSpace = 2000;
+    this.setManualMinKerbDistance = 200;
+    this.setManualFirstTurnAngle = 25.0; // degrees
+    this.setManualStartDistFromRearToPivot = -500;
+    this.setManualStartDistSideToPivot = 250;
+  }
   //
   /**
    * Returns the final turn-in angle for those manoeuvres that touch the rear
@@ -254,9 +266,9 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
         return 0;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
         return angle;
@@ -373,7 +385,7 @@ export class ManoeuvreService {
           config,
         });
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        return 100;
+        return this.setManualExtraParkingSpace / config.distScale;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
@@ -431,9 +443,11 @@ export class ManoeuvreService {
   };
 
   /**
-   * Returns the distance the car rear inner corner is out from the kerb when
-   * the car needs to start turning in to avoid the rear corner of the car
-   * swinging over the kerb.
+   * @returns Returns the distance the car ends up parked from the kerb.
+   * There are three inputs:
+   * - A minimum default value set in the config file.
+   * - A maximum value derived from the front car distance from the kerb and the legal maximum.
+   * - A minimum value derived from the distance the car rear inner corner is out from the kerb when the car starts turning in order to avoid the rear corner of the car swinging over the kerb.
    *
    * @remarks
    * Used in the Park3Rotate1StraightMinAngle manoeuvre to set a minimum
@@ -444,10 +458,6 @@ export class ManoeuvreService {
    *
    * Theory for the 3 move manoeuvre
    * See {@link http://www.talljerome.com/NOLA/parallelparking/attempt3.html}
-   *
-   * @returns The minimum distance, in scaled units, from the kerb at which the
-   * car turns in, in order that its rear corner (NOT wheel) does not touch the
-   * kerb.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -467,12 +477,13 @@ export class ManoeuvreService {
       config,
     });
 
-    /* Add a buffer to the result to avoid spurious collisions */
+    /* Add a minimal buffer to the result to avoid spurious collisions */
     const buffer = config.collisionBuffer;
+
     /* Set a default minimum distance to the kerb */
     const minDefault = config.defaultMinFromKerb;
 
-    /* Calculate the maximum allowed taking advantage of a very wide front car:
+    /* Set the maximum allowed taking advantage of a very wide front car:
     When the car is being parked, only require the car to turn in so it's outer
     side is level with the front car. This allows a large kerb size under
     certain circumstances but limit it to half the legal maximum. */
@@ -485,13 +496,14 @@ export class ManoeuvreService {
       maxDerivedFromFrontCar,
     );
 
-    /* Calculate a minimum kerb gap size to avoid the rear corner crossing the
+    /* Set a minimum kerb gap size to avoid the rear corner crossing the
     kerb */
     let minDerivedFromTurnIn = 0;
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
         /* The rear corner will swing out further than the rear tyre, on the
         outer side of the turn circle, by an amount equal to the difference of
         the rear corner and the rear side at the rear-axle turning circles */
@@ -500,8 +512,6 @@ export class ManoeuvreService {
           car.farRearAxleSideTurningRadius(ELock.Counterclockwise) +
           buffer;
         break;
-      case EManoeuvre.Park2Rotate1StraightSetManual:
-        return 400 / config.distScale;
       case EManoeuvre.Park3UsingRulesMinAngle:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
@@ -998,7 +1008,7 @@ export class ManoeuvreService {
          * Only certain values are valid - roughly between the value for a
          * 2RotateMin1Straight and 2Rotate0Straight.
          */
-        return 20.0 * config.DEG_TO_RAD;
+        return this.setManualFirstTurnAngle * config.DEG_TO_RAD;
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         return this.getFirstTurnAngle2R1SMinFixedStart({
           manoeuvre,
@@ -1097,8 +1107,7 @@ export class ManoeuvreService {
         /* Position the rear axle at the front car rear corner */
         return -car.rearOverhang + street.safetyGap;
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        /* Position the rear axle at the the front car rear axle*/
-        return street.safetyGap;
+        return this.setManualStartDistFromRearToPivot / config.distScale;
       case EManoeuvre.Park3UsingRulesMinAngle:
         /* Position rear bumper at the front car rear bumper */
         return this.getRules({ manoeuvre, street, car, config })
@@ -1188,8 +1197,7 @@ export class ManoeuvreService {
         return distSideY - this.getPivot({ manoeuvre, street, car, config }).y;
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        /* Position one safety gap out from the PP */
-        return street.safetyGap;
+        return this.setManualStartDistSideToPivot / config.distScale;
       case EManoeuvre.Park3UsingRulesMediumAngle:
         return (
           this.getRules({ manoeuvre, street, car, config }).carSideOutMed -
@@ -1439,7 +1447,6 @@ export class ManoeuvreService {
     config,
   }: IParams): TMoveStraight => {
     this.logger.log('getMoveF called', LoggingLevel.TRACE);
-    let excessGapAboveSafety = 0;
     let deltaY = 0;
     let delta = 0;
     switch (manoeuvre) {
@@ -1451,33 +1458,14 @@ export class ManoeuvreService {
           deltaPositionFn: () => car.rearAxleToFront,
           deltaAngleFn: () => 0,
         };
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        excessGapAboveSafety = street.safetyGap;
         deltaY =
           street.carFromKerb +
           street.frontCarWidth +
           street.safetyGap +
           this.getStartDistSideToPivot({ manoeuvre, street, car, config }) -
-          // excessGapAboveSafety -
           this.getMinKerbDistance({ manoeuvre, street, car, config }) -
-          this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y;
-        delta =
-          deltaY /
-          Math.sin(this.getFirstTurnAngle({ manoeuvre, street, car, config }));
-        return {
-          type: () => EMoveType.MoveStraight,
-          fwdOrReverseFn: () => EDirection.Reverse,
-          deltaPositionFn: () => delta,
-          deltaAngleFn: () => 0,
-        };
-      case EManoeuvre.Park2Rotate1StraightFixedStart:
-        excessGapAboveSafety = street.safetyGap;
-        deltaY =
-          street.carFromKerb -
-          this.getMinKerbDistance({ manoeuvre, street, car, config }) +
-          street.frontCarWidth +
-          street.safetyGap +
-          excessGapAboveSafety -
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y;
         delta =
           deltaY /
@@ -1566,7 +1554,7 @@ export class ManoeuvreService {
           this.getCollisionAngle({ manoeuvre, street, car, config })
         );
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        return 20.0 * config.DEG_TO_RAD;
+        return this.setManualFirstTurnAngle * config.DEG_TO_RAD;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1838,12 +1826,17 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
         return {
           type: () => EMoveType.MoveStraight,
           fwdOrReverseFn: () => EDirection.Forward,
           deltaPositionFn: () =>
             this.getExtraParkingSpace({ manoeuvre, street, car, config }) / 2,
+        };
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        return {
+          type: () => EMoveType.MoveStraight,
+          fwdOrReverseFn: () => EDirection.Forward,
+          deltaPositionFn: () => 0,
         };
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return {
