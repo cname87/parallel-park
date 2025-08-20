@@ -218,7 +218,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getCollisionAngle called`, LoggingLevel.TRACE);
+    this.logger.log('getCollisionAngle called', LoggingLevel.TRACE);
 
     /* arcsin(rb2 - rc2 - m2 / (2rc * (m2 + n2)**0.5)) + arctan(m/n) */
     const rb = car.farRearAxleSideTurningRadius(ELock.Counterclockwise);
@@ -294,7 +294,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getExtraParkingSpace2Rotate called`, LoggingLevel.TRACE);
+    this.logger.log('getExtraParkingSpace2Rotate called', LoggingLevel.TRACE);
     const lineToCarCorner = Math.pow(car.minTurningRadius, 2);
     const centreOfRotationFromKerb =
       this.getMinKerbDistance({ manoeuvre, street, car, config }) +
@@ -334,7 +334,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getExtraParkingSpace3Rotate called`, LoggingLevel.TRACE);
+    this.logger.log('getExtraParkingSpace3Rotate called', LoggingLevel.TRACE);
 
     return (
       car.farRearAxleSideTurningRadius(ELock.Counterclockwise) *
@@ -360,7 +360,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getExtraParkingSpace called`, LoggingLevel.TRACE);
+    this.logger.log('getExtraParkingSpace called', LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -373,7 +373,7 @@ export class ManoeuvreService {
           config,
         });
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        return 75;
+        return 100;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
@@ -404,7 +404,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getParkingSpace called`, LoggingLevel.TRACE);
+    this.logger.log('getParkingSpace called', LoggingLevel.TRACE);
 
     let extraParkingSpace = 0;
     switch (manoeuvre) {
@@ -458,7 +458,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getMinKerbDistance called`, LoggingLevel.TRACE);
+    this.logger.log('getMinKerbDistance called', LoggingLevel.TRACE);
 
     const collisionAngle = this.getCollisionAngle({
       manoeuvre,
@@ -501,7 +501,7 @@ export class ManoeuvreService {
           buffer;
         break;
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        return 10;
+        return 400 / config.distScale;
       case EManoeuvre.Park3UsingRulesMinAngle:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
@@ -542,7 +542,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getFirstTurnAngle2R1SMin called`, LoggingLevel.TRACE);
+    this.logger.log('getFirstTurnAngle2R1SMin called', LoggingLevel.TRACE);
     /* Consider the angle formed by the by the line from the CoR to the rear
     axle but with the second line moved to the position of the OC when the OC
     is at the PP. */
@@ -576,7 +576,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getTurnAngle3R1SMin called`, LoggingLevel.TRACE);
+    this.logger.log('getTurnAngle3R1SMin called', LoggingLevel.TRACE);
 
     /* Calculate the angle between the vertical y-axis to a line from CoR to
     the PP.
@@ -612,7 +612,7 @@ export class ManoeuvreService {
    * manoeuvre.
    */
   private getFirstTurnAngle2R0S = ({ street, car }: IParams): number => {
-    this.logger.log(`getFirstTurnAngle2R0S called`, LoggingLevel.TRACE);
+    this.logger.log('getFirstTurnAngle2R0S called', LoggingLevel.TRACE);
     /**
      * alpha = arccos((2r − (w + p)/2r)
      * r = Turning radius to midpoint of rear axle
@@ -643,7 +643,7 @@ export class ManoeuvreService {
     config,
   }: IParams): number => {
     this.logger.log(
-      `getFirstTurnAngle2R1SMinFixedStart called`,
+      'getFirstTurnAngle2R1SMinFixedStart called',
       LoggingLevel.TRACE,
     );
     /* Solve 2 equations with two unknowns - angle (alpha) and straight
@@ -747,13 +747,13 @@ export class ManoeuvreService {
    * directions, when the car (starting parallel to the x-axis) rotates first
    * in one direction and then in the opposite direction by the same angle.
    */
-  private getDistFrom2Turns = ({
+  private getDistFrom2Arcs = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TPoint => {
-    this.logger.log(`getDistFrom2Turns called`, LoggingLevel.TRACE);
+    this.logger.log('getDistFrom2Arcs called', LoggingLevel.TRACE);
     /* deltaX = 2r(sin(alpha)) */
     const x =
       2 *
@@ -795,7 +795,7 @@ export class ManoeuvreService {
     move6SteerCondition: TCondition;
     move6Condition: TCondition;
   } => {
-    this.logger.log(`getRules called`, LoggingLevel.TRACE);
+    this.logger.log('getRules called', LoggingLevel.TRACE);
 
     const baseFrontCarOut = config.baseFrontCarOut;
     const baseGap = config.baseGap;
@@ -974,7 +974,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getTurnAngle called`, LoggingLevel.TRACE);
+    this.logger.log('getTurnAngle called', LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -995,11 +995,10 @@ export class ManoeuvreService {
         return this.getFirstTurnAngle2R0S({ manoeuvre, street, car, config });
       case EManoeuvre.Park2Rotate1StraightSetManual:
         /**
-         * Note: Set manually.
          * Only certain values are valid - roughly between the value for a
          * 2RotateMin1Straight and 2Rotate0Straight.
          */
-        return 20.0 * config.DEG_TO_RAD; // Old value = 32.31
+        return 20.0 * config.DEG_TO_RAD;
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         return this.getFirstTurnAngle2R1SMinFixedStart({
           manoeuvre,
@@ -1030,7 +1029,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getStartDistFromRearToPivot called`, LoggingLevel.TRACE);
+    this.logger.log('getStartDistFromRearToPivot called', LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -1084,7 +1083,7 @@ export class ManoeuvreService {
         const distRearBumperX =
           street.rearCarCorner.x +
           street.safetyGap +
-          this.getDistFrom2Turns({ manoeuvre, street, car, config }).x +
+          this.getDistFrom2Arcs({ manoeuvre, street, car, config }).x +
           this.getMoveF({ manoeuvre, street, car, config }).deltaPositionFn(
             car,
           ) *
@@ -1124,7 +1123,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getStartDistSideToPivot called`, LoggingLevel.TRACE);
+    this.logger.log('getStartDistSideToPivot called', LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -1179,7 +1178,7 @@ export class ManoeuvreService {
         i.e. the distance from the kerb and the distance moved */
         const distSideY =
           this.getMinKerbDistance({ manoeuvre, street, car, config }) +
-          this.getDistFrom2Turns({ manoeuvre, street, car, config }).y +
+          this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y +
           this.getMoveF({ manoeuvre, street, car, config }).deltaPositionFn(
             car,
           ) *
@@ -1216,7 +1215,7 @@ export class ManoeuvreService {
    *
    */
   private getPivotPointFromKerb = ({ street }: IParams): number => {
-    this.logger.log(`getPivotPointFromKerb called`, LoggingLevel.TRACE);
+    this.logger.log('getPivotPointFromKerb called', LoggingLevel.TRACE);
     return street.carFromKerb + street.frontCarWidth + street.safetyGap;
   };
 
@@ -1224,7 +1223,7 @@ export class ManoeuvreService {
    * @returns A point containing the unscaled x/y coordinates of the PP.
    */
   private getPivot = ({ manoeuvre, street, car, config }: IParams): TPoint => {
-    this.logger.log(`getPivot called`, LoggingLevel.TRACE);
+    this.logger.log('getPivot called', LoggingLevel.TRACE);
     return {
       /* The PP is offset from the x-axis by the rear car and the parking space
       less a safety gap. */
@@ -1249,7 +1248,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TPoint => {
-    this.logger.log(`getStartRelativePosition called`, LoggingLevel.TRACE);
+    this.logger.log('getStartRelativePosition called', LoggingLevel.TRACE);
 
     /* Position the to the right of the PP */
     const startGap = config.defaultCarOuterCornerStartFromPP;
@@ -1274,7 +1273,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TPoint => {
-    this.logger.log(`getStartPosition called`, LoggingLevel.TRACE);
+    this.logger.log('getStartPosition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
@@ -1315,7 +1314,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getMoveBDist called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveBDist called', LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -1353,7 +1352,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getMoveDAngle called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveDAngle called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1381,7 +1380,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log(`getMoveDCondition called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveDCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
@@ -1439,7 +1438,10 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TMoveStraight => {
-    this.logger.log(`getMoveF called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveF called', LoggingLevel.TRACE);
+    let excessGapAboveSafety = 0;
+    let deltaY = 0;
+    let delta = 0;
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
@@ -1450,16 +1452,34 @@ export class ManoeuvreService {
           deltaAngleFn: () => 0,
         };
       case EManoeuvre.Park2Rotate1StraightSetManual:
+        excessGapAboveSafety = street.safetyGap;
+        deltaY =
+          street.carFromKerb +
+          street.frontCarWidth +
+          street.safetyGap +
+          this.getStartDistSideToPivot({ manoeuvre, street, car, config }) -
+          // excessGapAboveSafety -
+          this.getMinKerbDistance({ manoeuvre, street, car, config }) -
+          this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y;
+        delta =
+          deltaY /
+          Math.sin(this.getFirstTurnAngle({ manoeuvre, street, car, config }));
+        return {
+          type: () => EMoveType.MoveStraight,
+          fwdOrReverseFn: () => EDirection.Reverse,
+          deltaPositionFn: () => delta,
+          deltaAngleFn: () => 0,
+        };
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-        const excessGapAboveSafety = street.safetyGap;
-        const deltaY =
+        excessGapAboveSafety = street.safetyGap;
+        deltaY =
           street.carFromKerb -
           this.getMinKerbDistance({ manoeuvre, street, car, config }) +
           street.frontCarWidth +
           street.safetyGap +
           excessGapAboveSafety -
-          this.getDistFrom2Turns({ manoeuvre, street, car, config }).y;
-        const delta =
+          this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y;
+        delta =
           deltaY /
           Math.sin(this.getFirstTurnAngle({ manoeuvre, street, car, config }));
         return {
@@ -1501,7 +1521,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log(`getmoveFCondition called`, LoggingLevel.TRACE);
+    this.logger.log('getmoveFCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1533,11 +1553,10 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getMoveHAngle called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveHAngle called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
@@ -1546,6 +1565,8 @@ export class ManoeuvreService {
           this.getMoveDAngle({ manoeuvre, street, car, config }) -
           this.getCollisionAngle({ manoeuvre, street, car, config })
         );
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        return 20.0 * config.DEG_TO_RAD;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1563,7 +1584,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log(`getMoveHCondition called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveHCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1591,14 +1612,14 @@ export class ManoeuvreService {
    * Thrown if an invalid manoeuvre is passed in.
    */
   private getMoveISteer = ({ manoeuvre }: IParams): number => {
-    this.logger.log(`getMoveISteer called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveISteer called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
         return ELock.Center;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
         return ELock.Counterclockwise;
@@ -1619,7 +1640,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log(`getMoveISteerCondition called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveISteerCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1649,14 +1670,14 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): number => {
-    this.logger.log(`getMoveJAngle called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveJAngle called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
         return 0;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
         return this.getCollisionAngle({ manoeuvre, street, car, config });
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
@@ -1680,7 +1701,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log(`getMoveJCondition called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveJCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1714,7 +1735,7 @@ export class ManoeuvreService {
    * Thrown if an invalid manoeuvre is passed in.
    */
   private getMoveKSteer = ({ manoeuvre }: IParams): ELock => {
-    this.logger.log(`getMoveKSteer called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveKSteer called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1749,7 +1770,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log(`getMoveKSteerCondition called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveKSteerCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1778,7 +1799,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log(`getMoveLCondition called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveLCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1812,11 +1833,12 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TMoveStraight | TMoveStraightOrArc => {
-    this.logger.log(`getMoveL called`, LoggingLevel.TRACE);
+    this.logger.log('getMoveL called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
         return {
           type: () => EMoveType.MoveStraight,
           fwdOrReverseFn: () => EDirection.Forward,
@@ -1829,13 +1851,6 @@ export class ManoeuvreService {
           fwdOrReverseFn: () => EDirection.Reverse,
           deltaPositionFn: () =>
             this.getExtraParkingSpace({ manoeuvre, street, car, config }) / 2,
-        };
-      case EManoeuvre.Park2Rotate1StraightSetManual:
-        /* Don't reverse for the manual manoeuvre */
-        return {
-          type: () => EMoveType.MoveStraight,
-          fwdOrReverseFn: () => EDirection.Reverse,
-          deltaPositionFn: () => 0,
         };
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
@@ -1874,7 +1889,7 @@ export class ManoeuvreService {
    * IManoeuvre description.
    */
   public getManoeuvre({ manoeuvre, street, car, config }: IParams): IManoeuvre {
-    this.logger.log(`getManoeuvre called`, LoggingLevel.TRACE);
+    this.logger.log('getManoeuvre called', LoggingLevel.TRACE);
 
     let parkingSpaceLength = 0;
     let startPosition: TPoint = { x: 0, y: 0 };
