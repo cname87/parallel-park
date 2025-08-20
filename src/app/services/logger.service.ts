@@ -5,7 +5,7 @@ import { LoggingLevel } from '../shared/types';
 import { ConfigService } from './config.service';
 
 /**
- * Provides a ser vice to log messages to console.
+ * Provides a service to log messages to console.
  * Manually edit the initial logging
  */
 

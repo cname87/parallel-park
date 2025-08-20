@@ -18,7 +18,7 @@ export class ConfigService {
    */
 
   /* This sets the logging level used - set to Error unless debugging */
-  loggingLevel = LoggingLevel.ERROR;
+  loggingLevel = LoggingLevel.DEBUG;
   /* This sets whether to run in loop mode on start up - set to false unless testing */
   runLoopTest = false;
 
