@@ -5,8 +5,9 @@ import {
   EManoeuvre,
   ELock,
   EMoveType,
-  TCondition,
+  IMove,
   LoggingLevel,
+  TCondition,
   TMoveStraight,
   TMoveArc,
   TSteer,
@@ -26,8 +27,8 @@ import { InformationService } from './information.service';
  * * Description:
  *
  * The public getManoeuvre method is the entry point to the service. It gets an
- * IParams object and returns an IManoeuvre-type object - see descriptions
- * below. The returned IManoeuvre object contains a movie object which conatins
+ * IParams object and returns an IMove-type object - see descriptions
+ * below. The returned IMove object contains a movie object which conatins
  * the moves to draw the manoeuvre. Each move in the movie object are
  * calculated using the other methods in this service.
  *
@@ -57,20 +58,14 @@ import { InformationService } from './information.service';
  * straight movement, and min angle refers to the fact that the car pivots to
  * pull in at a minimum angle).
  *
- * getManoeuvre first calls getParkingSpace to calculate the required parking
- * space for this manoeuvre.
- * - getParkingSpace calls getExtraParkingSpace to calculate the extra space
- * required above that needed for the car and safty gaps.
+ * getManoeuvre first calls getParkingSpace to calculate the required parkingspace for this manoeuvre.
+ * - getParkingSpace calls getExtraParkingSpace to calculate the extra spacerequired above that needed for the car and safty gaps.
  * - For manouvres with 3 rotations, getExtraParkingSpace calls
  * getExtraParkingSpace3Rotate to get the required extra space.
- * - getExtraParkingSpace3Rotate calls getCollisionAngle to get the angle the
- * car is at when it touches the rear car, which is needed to calculate the
- * required parking space.
- * - getCollisionAngle uses a number of parameters to calculate the angle
- * including the distance from the kerb at which the car must turn in to avoid
- * the rear corner of the car swinging over the kerb  It can't call
- * getMinKerbDistance as that would create a loop so an estimate for the kerb
- * distance is used. See the notes in getCollisionAngle for the estimate used).
+ * - getExtraParkingSpace3Rotate calls getCollisionAngle to get the angle the car is at when it touches the rear car, which is needed to calculate the
+ required parking space.
+ * - getCollisionAngle uses a number of parameters to calculate the angle including the distance from the kerb at which the car must turn in to avoid the rear corner of the car swinging over the kerb  It can't call
+ getParkedKerbDistance as that would create a loop so an estimate for the parked kerb distance is used. See the notes in getCollisionAngle for the estimate used.
  *
  * getManoeuvre then calls getStartPosition to get the car starting position.
  * - getStartPosition calls getPivot to get the PP. (See definition of PP
@@ -89,21 +84,16 @@ import { InformationService } from './information.service';
  * - For this manoeuvre, getFirstTurnAngle calls getFirstTurnAngle3R1SMin to
  * calculate the first turn angle.
  * getFirstTurnAngle3R1SMin calls getCollisionAngle to get the collision angle.
- * getFirstTurnAngle3R1SMin calls getMinKerbDistance to get distance the car
+ * getFirstTurnAngle3R1SMin calls getParkedKerbDistance to get distance the car
  * rear inner corner is out from the kerb when the car needs to start turning in
  * to avoid the rear corner of the car swinging over the kerb.
- *- getMinKerbDistance calls getCollisionAngle to get the collision angle. See
- * the note above on a potential loop between getMinKerbDistance and
- * getCollisionAngle.
+ *- getParkedKerbDistance calls getCollisionAngle to get the collision angle. See the note above on a potential loop between getParkedKerbDistance and getCollisionAngle.
  *
- * getManoeuvre then calls getMinKerbDistance to get to get distance the car
- * rear inner corner is out from the kerb when the car needs to start turning in
- * to avoid the rear corner of the car swinging over the kerb
+ * getManoeuvre then calls getParkedKerbDistance to get to get distance the car rear inner corner is out from the kerb when the car needs to start turning in to avoid the rear corner of the car swinging over the kerb
  *
  * getManoeuvre then creates a set of moves which are returned in a movie
  * object, and are used by the move service to create the manoeuvre. A move can
- * be one of 4 types TSteer, TMoveStraight,   TMoveArc or TMoveStraightOrArc. See
- * types.ts for definitions.
+ * be one of 4 types TSteer, TMoveStraight,   TMoveArc or TMoveStraightOrArc. See types.ts for definitions.
  *
  * Each second move is a steering move, i.e. it just moves the steering wheel.
  * - moveFirstSteer sets the steering wheel to the center.
@@ -176,12 +166,6 @@ interface IParams {
  * @param movie - The set of moves that are passed to the move service to draw
  * the manoeuvre.
  */
-export interface IManoeuvre {
-  readonly parkingSpaceLength: number;
-  readonly startPosition: TPoint;
-  readonly minKerbDistance: number;
-  readonly movie: TMovie;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -236,22 +220,22 @@ export class ManoeuvreService {
     const rb = car.farRearAxleSideTurningRadius(ELock.Counterclockwise);
     const rc =
       2 * car.farRearAxleSideTurningRadius(ELock.Counterclockwise) - car.width;
-    /* The minimum distance to the kerb is required but you can't call
-    getMinKerbDistance as it calls this getCollisionAngle method resulting in
+    /* The parked distance to the kerb is required but you can't call
+    getParkedKerbDistance as it calls this getCollisionAngle method resulting in
     an infinite loop, so an estimate is made.
-    If the estimated minimum kerb distance is bigger than the value returned by
-    getMinKerbDistance then the car will cross the safety gap. Even if the
+    If the estimated parked kerb distance is bigger than the value returned by
+    getParkedKerbDistance then the car will cross the safety gap. Even if the
     safety gap is zero and the car collides with the rear car it will turn in
     and park albeit slightly off parallel.
-    If the estimated minimum kerb distance is smaller than the value returned
-    by getMinKerbDistance then the car will collide with the kerb and the
+    If the estimated parked kerb distance is smaller than the value returned
+    by getParkedKerbDistance then the car will collide with the kerb and the
     parking parking attempt will fail.
     So go for a relatively large value e.g. 400mm.
     */
-    const minKerbDistance = 400 / config.distScale;
+    const parkedKerbDistance = 600 / config.distScale;
     const m =
       car.farRearAxleSideTurningRadius(ELock.Counterclockwise) -
-      minKerbDistance -
+      parkedKerbDistance -
       car.width +
       street.carFromKerb +
       street.frontCarWidth +
@@ -309,7 +293,7 @@ export class ManoeuvreService {
     this.logger.log('getExtraParkingSpace2Rotate called', LoggingLevel.TRACE);
     const lineToCarCorner = Math.pow(car.minTurningRadius, 2);
     const centreOfRotationFromKerb =
-      this.getMinKerbDistance({ manoeuvre, street, car, config }) +
+      this.getParkedKerbDistance({ manoeuvre, street, car, config }) +
       car.farRearAxleSideTurningRadius(ELock.Counterclockwise);
     const pivotPointFromKerb = this.getPivotPointFromKerb({
       manoeuvre,
@@ -447,7 +431,7 @@ export class ManoeuvreService {
    * There are three inputs:
    * - A minimum default value set in the config file.
    * - A maximum value derived from the front car distance from the kerb and the legal maximum.
-   * - A minimum value derived from the distance the car rear inner corner is out from the kerb when the car starts turning in order to avoid the rear corner of the car swinging over the kerb.
+   * - A minimum value derived from where the car ends up parked if it starts turning in at the minimum distance the car rear inner corner must be out from the kerb in order to avoid the rear corner of the car swinging over the kerb.
    *
    * @remarks
    * Used in the Park3Rotate1StraightMinAngle manoeuvre to set a minimum
@@ -462,13 +446,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMinKerbDistance = ({
+  private getParkedKerbDistance = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): number => {
-    this.logger.log('getMinKerbDistance called', LoggingLevel.TRACE);
+    this.logger.log('getParkedKerbDistance called', LoggingLevel.TRACE);
 
     const collisionAngle = this.getCollisionAngle({
       manoeuvre,
@@ -481,7 +465,7 @@ export class ManoeuvreService {
     const buffer = config.collisionBuffer;
 
     /* Set a default minimum distance to the kerb */
-    const minDefault = config.defaultMinFromKerb;
+    const minDefault = 0; //config.defaultMinFromKerb;
 
     /* Set the maximum allowed taking advantage of a very wide front car:
     When the car is being parked, only require the car to turn in so it's outer
@@ -497,16 +481,14 @@ export class ManoeuvreService {
     );
 
     /* Set a minimum kerb gap size to avoid the rear corner crossing the
-    kerb */
+    kerb.  That is, the car ends up parked out from the kerb by the amount the rear corner swings out further than the rear tyre. (If the rear corner did not swing out further than the rear tyre then the car would park with the tyres at the kerb.) */
     let minDerivedFromTurnIn = 0;
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        /* The rear corner will swing out further than the rear tyre, on the
-        outer side of the turn circle, by an amount equal to the difference of
-        the rear corner and the rear side at the rear-axle turning circles */
+        /* For these manoeuvres, the car rotates in with the rear corner out further than the rear tyre by an amount equal to the difference between the rear corner and the rear outer tyre turning circles */
         minDerivedFromTurnIn =
           car.rearOuterCornerTurningRadius(ELock.Counterclockwise) -
           car.farRearAxleSideTurningRadius(ELock.Counterclockwise) +
@@ -515,7 +497,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park3UsingRulesMinAngle:
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-        /* The rear corner can cross the kerb as it approaches the rear car */
+        /* For these manoeuvres, the rear corner can cross the kerb as it approaches the rear car */
         // min = (1 - cos(alpha)) * (rb - w0) + jSin(alpha)
         minDerivedFromTurnIn =
           (1 - Math.cos(collisionAngle)) *
@@ -596,7 +578,7 @@ export class ManoeuvreService {
     const alpha = this.getCollisionAngle({ manoeuvre, street, car, config });
     const m =
       car.farRearAxleSideTurningRadius(ELock.Counterclockwise) -
-      this.getMinKerbDistance({ manoeuvre, street, car, config }) -
+      this.getParkedKerbDistance({ manoeuvre, street, car, config }) -
       car.width +
       street.carFromKerb +
       street.frontCarWidth +
@@ -670,7 +652,7 @@ export class ManoeuvreService {
     2. Car side y position after movement + y-axis movement = defined position
     of side at start (an extra safety gap outside the front car safety gap):
 
-    this.getMinKerbDistance +
+    this.getParkedKerbDistance +
     2 * car.centerRearAxleTurningRadius * (1 - Math.cos(alpha)) +
     d3 * Math.sin(alpha)
     = street.carFromKerb + street.frontCarWidth + street.safetyGap +
@@ -681,7 +663,7 @@ export class ManoeuvreService {
     - 2 * car.centerRearAxleTurningRadius * Math.sin(alpha)) / Math.cos(alpha)
     i.e. d3 = (c1 - c2Sin(a)) / Cos(a)
     2. d3 = (street.carFromKerb + street.frontCarWidth
-    + street.safetyGap + excessSafetyGap - this.getMinKerbDistance
+    + street.safetyGap + excessSafetyGap - this.getParkedKerbDistance
     - 2 * car.centerRearAxleTurningRadius
     + (2 * car.centerRearAxleTurningRadius)Cos(a)) / Sin(a)
     i.e. d3 = (c3 + c2Cos(a)) / Sin(a)
@@ -709,7 +691,7 @@ export class ManoeuvreService {
       street.frontCarWidth +
       street.safetyGap +
       excessSafetyGap -
-      this.getMinKerbDistance({ manoeuvre, street, car, config }) -
+      this.getParkedKerbDistance({ manoeuvre, street, car, config }) -
       2 * car.centerRearAxleTurningRadius(ELock.Counterclockwise);
 
     const a = Math.pow(c1, 2) + Math.pow(c3, 2);
@@ -1186,7 +1168,7 @@ export class ManoeuvreService {
         /* This is the distance the car side is at in the y-axis direction,
         i.e. the distance from the kerb and the distance moved */
         const distSideY =
-          this.getMinKerbDistance({ manoeuvre, street, car, config }) +
+          this.getParkedKerbDistance({ manoeuvre, street, car, config }) +
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y +
           this.getMoveF({ manoeuvre, street, car, config }).deltaPositionFn(
             car,
@@ -1465,7 +1447,7 @@ export class ManoeuvreService {
           street.frontCarWidth +
           street.safetyGap +
           this.getStartDistSideToPivot({ manoeuvre, street, car, config }) -
-          this.getMinKerbDistance({ manoeuvre, street, car, config }) -
+          this.getParkedKerbDistance({ manoeuvre, street, car, config }) -
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y;
         delta =
           deltaY /
@@ -1879,14 +1861,13 @@ export class ManoeuvreService {
   /**
    *
    * @returns The set of data that defines a complete manoeuvre - see
-   * IManoeuvre description.
+   * IMove description.
    */
-  public getManoeuvre({ manoeuvre, street, car, config }: IParams): IManoeuvre {
+  public getManoeuvre({ manoeuvre, street, car, config }: IParams): IMove {
     this.logger.log('getManoeuvre called', LoggingLevel.TRACE);
 
     let parkingSpaceLength = 0;
     let startPosition: TPoint = { x: 0, y: 0 };
-    let minKerbDistance = 0;
     parkingSpaceLength = this.getParkingSpace({
       manoeuvre,
       street,
@@ -1894,12 +1875,6 @@ export class ManoeuvreService {
       config,
     });
     startPosition = this.getStartPosition({
-      manoeuvre,
-      street,
-      car,
-      config,
-    });
-    minKerbDistance = this.getMinKerbDistance({
       manoeuvre,
       street,
       car,
@@ -2073,7 +2048,6 @@ export class ManoeuvreService {
     return {
       parkingSpaceLength,
       startPosition,
-      minKerbDistance,
       movie,
     };
   }

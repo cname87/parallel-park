@@ -7,7 +7,6 @@ import { GridService } from '../../services/grid.service';
 import { MoveService } from '../../services/move.service';
 import { ObjectsService } from '../../services/objects.service';
 import { ManoeuvreService } from '../../services/manoeuvres/manoeuvre.service';
-import { IManoeuvre } from '../../services/manoeuvres/manoeuvre.service';
 import { LoggerService } from '../../services/logger.service';
 import { ManualMoveService } from '../../services/manual-move.service';
 import { DataService } from '../../services/data.service';
@@ -18,6 +17,7 @@ import {
   EMode,
   EManoeuvre,
   EStreet,
+  IMove,
   LoggingLevel,
   TScenario,
   TMove,
@@ -85,7 +85,7 @@ export class AppComponent implements AfterViewInit {
    *
    * @returns A manoeuvre, i.e. the set of moves to complete a parking manoeuvre.
    */
-  setupScreen(scenario: TScenario = this.defaultScenario): IManoeuvre {
+  setupScreen(scenario: TScenario = this.defaultScenario): IMove {
     //
     /* Clear the screen */
     this.config.stage.removeAllChildren();
@@ -183,11 +183,6 @@ export class AppComponent implements AfterViewInit {
           this.car.length -
           2 * this.street.safetyGap) *
           this.config.distScale,
-      )}mm`,
-    );
-    this.logger.log(
-      `Kerb distance: ${Math.round(
-        manoeuvre.minKerbDistance * this.config.distScale,
       )}mm`,
     );
     this.logger.log(

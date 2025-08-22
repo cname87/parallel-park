@@ -232,19 +232,25 @@ export class ObjectsService {
   readonly modes: EMode[] = [EMode.Loop, EMode.Single, EMode.Keyboard];
 
   readonly manoeuvres: Array<[EManoeuvre, string]> = [
-    [EManoeuvre.Park2Rotate1StraightMinAngle, 'Minimum Angle Turn-In'],
-    [EManoeuvre.Park2Rotate0Straight, 'One Turn Only - Maximum Angle Turn-In'],
     [
-      EManoeuvre.Park2Rotate1StraightFixedStart,
-      'Fixed Location Start - Medium Angle Turn-In',
+      EManoeuvre.Park2Rotate1StraightMinAngle,
+      'No Forward Pull-In; Minimum Angle Turn-In',
     ],
     [
-      EManoeuvre.Park3Rotate1StraightMinAngle,
-      'Minimum Angle with Shunt - Minimum Parking Space',
+      EManoeuvre.Park2Rotate0Straight,
+      'No Forward Pull-In; Maximum Angle Turn-In',
+    ],
+    [
+      EManoeuvre.Park2Rotate1StraightFixedStart,
+      'No Forward Pull-In; Fixed Location Start',
     ],
     [
       EManoeuvre.Park2Rotate1StraightSetManual,
-      'Park By a Manual set of conditions',
+      'No Forward Pull-In; Manual Parameters',
+    ],
+    [
+      EManoeuvre.Park3Rotate1StraightMinAngle,
+      'Forward Pull-In; Minimum Angle Turn-In',
     ],
     [
       EManoeuvre.Park3UsingRulesMinAngle,

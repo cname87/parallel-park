@@ -89,6 +89,12 @@ export interface IManoeuvreForm {
   manoeuvre: EManoeuvre;
 }
 
+export interface IMove {
+  readonly parkingSpaceLength: number;
+  readonly startPosition: TPoint;
+  readonly movie: TMovie;
+}
+
 export interface IManoeuvre {
   manoeuvreForm: FormGroup;
   manoeuvre$: Observable<EManoeuvre>;
