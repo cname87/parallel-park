@@ -17,7 +17,7 @@ import {
   EMode,
   EManoeuvre,
   EStreet,
-  IMove,
+  IPark,
   LoggingLevel,
   TScenario,
   TMove,
@@ -85,7 +85,7 @@ export class AppComponent implements AfterViewInit {
    *
    * @returns A manoeuvre, i.e. the set of moves to complete a parking manoeuvre.
    */
-  setupScreen(scenario: TScenario = this.defaultScenario): IMove {
+  setupScreen(scenario: TScenario = this.defaultScenario): IPark {
     //
     /* Clear the screen */
     this.config.stage.removeAllChildren();

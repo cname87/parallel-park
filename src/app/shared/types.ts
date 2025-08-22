@@ -89,7 +89,7 @@ export interface IManoeuvreForm {
   manoeuvre: EManoeuvre;
 }
 
-export interface IMove {
+export interface IPark {
   readonly parkingSpaceLength: number;
   readonly startPosition: TPoint;
   readonly movie: TMovie;

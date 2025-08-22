@@ -96,7 +96,7 @@ export class ConfigService {
 
   /* Limits */
   collisionBuffer = 1 / this.distScale;
-  defaultMinFromKerb = 0 / this.distScale;
+  defaultMinFromKerb = 150 / this.distScale;
   maxLegalKerbGap = 500 / this.distScale;
 
   /**
