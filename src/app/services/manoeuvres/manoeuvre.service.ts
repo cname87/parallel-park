@@ -174,12 +174,14 @@ export class ManoeuvreService {
     private calc: CalculationService,
     private logger: LoggerService,
     private info: InformationService,
+    private config: ConfigService,
+    private car: CarService,
   ) {
     /* Unscaled distances in mm for the setManual manoeuvre */
     this.setManualExtraParkingSpace = 2000;
-    this.setManualMinKerbDistance = 200;
+    this.setManualMinKerbDistance = this.config.defaultCarFromKerb;
     this.setManualFirstTurnAngle = 25.0; // degrees
-    this.setManualStartDistFromRearToPivot = -500;
+    this.setManualStartDistFromRearToPivot = this.car.rearOverhang;
     this.setManualStartDistSideToPivot = 250;
   }
   //
@@ -483,7 +485,7 @@ export class ManoeuvreService {
       maxDerivedFromFrontCar,
       minDerivedFromTurnIn,
     );
-    this.logger.log(`Min. kerb distance: ${value}`, LoggingLevel.DEBUG);
+    this.logger.log(`Min. kerb distance: ${value}`, LoggingLevel.TRACE);
     return value;
   };
 
@@ -1254,8 +1256,8 @@ export class ManoeuvreService {
             this.getPivot({ manoeuvre, street, car, config }).y +
             this.getStartRelativePosition({ manoeuvre, street, car, config }).y,
         };
-        this.logger.log(`Starting position x: ${value.x}`, LoggingLevel.TRACE);
-        this.logger.log(`Starting position y: ${value.y}`, LoggingLevel.TRACE);
+        this.logger.log(`Starting position X: ${value.x}`, LoggingLevel.TRACE);
+        this.logger.log(`Starting position Y: ${value.y}`, LoggingLevel.TRACE);
         return value;
 
       default:

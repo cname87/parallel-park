@@ -115,7 +115,7 @@ export class ConfigService {
    */
   RAD_TO_DEG = 180 / Math.PI;
   DEG_TO_RAD = Math.PI / 180;
-  round(n: number, places = 6): number {
+  round(n: number, places = 2): number {
     return Math.round(Math.pow(10, places) * n) / Math.pow(10, places);
   }
 
