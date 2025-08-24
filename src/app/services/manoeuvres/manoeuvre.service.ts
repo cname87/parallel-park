@@ -254,7 +254,7 @@ export class ManoeuvreService {
    * the car does NOT touch the rear car (out by the safety gap) at an angle
    * and then execute the final pull-in.
    *
-   * * Theory
+   * @theory
    * Consider the car to be positioned with the OC to be at the PP.
    * Consider the triangle formed by:
    * - a line from the CoR to the OC (which is the minimum turning radius,
@@ -301,7 +301,7 @@ export class ManoeuvreService {
    * the safety gap) at an angle and then executes the final pull-in, i.e.
    * where the pull-in consists of 2 turns.
    *
-   * * Theory
+   * @theory
    * See {@link http://www.talljerome.com/NOLA/parallelparking/attempt3.html}
    */
   private getExtraParkingSpace3Rotate = ({
@@ -417,7 +417,7 @@ export class ManoeuvreService {
    -- For 3-turn manoeuvres this is derived from where the car ends up parked when the the rear corner touches the kerb as the car touches the rear car at an angle.
    -- NOTE: You could set up so that a minimum is set when the rear wheel (not the corner) touches the kerb and then the formula below must be edited and the minimum distances would be much shorter.
    *
-   * Theory for the 3 move manoeuvre
+   @theory for the 3 move manoeuvre
    * See {@link http://www.talljerome.com/NOLA/parallelparking/attempt3.html}
    *
    * @throws Error
@@ -494,12 +494,10 @@ export class ManoeuvreService {
    * @remarks
    * This applies to the manoeuvre with the first turn at a minimum angle as part of a 2-turn, 1 straight manoeuvre.
    *
-   * * Theory
-   * Consider the angle formed by the line from the CoR to the rear axle and
-   * the line from the CoR to the OC when the car is parked parallel to the
-   * kerb.
-   * Consider the angle formed by the same first line but with the second line
-   * moved to the position of the OC when the OC is at the PP.
+   * @theory
+   * The first turning angle from parallel to a turned position is the same as the turning angle from the turned position to parallel. That is, a rotation from a position where the car OC is at the PP to a position where the car OC is at the kerb. To calculate this angle consider the difference between two angles:
+   1. OC at PP position: The angle formed by a line from the CoR to the rear axle and a line from the CoR to the PP.
+   2. OC at parked position: The angle formed by a line from the CoR to the rear axle and a line from the CoR to the OC.
    */
   private getFirstTurnAngle2R1SMin = ({
     manoeuvre,
@@ -508,16 +506,13 @@ export class ManoeuvreService {
     config,
   }: IParams): number => {
     this.logger.log('getFirstTurnAngle2R1SMin called', LoggingLevel.TRACE);
-    /* Consider the angle formed by the by the line from the CoR to the rear
-    axle but with the second line moved to the position of the OC when the OC
-    is at the PP. */
+    /* Car at PP position: The angle formed by a line from the CoR to the rear axle and a line from the CoR to the PP. */
     const angleYToPP = Math.asin(
       (car.rearAxleToFront +
         this.getExtraParkingSpace2Rotate({ manoeuvre, street, car, config })) /
         car.minTurningRadius,
     );
-    /* Consider the angle formed by the line from the CoR to the rear axle and
-    the line from the CoR to the OC when the car is parked parallel to the kerb. */
+    /* OC at parked position: The angle formed by a line from the CoR to the rear axle and a line from the CoR to the OC. */
     const angleYToOCParked = Math.asin(
       car.rearAxleToFront / car.minTurningRadius,
     );
@@ -532,12 +527,10 @@ export class ManoeuvreService {
    * @remarks
    * This applies to the manoeuvre with the first turn at a minimum angle as part of a 3-turn, 1 straight manoeuvre.
    *
-   * @remarks
-   * This applies to the manoeuvre requiring 2 final turn-ins (as opposed to
-   * the 1 used by other manoeuvres).
-   *
-   * @returns The angle in radians of the first turn in for a particular
-   * manoeuvre.
+   * @theory
+   * The first turning angle from parallel to a turned position is the same as the turning angle from the turned position to parallel. That is, a rotation from a position where the car OC is at the PP and the car is at the collission angle to the rear car to a position where the car OC is at the kerb. To calculate this angle consider the difference between two angles:
+   1. OC at PP position and car at collision angle to rear car: The angle formed by the vertical y-axis and a line from the CoR to the PP.
+   2. OC at parked position: The angle formed by a line from the CoR to the rear axle and a line from the CoR to the OC.
    */
   private getFirstTurnAngle3R1SMin = ({
     manoeuvre,
@@ -546,9 +539,7 @@ export class ManoeuvreService {
     config,
   }: IParams): number => {
     this.logger.log('getTurnAngle3R1SMin called', LoggingLevel.TRACE);
-
-    /* Calculate the angle between the vertical y-axis to a line from CoR to
-    the PP.
+    /* OC at PP position and car at collision angle to rear car: The angle formed by the vertical y-axis and a line from the CoR to the PP:
     tan(angleYToPP) = (rc * Sin(alpha) + n) / (rc * Cos(alpha) - m) */
     const rc =
       2 * car.farRearAxleSideTurningRadius(ELock.Counterclockwise) - car.width;
@@ -564,9 +555,7 @@ export class ManoeuvreService {
     const angleYToPP = Math.atan(
       (rc * Math.sin(alpha) + n) / (rc * Math.cos(alpha) - m),
     );
-    /* Consider the angle formed by the line from the CoR to the rear axle and
-    the line from the CoR to the OC when the car is parked parallel to the
-    kerb. */
+    /* OC at parked position: The angle formed by a line from the CoR to the rear axle and a line from the CoR to the OC. */
     const angleYToOCParked = Math.asin(
       car.rearAxleToFront / car.minTurningRadius,
     );
