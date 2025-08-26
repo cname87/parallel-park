@@ -120,24 +120,6 @@ export class ConfigService {
   }
 
   /**
-   * * Park by Park3UsingRulesMinAngle manoeuvre constants
-   */
-  /* Minimum front car out from kerb gap*/
-  baseMinFrontCarOut = 2000 / this.distScale;
-  /* Starting distance out from front car */
-  baseSideGaptoFrontCar = 500 / this.distScale;
-  /* MedAngle Manoeuvre: Move in by this amount */
-  moveDDistXMed = 400 / this.distScale;
-  /* MinAngle Manoeuvre: Aim at this point forward of the rear car */
-  moveDProjectedDistFromRearCarMin = 1250 / this.distScale;
-  /* MedAngle: Reverse until this close to kerb */
-  distFromKerbMed = 900 / this.distScale;
-  /* MinAngle: Reverse until this close to kerb */
-  distFromKerbMin = 400 / this.distScale;
-  /* Reverse until this close to rear car */
-  distFromRearCarMin = this.defaultSafetyGap / this.distScale;
-
-  /**
    * * Custom car and street defaults
    */
   minWheelbaseForm = 2300;

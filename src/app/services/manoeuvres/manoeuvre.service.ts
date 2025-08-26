@@ -20,6 +20,7 @@ import { StreetService } from '../street.service';
 import { CalculationService } from '../calculation.service';
 import { LoggerService } from '../logger.service';
 import { InformationService } from './information.service';
+import { RulesService } from './rules.service';
 
 /**
  * @packageDocumentation
@@ -176,6 +177,7 @@ export class ManoeuvreService {
     private info: InformationService,
     private config: ConfigService,
     private car: CarService,
+    private rulesService: RulesService,
   ) {
     /* Unscaled distances in mm for the setManual manoeuvre */
     this.setManualExtraParkingSpace = 2000;
@@ -748,194 +750,6 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns A set of distances and condition functions used by the manoeuvres
-   * that are defined by rules as opposed to calculation of optimums.
-   */
-  private getRules = ({
-    manoeuvre,
-    street,
-    car,
-    config,
-  }: IParams): {
-    carSideOutMed: number;
-    carSideOutMin: number;
-    carDistXFromBumperMed: number;
-    carDistXFromBumperMin: number;
-    moveDConditionMed: TCondition;
-    moveDConditionMin: TCondition;
-    moveFConditionMed: TCondition;
-    moveFConditionMin: TCondition;
-    moveHCondition: TCondition;
-    moveICondition: TCondition;
-    moveJCondition: TCondition;
-    moveKCondition: TCondition;
-    moveLCondition: TCondition;
-  } => {
-    this.logger.log('getRules called', LoggingLevel.TRACE);
-
-    const baseMinFrontCarOut = config.baseMinFrontCarOut;
-    const baseSideGaptoFrontCar = config.baseSideGaptoFrontCar;
-    const adjustForFrontCarWidthFactor =
-      street.frontCarWidth + street.carFromKerb <= baseMinFrontCarOut ? 0.5 : 1;
-    /* Always park at a fixed distance out from the kerb, or else a fixed
-    distance out from the front car if the front car is more than a minimum
-    distance out from the kerb. The idea is to always park where you park for a
-    typical front car */
-    const carSideOutMed = Math.max(
-      baseMinFrontCarOut + baseSideGaptoFrontCar,
-      street.carFromKerb + street.frontCarWidth + baseSideGaptoFrontCar,
-    );
-
-    /* Always park at a fixed distance out from the from the front car */
-    const carSideOutMin =
-      street.carFromKerb + street.frontCarWidth + baseSideGaptoFrontCar;
-
-    /* The starting bumper x-position stays constant in absolute terms for
-    front cars nearer to the kerb than the base, but this is equivalent to the
-    car moving to the right with respect to the rear of the front car for front
-    cars less than the base width (as narrower front cars result in a smaller
-    car space) */
-    /* The starting bumper x-position moves forward with respect to the rear of
-    the front car for front cars wider than the base width (as wider front cars
-    allow you start the straight move in closer to the front car outer corner
-    for the same turned-in angle as you can move in more to clear the corner)
-    */
-    const differenceFromBase =
-      baseMinFrontCarOut - (street.frontCarWidth + street.carFromKerb);
-    const adjustment = adjustForFrontCarWidthFactor * differenceFromBase;
-    const carDistXFromBumperMed =
-      -car.rearOverhang + street.safetyGap + Math.abs(adjustment);
-
-    /* The starting bumper x-position with repect to the OC is the safety gao which is equivalent to being level with the rear bumper of the front car */
-    const carDistXFromBumperMin = street.safetyGap;
-
-    /* Rotate until rear axle side has moved in by a fixed amount. (This is
-    equivalent to a rotation of about 30 degrees). The idea is to know how to
-    rotate through this distance and not have to adjust angles for different
-    situations */
-    const moveDConditionMed = (carInUse: CarService, _tick: any) => {
-      const move2Turn = config.moveDDistXMed;
-      const start =
-        this.getStartPosition({ manoeuvre, street, car, config }).y - car.width;
-      return start - carInUse.readRearPortAxleSide.y >= move2Turn;
-    };
-
-    /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. */
-    const moveDConditionMin = (carInUse: CarService, _tick: any) => {
-      return (
-        Math.abs(
-          /* Rear axle x-axis value */
-          carInUse.readRearPortAxleSide.x -
-            /* How far the car will move in the x-axis direction before it intersects the kerb */
-            carInUse.readRearPortAxleSide.y /
-              Math.tan(carInUse.readCarRotation) -
-            /* Rear car corner x-axis value */
-            street.rearCarCorner.x -
-            /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
-            config.moveDProjectedDistFromRearCarMin,
-        ) < 1
-      );
-    };
-
-    /* Reverse until the rear port axle is a fixed distance from the kerb */
-    /* NOTE:  This can be expressed as a distance from the rear port corner but
-    this varies with the rear overhang of the car. Eg it is 300mm for the VW T5
-    but 500mm for the Hyundai i10 */
-    const moveFConditionMed = (carInUse: CarService, _tick: any) => {
-      const distFromKerb = config.distFromKerbMed;
-      return carInUse.readRearPortAxleSide.y - distFromKerb < 0.1;
-    };
-    /*
-    If the rear starboard corner gets closer to the rear car than the configured
-    minimum distance then stop.
-    Otherwise reverse until the car front port corner is level with the rear
-    bumper of the front car + safety gap and the rear port corner is within a
-    given distance of the kerb.
-     */
-    const moveFConditionMin = (carInUse: CarService, _tick: any) => {
-      return (
-        carInUse.readRearStarboardCorner.x -
-          street.rearCarCorner.x -
-          street.safetyGap -
-          config.distFromRearCarMin <
-          1 ||
-        (carInUse.readFrontPortCorner.x -
-          street.frontCarCorner.x +
-          street.safetyGap <
-          1 &&
-          carInUse.readRearPortCorner.y - config.distFromKerbMin < 1)
-      );
-    };
-
-    /* Rotate in until the car comes within the allowed distance of the rear
-    car or is horizontal */
-    const moveHCondition = (carInUse: CarService, _tick: unknown) => {
-      const tooClose =
-        carInUse.readRearStarboardCorner.x -
-          street.rearCarCorner.x -
-          street.safetyGap -
-          config.distFromRearCarMin <
-        1;
-      const isHorizontal = Math.abs(carInUse.readCarRotation) < 0.001;
-      return tooClose || isHorizontal;
-    };
-
-    /* Keep turnng the wheels until counter-clockwise, stopping in the center position only if the car is horizontal */
-    const moveICondition = (carInUse: CarService) => {
-      return Math.abs(carInUse.readCarRotation) < 0.01 &&
-        Math.abs(carInUse.readFrontPortWheelRotation) < 0.01
-        ? true
-        : false;
-    };
-
-    /* Rotate in until the car touches the safety gap of the front car or is
-    horizontal */
-    const moveJCondition = (carInUse: CarService, tick: unknown) => {
-      const collision = this.calc.checkCollision(carInUse, true);
-      if (collision && typeof tick === 'number') {
-        /* Clear collision */
-        do {
-          carInUse.readCarRotation -= tick;
-        } while (this.calc.checkCollision(carInUse, true));
-        {
-          carInUse.readCarRotation -= tick;
-        }
-      }
-      const isHorizontal = carInUse.readCarRotation < 0.001;
-      return collision || isHorizontal;
-    };
-
-    /* Keep turning the wheels until clockwise, stopping in the center position only if the car is horizontal */
-    const moveKCondition = (carInUse: CarService) => {
-      return Math.abs(carInUse.readCarRotation) < 0.01 &&
-        Math.abs(carInUse.readFrontPortWheelRotation) < 0.01
-        ? true
-        : false;
-    };
-
-    /* If the car is horizontal then stop */
-    const moveLCondition = (carInUse: CarService) => {
-      return carInUse.readCarRotation < 0.01;
-    };
-
-    return {
-      carSideOutMed,
-      carSideOutMin,
-      carDistXFromBumperMed,
-      carDistXFromBumperMin,
-      moveDConditionMed,
-      moveDConditionMin,
-      moveFConditionMed,
-      moveFConditionMin,
-      moveHCondition,
-      moveICondition,
-      moveJCondition,
-      moveKCondition,
-      moveLCondition,
-    };
-  };
-
-  /**
    * @returns The angle in radians that the car rotates on it's first rotation
    * from it's starting position parallel to the x-axis.
    *
@@ -1078,10 +892,10 @@ export class ManoeuvreService {
         return this.setManualStartDistFromRearToPivot / config.distScale;
       case EManoeuvre.Park3UsingRulesMinAngle:
         /* Position rear bumper at the front car rear bumper */
-        return this.getRules({ manoeuvre, street, car, config })
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
           .carDistXFromBumperMin;
       case EManoeuvre.Park3UsingRulesMediumAngle:
-        return this.getRules({ manoeuvre, street, car, config })
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
           .carDistXFromBumperMed;
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1168,13 +982,13 @@ export class ManoeuvreService {
         return this.setManualStartDistSideToPivot / config.distScale;
       case EManoeuvre.Park3UsingRulesMediumAngle:
         return (
-          this.getRules({ manoeuvre, street, car, config }).carSideOutMed -
-          this.getPivot({ manoeuvre, street, car, config }).y
+          this.rulesService.getRules({ manoeuvre, street, car, config })
+            .carSideOutMed - this.getPivot({ manoeuvre, street, car, config }).y
         );
       case EManoeuvre.Park3UsingRulesMinAngle:
         return (
-          this.getRules({ manoeuvre, street, car, config }).carSideOutMin -
-          this.getPivot({ manoeuvre, street, car, config }).y
+          this.rulesService.getRules({ manoeuvre, street, car, config })
+            .carSideOutMin - this.getPivot({ manoeuvre, street, car, config }).y
         );
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1363,10 +1177,10 @@ export class ManoeuvreService {
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
-        return this.getRules({ manoeuvre, street, car, config })
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveDConditionMed;
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config })
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveDConditionMin;
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1466,10 +1280,10 @@ export class ManoeuvreService {
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
-        return this.getRules({ manoeuvre, street, car, config })
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveFConditionMed;
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config })
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveFConditionMin;
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1532,7 +1346,7 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({
+        return this.rulesService.getRules({
           manoeuvre,
           street,
           car,
@@ -1593,7 +1407,8 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config }).moveICondition;
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
+          .moveICondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1655,7 +1470,7 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({
+        return this.rulesService.getRules({
           manoeuvre,
           street,
           car,
@@ -1715,7 +1530,8 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config }).moveKCondition;
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
+          .moveKCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1745,7 +1561,8 @@ export class ManoeuvreService {
         return () => false;
       case EManoeuvre.Park3UsingRulesMediumAngle:
       case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.getRules({ manoeuvre, street, car, config }).moveLCondition;
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
+          .moveLCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
