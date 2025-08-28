@@ -75,7 +75,7 @@ export class InformationService {
           },
           pause: false,
         };
-      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park4UsingRules1:
         return {
           message:
             'Rule 1: Reverse 0.6m out from the front car until the rear bumper of the car is level with the rear bumper of the front car',
@@ -97,7 +97,7 @@ export class InformationService {
           },
           pause: false,
         };
-      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park4UsingRules2:
         return {
           message: 'TBC',
         };
@@ -118,7 +118,7 @@ export class InformationService {
     this.logger.log(`getMoveCMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
-      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park4UsingRules1:
         return {
           message:
             'Rule 2: Lock counterclockwise and turn in until your port side mirror lines up with a point 1.25m forward of the rear car',
@@ -134,7 +134,7 @@ export class InformationService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
@@ -155,7 +155,7 @@ export class InformationService {
     this.logger.log(`getMoveEMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
-      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park4UsingRules1:
         return {
           message:
             'Rule 3: Straighten the wheel and reverse until the front port corner is in front of the rear bumper of the front car by the required safety gap (0.3m) AND the car is within 0.4m of the kerb',
@@ -171,7 +171,7 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
@@ -192,7 +192,7 @@ export class InformationService {
     this.logger.log(`getMoveGMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
-      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park4UsingRules1:
         return {
           message:
             'Rule 4: Lock clockwise and reverse until you are 0.3m, (i.e. the safety gap), from the rear car',
@@ -208,7 +208,7 @@ export class InformationService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
@@ -229,7 +229,7 @@ export class InformationService {
     this.logger.log(`getMoveIMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
-      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park4UsingRules1:
         return {
           message:
             'Rule 5: Lock counterclockwise and move forward until you are parallel to the kerb',
@@ -245,7 +245,7 @@ export class InformationService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };

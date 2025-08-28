@@ -252,14 +252,8 @@ export class ObjectsService {
       EManoeuvre.Park3Rotate1StraightMinAngle,
       'Forward Pull-In; Minimum Angle Turn-In',
     ],
-    [
-      EManoeuvre.Park3UsingRules1,
-      'Park By Rule 1 - NOT using optimal calculations',
-    ],
-    [
-      EManoeuvre.Park3UsingRules2,
-      'Park By Rule 2 - NOT using optimal calculations',
-    ],
+    [EManoeuvre.Park4UsingRules1, 'Park By Rule 1'],
+    [EManoeuvre.Park4UsingRules2, 'Park By Rule 2'],
   ];
 
   readonly cars: Array<[ECar, string]> = [

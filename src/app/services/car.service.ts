@@ -277,7 +277,7 @@ export class CarService {
 
   /**
    * @returns: The rotation of the createjs car container on the canvas in radians.
-   * * Note: All angles within the application are in radians - they are converted to degrees for all input and output. Therefore do NOT use the createjs container property 'rotation' to access the container rotation as it returns degrees.
+   * Note: All angles within the application are in radians - they are converted to degrees for all input and output. Therefore do NOT use the createjs container property 'rotation' to access the container rotation as it returns degrees.
    */
   public get readCarRotation(): number {
     if (!this.carContainer) {

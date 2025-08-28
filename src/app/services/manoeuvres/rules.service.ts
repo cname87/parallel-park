@@ -16,6 +16,7 @@ export class RulesService {
   ) {}
 
   getRules({ manoeuvre, street, car, config }: IParams): {
+    extraParkingSpace: number;
     startDistXToPivot: number;
     startDistYToPivot: number;
     moveDCondition: TCondition;
@@ -39,6 +40,10 @@ export class RulesService {
     /* Horizontal test must not be less than a certain value as the readCarRotation angle will go from a positive value to a negative value at a certain point */
     const horizontalAngle = 0.015;
 
+    /* Set the extra parking space (i.e the space between the front and rear cars minus the length of the car being parked, minus two safety gaps) to a fixed value for rules-based manoeuvres */
+    const grossExtraParkingSpace = 1200 / config.distScale;
+    const extraParkingSpace = grossExtraParkingSpace - 2 * street.safetyGap;
+
     /* Starting distance car side is out from the front car */
     /* The starting side y-axis position to the PP is a fixed default minus the safety gap which meaans the car side is the fixed default distance out from the front car */
     const baseStartDistYToPivot = 500 / config.distScale;
@@ -46,7 +51,7 @@ export class RulesService {
 
     /* The switch statement sets different rules for each manoeuvre */
     switch (manoeuvre) {
-      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park4UsingRules1:
         /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
         startDistXToPivot = street.safetyGap;
         /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. */
@@ -85,7 +90,7 @@ export class RulesService {
           return tooCloseToRearCar || (beyondPP && withinKerbDistance);
         };
         break;
-      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park4UsingRules2:
         /* The starting rear bumper x-axis position to the PP is minus the car rear overhang plus the safety gap which is equivalent to the car rear axle being level with the rear axle of the front car */
         startDistXToPivot = -car.rearOverhang + street.safetyGap;
         /* Rotate until rear axle side has moved in by a fixed amount. (This is
@@ -167,17 +172,15 @@ export class RulesService {
         : false;
     };
 
-    /* If the car is horizontal then stop */
+    /* Stop the car if, or once, horizontal */
     const moveLCondition = (carInUse: CarService) => {
-      this.logger.log(
-        'Rotation: ' + carInUse.readCarRotation,
-        LoggingLevel.DEBUG,
-      );
-      const isHorizontal = Math.abs(carInUse.readCarRotation) < horizontalAngle;
-      return isHorizontal;
+      const pastHorizontal =
+        Math.abs(carInUse.readCarRotation) < horizontalAngle;
+      return pastHorizontal;
     };
 
     return {
+      extraParkingSpace,
       startDistXToPivot,
       startDistYToPivot,
       moveDCondition,

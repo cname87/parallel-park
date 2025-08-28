@@ -215,10 +215,10 @@ export const enum EManoeuvre {
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
   /* Rotate in using rules and collision conditions rather than optimally
   calculated angles and distances - mimimum angle of approach */
-  Park3UsingRules1 = 'Park3UsingRules1',
+  Park4UsingRules1 = 'Park4UsingRules1',
   /* Rotate in using rules and collision conditions rather than optimally
   calculated angles and distances - medium angle of approach */
-  Park3UsingRules2 = 'Park3UsingRules2',
+  Park4UsingRules2 = 'Park4UsingRules2',
 }
 
 export const enum EStreet {
