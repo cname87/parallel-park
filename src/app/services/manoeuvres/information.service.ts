@@ -20,9 +20,7 @@ export class InformationService {
   constructor(private logger: LoggerService) {}
 
   /**
-   * Returns an information message displayed to the user during a move.
-   *
-   * @returns Information message for a move.
+   * @returns Returns an information message displayed to the user during a move.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -31,10 +29,10 @@ export class InformationService {
     this.logger.log(`getMoveFirstSteerMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
-      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
         return {
           message:
-            'This manoeuvre starts turning late and takes one wide turn only, and enters at a maximum angle',
+            'This manoeuvre starts turning early and enters the parking space at the minimum angle',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -42,10 +40,10 @@ export class InformationService {
           },
           pause: false,
         };
-      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
         return {
           message:
-            'This manoeuvre starts turning early and enters the parking space at a minimum angle',
+            'This manoeuvre starts turning late and takes one wide turn only, with no straight reverse, and enters at the maximum angle',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -57,6 +55,16 @@ export class InformationService {
         return {
           message:
             'This manoeuvre starts turning when the rear axle is opposite the rear car bumper and enters at a medium angle',
+          snackConfig: {
+            duration: 10000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        };
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        return {
+          message: 'This manoeuvre uses manually set parameters',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -78,18 +86,7 @@ export class InformationService {
       case EManoeuvre.Park4UsingRules1:
         return {
           message:
-            'Rule 1: Reverse 0.6m out from the front car until the rear bumper of the car is level with the rear bumper of the front car',
-          snackConfig: {
-            duration: 10000,
-            horizontalPosition: 'center',
-            verticalPosition: 'bottom',
-          },
-          pause: false,
-        };
-      case EManoeuvre.Park2Rotate1StraightSetManual:
-        return {
-          message:
-            'Condition 1: Start 0.5m out from the front car and reverse until the rear bumper of your car is level with the rear bumper of the front car',
+            'Rule 1: Start 0.5m out from the front car and reverse until the rear bumper of the car is level with the rear bumper of the front car',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -99,7 +96,7 @@ export class InformationService {
         };
       case EManoeuvre.Park4UsingRules2:
         return {
-          message: 'TBC',
+          message: 'Rule 1: TBC',
         };
       default:
         throw new Error('Unexpected manoeuvre');
@@ -107,9 +104,7 @@ export class InformationService {
   };
 
   /**
-   * Returns an information message displayed to the user during a move.
-   *
-   * @returns Information message for a move.
+   * @returns Returns an information message displayed to the user during a move.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -120,8 +115,7 @@ export class InformationService {
     switch (manoeuvre) {
       case EManoeuvre.Park4UsingRules1:
         return {
-          message:
-            'Rule 2: Lock counterclockwise and turn in until your port side mirror lines up with a point 1.25m forward of the rear car',
+          message: 'Rule 2: TBC',
           snackConfig: {
             duration: 5000,
             horizontalPosition: 'center',
@@ -144,9 +138,7 @@ export class InformationService {
   };
 
   /**
-   * Returns an information message displayed to the user during a move.
-   *
-   * @returns Information message for a move.
+   * @returns Returns an information message displayed to the user during a move.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -157,8 +149,7 @@ export class InformationService {
     switch (manoeuvre) {
       case EManoeuvre.Park4UsingRules1:
         return {
-          message:
-            'Rule 3: Straighten the wheel and reverse until the front port corner is in front of the rear bumper of the front car by the required safety gap (0.3m) AND the car is within 0.4m of the kerb',
+          message: 'Rule 3: TBC',
           snackConfig: {
             duration: 10000,
             horizontalPosition: 'center',
@@ -194,8 +185,7 @@ export class InformationService {
     switch (manoeuvre) {
       case EManoeuvre.Park4UsingRules1:
         return {
-          message:
-            'Rule 4: Lock clockwise and reverse until you are 0.3m, (i.e. the safety gap), from the rear car',
+          message: 'Rule 4: TBC',
           snackConfig: {
             duration: 5000,
             horizontalPosition: 'center',
@@ -218,9 +208,7 @@ export class InformationService {
   };
 
   /**
-   * Returns an information message displayed to the user during a move.
-   *
-   * @returns Information message for a move.
+   * @returns Returns an information message displayed to the user during a move.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
@@ -231,8 +219,7 @@ export class InformationService {
     switch (manoeuvre) {
       case EManoeuvre.Park4UsingRules1:
         return {
-          message:
-            'Rule 5: Lock counterclockwise and move forward until you are parallel to the kerb',
+          message: 'Rule 5: TBC',
           snackConfig: {
             duration: 5000,
             horizontalPosition: 'center',

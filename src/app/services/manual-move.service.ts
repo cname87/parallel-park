@@ -7,7 +7,7 @@ import {
   EMoveType,
   LoggingLevel,
   TButtonNames,
-    TMoveArc,
+  TMoveArc,
   TMoveStraight,
   TPoint,
   TSteer,
@@ -35,15 +35,15 @@ export class ManualMoveService {
   #keydown!: (event: any) => Promise<void>;
   #keyup!: (event: any) => Promise<void>;
 
-  #moveForwardSteerClockwise: TMoveStraight |   TMoveArc = {
-    type: () => EMoveType.  MoveArc,
+  #moveForwardSteerClockwise: TMoveStraight | TMoveArc = {
+    type: () => EMoveType.MoveArc,
     fwdOrReverseFn: () => EDirection.Forward,
     deltaAngleFn: () => this.#infinite,
     deltaPositionFn: () => this.#infinite,
   };
 
-  #moveReverseSteerClockwise:   TMoveArc = {
-    type: () => EMoveType.  MoveArc,
+  #moveReverseSteerClockwise: TMoveArc = {
+    type: () => EMoveType.MoveArc,
     fwdOrReverseFn: () => EDirection.Reverse,
     deltaAngleFn: () => this.#infinite,
     deltaPositionFn: () => this.#infinite,

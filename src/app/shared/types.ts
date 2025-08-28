@@ -191,33 +191,32 @@ export const enum ECar {
   Fiat_Ducato_MWB_Van_2025 = 'Fiat_Ducato_MWB_Van_2025',
 }
 
-/* so that the car left front corner
-  touches the front car rear outside corner (outside the minimum gap), */
-
 export const enum EManoeuvre {
-  /* 2 rotations / 1 straight reverse
+  /* Automated / 2 rotations / 1 straight reverse
   - Reverse, rotate out by a minimum angle, then reverse straight, and then rotate in to parked */
   Park2Rotate1StraightMinAngle = 'Park2Rotate1StraightMinAngle',
-  /* 2 rotations / no straight reverse
+  /* Automated / 2 rotations / no straight reverse
   - Reverse, then rotate out and rotate in to parked with no straight reverse */
   Park2Rotate0Straight = 'Park2Rotate0Straight',
-  /* Fixed start position / 2 rotations / 1 straight reverse
+  /* Automated / Fixed start position / 2 rotations / 1 straight reverse
   - Start from a fixed position, then rotate out, reverse, and rotate in to
   parked */
   Park2Rotate1StraightFixedStart = 'Park2Rotate1StraightFixedStart',
-  /* 3 rotations / 1 straight reverse
-  - Reverse, rotate out, reverse straight, rotate in until the car hits the
-  rear car, and then rotate in and forward to parked */
-  Park3Rotate1StraightMinAngle = 'Park3Rotate1StraightMinAngle',
-  /* 2 rotations / 1 straight reverse
+  /* Partially Manual / 2 rotations / 1 straight reverse
   - Reverse to a given position, rotate out by a given angle, reverse by a
   given amount, and then rotate in to parked */
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
+  /* Automated / 3 rotations / 1 straight reverse
+  - Reverse, rotate out, reverse straight, rotate in until the car hits the
+  rear car, and then rotate in and forward to parked */
+  Park3Rotate1StraightMinAngle = 'Park3Rotate1StraightMinAngle',
+  /* Using Rules / Up to 4 rotations / 1 straight reverse
   /* Rotate in using rules and collision conditions rather than optimally
-  calculated angles and distances - mimimum angle of approach */
+  calculated angles and distances */
   Park4UsingRules1 = 'Park4UsingRules1',
+  /* Using Rules / Up to 4 rotations / 1 straight reverse
   /* Rotate in using rules and collision conditions rather than optimally
-  calculated angles and distances - medium angle of approach */
+  calculated angles and distances */
   Park4UsingRules2 = 'Park4UsingRules2',
 }
 

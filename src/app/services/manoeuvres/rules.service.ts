@@ -2,7 +2,14 @@ import { Injectable } from '@angular/core';
 import { CarService } from '../car.service';
 import { CalculationService } from '../calculation.service';
 import { LoggerService } from '../logger.service';
-import { TCondition, EManoeuvre } from '../../shared/types';
+import {
+  TCondition,
+  EManoeuvre,
+  EDirection,
+  EMoveType,
+  TMoveStraight,
+  TMoveStraightOrArc,
+} from '../../shared/types';
 import { LoggingLevel } from '../../shared/types';
 import { IParams } from '../../shared/types';
 
@@ -25,7 +32,8 @@ export class RulesService {
     moveICondition: TCondition;
     moveJCondition: TCondition;
     moveKCondition: TCondition;
-    moveLCondition: TCondition;
+    moveL: TMoveStraight | TMoveStraightOrArc;
+    moveN: TMoveStraight;
   } {
     this.logger.log('getRules called', LoggingLevel.TRACE);
 
@@ -172,11 +180,49 @@ export class RulesService {
         : false;
     };
 
-    /* Stop the car if, or once, horizontal */
-    const moveLCondition = (carInUse: CarService) => {
-      const pastHorizontal =
-        Math.abs(carInUse.readCarRotation) < horizontalAngle;
-      return pastHorizontal;
+    /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is the final reverse rotation to the horizontal position. */
+    const midPoint =
+      street.rearCarFromLeft +
+      street.rearCarLength +
+      street.safetyGap +
+      car.length +
+      extraParkingSpace / 2;
+    const moveL = {
+      type: (carInUse: CarService) => {
+        return Math.abs(carInUse.readCarRotation) < horizontalAngle
+          ? EMoveType.MoveStraight
+          : EMoveType.MoveArc;
+      },
+      fwdOrReverseFn: () => EDirection.Reverse,
+      /* Return a large angle as the condition will stop the rotation */
+      deltaAngleFn: () => 0.5 * Math.PI,
+      deltaPositionFn: (carInUse: CarService) => {
+        return Math.abs(carInUse.readFrontStarboardCorner.x - midPoint);
+      },
+      condition: () => {
+        return (carInUse: CarService) => {
+          const pastHorizontal =
+            Math.abs(carInUse.readCarRotation) < horizontalAngle;
+          return pastHorizontal;
+        };
+      },
+    };
+
+    /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is the final reverse rotation to the horizontal position. */
+    const moveN = {
+      type: (): EMoveType.MoveStraight => EMoveType.MoveStraight,
+      fwdOrReverseFn: (carInUse: CarService) =>
+        carInUse.readFrontStarboardCorner.x - midPoint > 0
+          ? EDirection.Reverse
+          : EDirection.Forward,
+      deltaPositionFn: (carInUse: CarService) => {
+        return Math.abs(carInUse.readFrontStarboardCorner.x - midPoint);
+      },
+      condition: () => {
+        return (_carInUse: CarService) => {
+          return false;
+        };
+      },
     };
 
     return {
@@ -189,7 +235,8 @@ export class RulesService {
       moveICondition,
       moveJCondition,
       moveKCondition,
-      moveLCondition,
+      moveL,
+      moveN,
     };
   }
 }
