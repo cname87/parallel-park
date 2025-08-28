@@ -6,6 +6,7 @@ import {
   ELock,
   EMoveType,
   IPark,
+  IParams,
   LoggingLevel,
   TCondition,
   TMoveStraight,
@@ -16,7 +17,6 @@ import {
 } from '../../shared/types';
 import { CarService } from '../car.service';
 import { ConfigService } from '../config.service';
-import { StreetService } from '../street.service';
 import { CalculationService } from '../calculation.service';
 import { LoggerService } from '../logger.service';
 import { InformationService } from './information.service';
@@ -137,12 +137,6 @@ and finally moves forward to pull the car into a parallel position. (The '3' ref
  * @param car - The car instance being used
  * @param config - The config instance with configuration data
  */
-interface IParams {
-  readonly manoeuvre: EManoeuvre;
-  readonly street: StreetService;
-  readonly car: CarService;
-  readonly config: ConfigService;
-}
 
 /**
  * This object is returned by the getManoeuvre method and allows one
@@ -218,8 +212,8 @@ export class ManoeuvreService {
         /* Return zero as getCollisionAngle is called for some move calculations and zero is the correct collision angle for these manoeuvres*/
         return 0;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         /* arcsin(rb2 - rc2 - m2 / (2rc * (m2 + n2)**0.5)) + arctan(m/n) */
         const rb = car.farRearAxleSideTurningRadius(ELock.Counterclockwise);
         const lockDirection = ELock.Counterclockwise;
@@ -362,8 +356,8 @@ export class ManoeuvreService {
           car,
           config,
         });
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return (
           this.getExtraParkingSpace3Rotate({
             manoeuvre,
@@ -400,8 +394,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         extraParkingSpace = this.getExtraParkingSpace({
           manoeuvre,
           street,
@@ -468,8 +462,8 @@ export class ManoeuvreService {
           car.farRearAxleSideTurningRadius(ELock.Counterclockwise) +
           buffer;
         break;
-      case EManoeuvre.Park3UsingRulesMinAngle:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         /* For these manoeuvres, the rear corner can cross the kerb as it approaches the rear car. When it just touches the kerb and then pulls forward the parked kerb distance is calculated as follows:
         min = (1 - cos(alpha)) * (rb - w0) + jSin(alpha).
@@ -798,8 +792,8 @@ export class ManoeuvreService {
           car,
           config,
         });
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         /* Return a large angle as the rotation will be limited by the supplied
         condition function */
         return Math.PI / 2;
@@ -890,13 +884,10 @@ export class ManoeuvreService {
         return -car.rearOverhang + street.safetyGap;
       case EManoeuvre.Park2Rotate1StraightSetManual:
         return this.setManualStartDistFromRearToPivot / config.distScale;
-      case EManoeuvre.Park3UsingRulesMinAngle:
-        /* Position rear bumper at the front car rear bumper */
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .carDistXFromBumperMin;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-        return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .carDistXFromBumperMed;
+          .startDistXToPivot;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -980,16 +971,10 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightSetManual:
         return this.setManualStartDistSideToPivot / config.distScale;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-        return (
-          this.rulesService.getRules({ manoeuvre, street, car, config })
-            .carSideOutMed - this.getPivot({ manoeuvre, street, car, config }).y
-        );
-      case EManoeuvre.Park3UsingRulesMinAngle:
-        return (
-          this.rulesService.getRules({ manoeuvre, street, car, config })
-            .carSideOutMin - this.getPivot({ manoeuvre, street, car, config }).y
-        );
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
+          .startDistYToPivot;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1068,8 +1053,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-      case EManoeuvre.Park3UsingRulesMinAngle:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
         const value = {
           x:
             this.getPivot({ manoeuvre, street, car, config }).x +
@@ -1109,8 +1094,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-      case EManoeuvre.Park3UsingRulesMinAngle:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
         const startRelPositionX = this.getStartRelativePosition({
           manoeuvre,
           street,
@@ -1146,8 +1131,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-      case EManoeuvre.Park3UsingRulesMinAngle:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
         return this.getFirstTurnAngle({ manoeuvre, street, car, config });
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1176,12 +1161,10 @@ export class ManoeuvreService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveDConditionMed;
-      case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveDConditionMin;
+          .moveDCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1236,8 +1219,8 @@ export class ManoeuvreService {
           deltaPositionFn: () => delta,
           deltaAngleFn: () => 0,
         };
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         /* The move distance is large as the condition will stop the move */
         return {
           type: () => EMoveType.MoveStraight,
@@ -1279,12 +1262,10 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
+      case EManoeuvre.Park3UsingRules1:
+      case EManoeuvre.Park3UsingRules2:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveFConditionMed;
-      case EManoeuvre.Park3UsingRulesMinAngle:
-        return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveFConditionMin;
+          .moveFCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1308,8 +1289,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return (
           this.getMoveDAngle({ manoeuvre, street, car, config }) -
@@ -1344,8 +1325,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return this.rulesService.getRules({
           manoeuvre,
           street,
@@ -1375,8 +1356,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightSetManual:
         return ELock.Center;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return ELock.Counterclockwise;
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1405,8 +1386,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveICondition;
       default:
@@ -1436,8 +1417,8 @@ export class ManoeuvreService {
         return 0;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return this.getCollisionAngle({ manoeuvre, street, car, config });
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         /* Return a large angle as the rotation will be limited by the
         condition */
         return Math.PI / 2;
@@ -1468,8 +1449,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return this.rulesService.getRules({
           manoeuvre,
           street,
@@ -1496,8 +1477,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return ELock.Center;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return ELock.Clockwise;
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1528,8 +1509,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveKCondition;
       default:
@@ -1559,8 +1540,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
         /* These manoeuvres are not stopped by the condition function */
         return () => false;
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveLCondition;
       default:
@@ -1574,7 +1555,7 @@ export class ManoeuvreService {
    * @remarks For most manoeuvres, the move is a straight move and moves the
    * distance in unscaled units that positions the car as it finally moves
    * forward or reverse into the middle of the parking space.  For the
-   * Park3UsingRulesMediumAngle manoeuvre it might be a final reverse rotation
+   * Park3UsingRules2 manoeuvre it might be a final reverse rotation
    * to the horizontal position.
    *
    * @throws Error
@@ -1610,8 +1591,8 @@ export class ManoeuvreService {
           deltaPositionFn: () =>
             this.getExtraParkingSpace({ manoeuvre, street, car, config }) / 2,
         };
-      case EManoeuvre.Park3UsingRulesMediumAngle:
-      case EManoeuvre.Park3UsingRulesMinAngle:
+      case EManoeuvre.Park3UsingRules2:
+      case EManoeuvre.Park3UsingRules1:
         const midPoint =
           street.rearCarFromLeft +
           street.rearCarLength +

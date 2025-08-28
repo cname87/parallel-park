@@ -2,6 +2,8 @@ import { FormGroup } from '@angular/forms';
 import { MatSnackBarConfig } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { CarService } from '../services/car.service';
+import { StreetService } from '../services/street.service';
+import { ConfigService } from '../services/config.service';
 
 export const enum EButtonStatus {
   NotClicked = 'NotClicked',
@@ -99,6 +101,13 @@ export interface IManoeuvre {
   manoeuvreForm: FormGroup;
   manoeuvre$: Observable<EManoeuvre>;
   manoeuvreInitialFormValue: IManoeuvreForm;
+}
+
+export interface IParams {
+  manoeuvre: EManoeuvre;
+  street: StreetService;
+  car: CarService;
+  config: ConfigService;
 }
 
 export interface ICarForm {
@@ -206,10 +215,10 @@ export const enum EManoeuvre {
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',
   /* Rotate in using rules and collision conditions rather than optimally
   calculated angles and distances - mimimum angle of approach */
-  Park3UsingRulesMinAngle = 'Park3UsingRulesMinAngle',
+  Park3UsingRules1 = 'Park3UsingRules1',
   /* Rotate in using rules and collision conditions rather than optimally
   calculated angles and distances - medium angle of approach */
-  Park3UsingRulesMediumAngle = 'Park3UsingRulesMediumAngle',
+  Park3UsingRules2 = 'Park3UsingRules2',
 }
 
 export const enum EStreet {

@@ -253,11 +253,11 @@ export class ObjectsService {
       'Forward Pull-In; Minimum Angle Turn-In',
     ],
     [
-      EManoeuvre.Park3UsingRulesMinAngle,
+      EManoeuvre.Park3UsingRules1,
       'Park By Rule 1 - NOT using optimal calculations',
     ],
     [
-      EManoeuvre.Park3UsingRulesMediumAngle,
+      EManoeuvre.Park3UsingRules2,
       'Park By Rule 2 - NOT using optimal calculations',
     ],
   ];
