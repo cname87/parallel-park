@@ -53,7 +53,12 @@ $smallRadioSize: clamp(1rem, 2vw, 2rem);
   padding-bottom: 5px;
 }
 
-/* The Snackbar call passes in 'snackBar' as a custom class */
+/* The Snackbar call passes in 'custom-snackBar' as a custom class */
+.custom-snackbar .mat-mdc-snack-bar-label {
+  min-width: 500px; /* or any width you want */
+  max-width: 80vw;  /* optional, for responsiveness */
+  color: $colorPrimary;
+}
 .snackBar .mat-mdc-snack-bar-actions {
   max-width: 100%; /* Ensure actions don't overflow */
   color: $colorAccent;

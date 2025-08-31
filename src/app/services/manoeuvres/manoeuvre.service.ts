@@ -17,7 +17,6 @@ import {
 } from '../../shared/types';
 import { CarService } from '../car.service';
 import { ConfigService } from '../config.service';
-import { CalculationService } from '../calculation.service';
 import { LoggerService } from '../logger.service';
 import { InformationService } from './information.service';
 import { RulesService } from './rules.service';
@@ -166,7 +165,6 @@ export class ManoeuvreService {
   setManualStartDistSideToPivot: number;
   //
   constructor(
-    private calc: CalculationService,
     private logger: LoggerService,
     private info: InformationService,
     private config: ConfigService,
@@ -209,7 +207,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-        /* Return zero as getCollisionAngle is called for some move calculations and zero is the correct collision angle for these manoeuvres*/
+        /* Return zero as getCollisionAngle is called by some move calculations and these manoeuvres must return zero as they don't collide */
         return 0;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         /* arcsin(rb2 - rc2 - m2 / (2rc * (m2 + n2)**0.5)) + arctan(m/n) */
@@ -463,7 +461,7 @@ export class ManoeuvreService {
           buffer;
         break;
       case EManoeuvre.Park3Rotate1StraightMinAngle:
-        /* For these manoeuvres, the rear corner can cross the kerb as it approaches the rear car. When it just touches the kerb and then pulls forward the parked kerb distance is calculated as follows:
+        /* For these manoeuvres, the rear corner could cross the kerb as it approaches the rear car. When it just touches the kerb and then pulls forward the parked kerb distance is calculated as follows:
         min = (1 - cos(alpha)) * (rb - w0) + jSin(alpha).
         This is the closest the car can park to the kerb without the rear corner crossing the kerb during the parking manoeuvre.*/
         const collisionAngle = this.getCollisionAngle({
@@ -1648,16 +1646,16 @@ export class ManoeuvreService {
         deltaPositionFn: () =>
           this.getMoveBDist({ manoeuvre, street, car, config }),
         deltaAngleFn: () => 0,
-      },
-      moveC: {
-        type: () => EMoveType.Steer,
-        steeringWheelAngle: ELock.Counterclockwise,
-        message: this.info.getMoveCMessage({
+        message: this.info.getMoveBMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
+      },
+      moveC: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Counterclockwise,
       },
       moveD: {
         type: () => EMoveType.MoveArc,
@@ -1665,7 +1663,6 @@ export class ManoeuvreService {
         deltaPositionFn: () => 0,
         deltaAngleFn: () =>
           this.getMoveDAngle({ manoeuvre, street, car, config }),
-        /* The condition can stop the car when it returns true */
         condition: () =>
           this.getMoveDCondition({
             manoeuvre,
@@ -1673,16 +1670,16 @@ export class ManoeuvreService {
             car,
             config,
           }),
-      },
-      moveE: {
-        type: () => EMoveType.Steer,
-        steeringWheelAngle: ELock.Center,
-        message: this.info.getMoveEMessage({
+        message: this.info.getMoveDMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
+      },
+      moveE: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
       },
       moveF: {
         type: this.getMoveF({ manoeuvre, street, car, config }).type,
@@ -1698,16 +1695,16 @@ export class ManoeuvreService {
             car,
             config,
           }),
-      },
-      moveG: {
-        type: () => EMoveType.Steer,
-        steeringWheelAngle: ELock.Clockwise,
-        message: this.info.getMoveGMessage({
+        message: this.info.getMoveFMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
+      },
+      moveG: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Clockwise,
       },
       moveH: {
         type: () => EMoveType.MoveArc,
@@ -1722,6 +1719,12 @@ export class ManoeuvreService {
             car,
             config,
           }),
+        message: this.info.getMoveHMessage({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }),
       },
       moveI: {
         type: () => EMoveType.Steer,
@@ -1738,12 +1741,6 @@ export class ManoeuvreService {
             car,
             config,
           }),
-        message: this.info.getMoveIMessage({
-          manoeuvre,
-          street,
-          car,
-          config,
-        }),
       },
       moveJ: {
         type: () => EMoveType.MoveArc,
@@ -1758,6 +1755,12 @@ export class ManoeuvreService {
             car,
             config,
           }),
+        message: this.info.getMoveIMessage({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }),
       },
       moveK: {
         type: () => EMoveType.Steer,

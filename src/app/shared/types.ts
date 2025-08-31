@@ -202,7 +202,7 @@ export const enum EManoeuvre {
   - Start from a fixed position, then rotate out, reverse, and rotate in to
   parked */
   Park2Rotate1StraightFixedStart = 'Park2Rotate1StraightFixedStart',
-  /* Partially Manual / 2 rotations / 1 straight reverse
+  /* Manual / 2 rotations / 1 straight reverse
   - Reverse to a given position, rotate out by a given angle, reverse by a
   given amount, and then rotate in to parked */
   Park2Rotate1StraightSetManual = 'Park2Rotate1StraightSetManual',

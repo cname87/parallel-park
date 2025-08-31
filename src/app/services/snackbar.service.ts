@@ -124,7 +124,7 @@ export class SnackbarService {
         duration: config.duration,
         horizontalPosition: config.horizontalPosition,
         verticalPosition: config.verticalPosition,
-        panelClass: 'snackBar',
+        panelClass: 'custom-snackbar',
       });
 
       if (pause) {

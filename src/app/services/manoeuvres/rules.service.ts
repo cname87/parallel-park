@@ -79,7 +79,7 @@ export class RulesService {
             ) < 1
           );
         };
-        /* If the rear starboard corner gets closer to the rear car than the configured minimum distance then stop. Otherwise reverse until the car front port corner is level or beyond the rear bumper of the front car + safety gap, and the rear port corner is within a given distance of the kerb. */
+        /* If the rear outer corner gets closer to the rear car than the configured minimum distance then stop. Otherwise reverse until the car front inner corner is level or beyond the rear bumper of the front car + safety gap and the rear inner corner is within a given distance of the kerb. */
         moveFCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
             carInUse.readRearStarboardCorner.x -
@@ -87,15 +87,15 @@ export class RulesService {
               street.safetyGap -
               distFromRearCarMin <
             1;
-          const beyondPP =
+          const beyondRearBumper =
             carInUse.readFrontPortCorner.x -
               street.frontCarCorner.x +
               street.safetyGap <
-            1;
-          const distFromKerb = 400 / config.distScale;
+            0.1;
+          const distFromKerb = 300 / config.distScale;
           const withinKerbDistance =
             carInUse.readRearPortCorner.y - distFromKerb < 0.1;
-          return tooCloseToRearCar || (beyondPP && withinKerbDistance);
+          return tooCloseToRearCar || (beyondRearBumper && withinKerbDistance);
         };
         break;
       case EManoeuvre.Park4UsingRules2:
