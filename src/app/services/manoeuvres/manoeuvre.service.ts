@@ -1787,6 +1787,12 @@ export class ManoeuvreService {
         deltaPositionFn: this.getMoveL({ manoeuvre, street, car, config })
           .deltaPositionFn,
         condition: this.getMoveL({ manoeuvre, street, car, config }).condition,
+        message: this.info.getMoveLMessage({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }),
       } as TMoveStraight | TMoveArc,
       moveM: {
         type: () => EMoveType.Steer,

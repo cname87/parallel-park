@@ -156,7 +156,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
@@ -204,7 +203,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
@@ -243,7 +241,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
@@ -282,7 +279,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
@@ -312,8 +308,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveKMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveKMessage called`, LoggingLevel.TRACE);
+  getMoveLMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMoveLMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -321,7 +317,6 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park4UsingRules2:
         return {
           message: '',
         };
