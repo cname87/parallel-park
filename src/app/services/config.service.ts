@@ -157,7 +157,7 @@ export class ConfigService {
   /**
    * * Information message duration on ms
    */
-  infoMessageDuration = 3000;
+  infoMessageDuration = 2000;
 
   /**
    * * Manual mode run text for all buttons

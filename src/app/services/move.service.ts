@@ -20,6 +20,7 @@ import { SnackbarService } from './snackbar.service';
 import { LoggerService } from './logger.service';
 import { DataService } from './data.service';
 import { BehaviorSubject } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * Moves the car.
@@ -673,7 +674,10 @@ export class MoveService {
     move: TMoveStraight | TMoveArc | TSteer,
   ): Promise<void> {
     if (move.message) {
-      this.snack.open(move.message);
+      const snackRef = this.snack.open(move.message);
+      if (snackRef) {
+        await firstValueFrom(snackRef.afterDismissed());
+      }
     }
     switch (move.type(this.car)) {
       case EMoveType.Steer:

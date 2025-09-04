@@ -1,10 +1,11 @@
 /* eslint-disable max-len */
 import { Injectable } from '@angular/core';
 import { EManoeuvre, ISnackOpen, LoggingLevel } from '../../shared/types';
-import { CarService } from '../car.service';
-import { ConfigService } from '../config.service';
 import { LoggerService } from '../logger.service';
+import { ConfigService } from '../config.service';
+import { CarService } from '../car.service';
 import { StreetService } from '../street.service';
+import { RulesService } from './rules.service';
 
 interface IParams {
   readonly manoeuvre: EManoeuvre;
@@ -17,7 +18,11 @@ interface IParams {
   providedIn: 'root',
 })
 export class InformationService {
-  constructor(private logger: LoggerService) {}
+  constructor(
+    private logger: LoggerService,
+    private rules: RulesService,
+    private config: ConfigService,
+  ) {}
 
   /**
    * @returns Returns an information message displayed to the user during a move.
@@ -34,7 +39,7 @@ export class InformationService {
           message:
             'This manoeuvre starts turning early and enters the parking space at the minimum angle.',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -45,7 +50,7 @@ export class InformationService {
           message:
             'This manoeuvre starts turning late and takes one wide turn only, with no straight reverse, and enters at the maximum angle',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -56,7 +61,7 @@ export class InformationService {
           message:
             'This manoeuvre starts turning when the rear axle is opposite the rear car bumper and enters at a medium angle',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -66,7 +71,7 @@ export class InformationService {
         return {
           message: 'This manoeuvre uses manually set parameters',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -77,7 +82,7 @@ export class InformationService {
           message:
             'This manoeuvre starts turning early and enters the parking space at a minimum angle. It reaches the rear car at an angle and then turns in',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -86,9 +91,13 @@ export class InformationService {
       case EManoeuvre.Park4UsingRules1:
         return {
           message:
-            'Rule 1: Start 0.5m out from the front car and reverse until the rear bumper of the car is level with the rear bumper of the front car',
+            'Rule 1: Start with an extra ' +
+            this.rules.grossExtraParkingSpace * this.config.distScale +
+            'mm parking space, and start ' +
+            this.rules.startDistYToRearCarSide * this.config.distScale +
+            'mm out from the front car',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -124,9 +133,11 @@ export class InformationService {
       case EManoeuvre.Park4UsingRules1:
         return {
           message:
-            'Rule 1: Reverse until the rear bumper of the car is in line with the rear bumper of the rear car',
+            'Rule 1: Reverse until the rear bumper of the car is ' +
+            this.rules.startDistXToRearCarBumper * this.config.distScale +
+            'mm beyond the rear bumper of the rear car',
           snackConfig: {
-            duration: 5000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -162,9 +173,11 @@ export class InformationService {
       case EManoeuvre.Park4UsingRules1:
         return {
           message:
-            'Rule 2: Rotate until the inner side of the car is inline with a point 1.25m forward of the parked rear car',
+            'Rule 2: Rotate until the inner side of the car is inline with a point ' +
+            this.rules.moveDProjectedDistFromRearCar * this.config.distScale +
+            'mm forward of the parked rear car',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
             panelClass: 'custom-snackbar',
@@ -175,7 +188,7 @@ export class InformationService {
         return {
           message: 'Rule 2: TBC',
           snackConfig: {
-            duration: 10000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -209,9 +222,13 @@ export class InformationService {
       case EManoeuvre.Park4UsingRules1:
         return {
           message:
-            'Rule 3: If the rear outer corner gets closer to the rear car than the minimum distance then stop. Otherwise reverse until the car front inner corner is beyond the rear bumper of the front parked car by the minimum distance AND the rear inner corner is within 300mm of the kerb.',
+            'Rule 3: If the rear outer corner gets closer to the rear car than the minimum distance then stop. Otherwise reverse until the car front inner corner is beyond the rear bumper of the front parked car by ' +
+            this.rules.beyondRearBumperDist * this.config.distScale +
+            'mm the minimum distance AND the rear inner corner is within ' +
+            this.rules.distFromKerb * this.config.distScale +
+            'mm of the kerb.',
           snackConfig: {
-            duration: 5000,
+            duration: this.config.infoMessageDuration + 2000,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -249,7 +266,7 @@ export class InformationService {
           message:
             'Rule 5: Rotate in until the car comes within the allowed distance of the rear car, touches the kerb, or is horizontal',
           snackConfig: {
-            duration: 5000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -287,7 +304,7 @@ export class InformationService {
           message:
             'Rule 6: Rotate forward until you touch the front parked car',
           snackConfig: {
-            duration: 5000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },
@@ -324,7 +341,7 @@ export class InformationService {
         return {
           message: 'Rule 7: Rotate backwards until parallel with the kerb',
           snackConfig: {
-            duration: 5000,
+            duration: this.config.infoMessageDuration,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
           },

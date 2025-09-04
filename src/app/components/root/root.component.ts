@@ -391,7 +391,9 @@ export class AppComponent implements AfterViewInit {
       /* Redraw screen here only if the Reset button was pressed during a manoeuvre i.e. leave the car 'parked' until the next button click otherwise */
       if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
         /* Dismiss any open info snackbar */
-        this.infoSnackRef.dismiss();
+        if (this.infoSnackRef) {
+          this.infoSnackRef.dismiss();
+        }
 
         scenario = this.getCurrentScenario();
         this.setupScreen(scenario);
@@ -445,7 +447,6 @@ export class AppComponent implements AfterViewInit {
       do {
         await this.runEventLoop();
         /* Disable menus if custom car or street entry form is invalid */
-
         if (
           // Add ? as custom car and street are optional
           this.data.getCustomCar()?.customCarForm?.invalid ||

@@ -110,7 +110,7 @@ export class SnackbarService {
       verticalPosition: 'bottom',
     },
     pause = false,
-  }: ISnackOpen): void {
+  }: ISnackOpen): MatSnackBarRef<TextOnlySnackBar> | undefined {
     /* No snackbar is presented if '' is passed in as the message */
     if (message === '') {
       return;
@@ -119,8 +119,9 @@ export class SnackbarService {
     if (pause === true) {
       action = 'RESUME';
     }
+    let snackRef: MatSnackBarRef<TextOnlySnackBar> | undefined;
     this.zone.run(() => {
-      const snackRef = this.snackBar.open(message, action, {
+      snackRef = this.snackBar.open(message, action, {
         duration: config.duration,
         horizontalPosition: config.horizontalPosition,
         verticalPosition: config.verticalPosition,
@@ -134,7 +135,7 @@ export class SnackbarService {
           .onAction()
           .pipe(take(1))
           .subscribe(() => {
-            snackRef.dismiss();
+            snackRef?.dismiss();
             this.#pause = false;
           });
         snackRef
@@ -147,5 +148,6 @@ export class SnackbarService {
         this.#infoSubject.next(snackRef);
       }
     });
+    return snackRef;
   }
 }
