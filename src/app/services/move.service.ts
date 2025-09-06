@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarRef,
+  TextOnlySnackBar,
+} from '@angular/material/snack-bar';
 import * as createjs from 'createjs-module';
 import {
   EButtonStatus,
@@ -44,6 +48,7 @@ export class MoveService {
     private calc: CalculationService,
     private data: DataService,
     private snack: SnackbarService,
+    private snackBar: MatSnackBar,
     private logger: LoggerService,
   ) {
     this.snack.pause$.subscribe(
@@ -94,7 +99,7 @@ export class MoveService {
 
     switch (eventObjOrMove) {
       case 'steer':
-        this.logger.log(`Front wheels stopped at:`);
+        this.logger.log('Front wheels stopped at:');
         this.logger.log(
           `Front startboard wheel angle: ${Math.round(
             this.car.readFrontStarboardWheelRotation * this.config.RAD_TO_DEG,
@@ -106,13 +111,26 @@ export class MoveService {
           )} degrees`,
         );
         break;
-      case '  moveArc':
+      case 'moveArc':
         this.logger.log(`Rotation move stopped at:`);
         this.logger.log(
           `Car Rotation: ${this.config.round(
             this.car.readCarRotation * this.config.RAD_TO_DEG,
           )} degrees`,
         );
+        // Show snackbar message
+        this.snackBar.dismiss();
+        this.snack.open({
+          message: `Rotation move stopped at ${this.config.round(
+            this.car.readCarRotation * this.config.RAD_TO_DEG,
+          )} degrees`,
+          snackConfig: {
+            duration: this.config.infoMessageDuration + 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+          },
+          pause: false,
+        });
         this.logger.log(
           `Car Starboard-Side Corner X: ${this.config.round(
             (this.car.readFrontStarboardCorner.x * this.config.distScale) /
@@ -309,8 +327,8 @@ export class MoveService {
 
           /* Check if the stop condition is met */
           const stop = condition(this.car)(this.car, tickMove);
-          /* Check for a collision */
-          const collision = this.calc.checkCollision(this.car);
+          /* Check for a collision including safety gap */
+          const collision = this.calc.checkCollision(this.car, true);
           /* Check if move is complete */
           /* Note: Caution comparing floating point numbers */
           const bigNum = 100000;
@@ -455,7 +473,8 @@ export class MoveService {
       /* Calculate the angle turned in 1 tick */
       createjs.Ticker.framerate = this.config.FPS;
       const tickTime = 1 / this.config.FPS;
-      const tickMove = angleSign * speed * tickTime; // The distance moved along the arc
+      /* The distance moved along the arc */
+      const tickMove = angleSign * speed * tickTime;
       const tickAngle = tickMove / this.car.turningRadius(steeringWheelAngle);
 
       /* Calculate the start end angle */
@@ -487,7 +506,7 @@ export class MoveService {
           this.config.stage.update();
 
           /* Console debug */
-          // this.logger.log(`  moveArc loop`);
+          // this.logger.log(`moveArc loop`);
           // this.logger.log(
           //   `Start angle: ${startAngle * this.config.RAD_TO_DEG} degrees`,
           // );
@@ -509,8 +528,8 @@ export class MoveService {
 
           /* Check if the condition is met */
           const stop = condition(this.car)(this.car, tickAngle);
-          /* Check for a collision */
-          const collision = this.calc.checkCollision(this.car);
+          /* Check for a collision, including safety gap */
+          const collision = this.calc.checkCollision(this.car, true);
           /* Check if move is complete */
           /* Note: Caution comparing floating point numbers */
           const bigNum = 100000;
@@ -521,7 +540,7 @@ export class MoveService {
             /* Clear collision */
             do {
               this.car.readCarRotation -= tickAngle;
-            } while (this.calc.checkCollision(this.car));
+            } while (this.calc.checkCollision(this.car, true));
             {
               this.car.readCarRotation -= tickAngle;
             }
@@ -532,7 +551,7 @@ export class MoveService {
             complete ||
             this.#buttonLastClickStatus === EButtonStatus.Reset
           ) {
-            const resolveReturned = this.stop('  moveArc', resolve);
+            const resolveReturned = this.stop('moveArc', resolve);
             resolveReturned();
           }
         },

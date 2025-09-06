@@ -92,9 +92,9 @@ export class InformationService {
         return {
           message:
             'Rule 1: Start with an extra ' +
-            this.rules.grossExtraParkingSpace * this.config.distScale +
+            this.rules.r1_grossExtraParkingSpace * this.config.distScale +
             'mm parking space, and start ' +
-            this.rules.startDistYToRearCarSide * this.config.distScale +
+            this.rules.r1_startDistYToRearCarSide * this.config.distScale +
             'mm out from the front car',
           snackConfig: {
             duration: this.config.infoMessageDuration,
@@ -134,7 +134,7 @@ export class InformationService {
         return {
           message:
             'Rule 1: Reverse until the rear bumper of the car is ' +
-            this.rules.startDistXToRearCarBumper * this.config.distScale +
+            this.rules.r1_startDistXToRearCarBumper * this.config.distScale +
             'mm beyond the rear bumper of the rear car',
           snackConfig: {
             duration: this.config.infoMessageDuration,
@@ -174,7 +174,7 @@ export class InformationService {
         return {
           message:
             'Rule 2: Rotate until the inner side of the car is inline with a point ' +
-            this.rules.moveDProjectedDistFromRearCar * this.config.distScale +
+            this.rules.r1_moveDProjectedDistFromRearCar * this.config.distScale +
             'mm forward of the parked rear car',
           snackConfig: {
             duration: this.config.infoMessageDuration,
@@ -223,9 +223,9 @@ export class InformationService {
         return {
           message:
             'Rule 3: If the rear outer corner gets closer to the rear car than the minimum distance then stop. Otherwise reverse until the car front inner corner is beyond the rear bumper of the front parked car by ' +
-            this.rules.beyondRearBumperDist * this.config.distScale +
+            this.rules.r1_beyondRearBumperDist * this.config.distScale +
             'mm the minimum distance AND the rear inner corner is within ' +
-            this.rules.distFromKerb * this.config.distScale +
+            this.rules.r1_distFromKerb * this.config.distScale +
             'mm of the kerb.',
           snackConfig: {
             duration: this.config.infoMessageDuration + 2000,

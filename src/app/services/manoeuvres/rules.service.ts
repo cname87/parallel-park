@@ -18,24 +18,24 @@ import { IParams } from '../../shared/types';
   providedIn: 'root',
 })
 export class RulesService {
-  public grossExtraParkingSpace: number;
-  public startDistXToRearCarBumper: number;
-  public startDistYToRearCarSide: number;
-  public moveDProjectedDistFromRearCar: number;
-  public beyondRearBumperDist: number;
-  public distFromKerb: number;
+  public r1_grossExtraParkingSpace: number;
+  public r1_startDistXToRearCarBumper: number;
+  public r1_startDistYToRearCarSide: number;
+  public r1_moveDProjectedDistFromRearCar: number;
+  public r1_beyondRearBumperDist: number;
+  public r1_distFromKerb: number;
 
   constructor(
     private calc: CalculationService,
     private logger: LoggerService,
     private config: ConfigService,
   ) {
-    this.grossExtraParkingSpace = 1200 / this.config.distScale;
-    this.startDistXToRearCarBumper = 0;
-    this.startDistYToRearCarSide = 500 / this.config.distScale;
-    this.moveDProjectedDistFromRearCar = 1250 / this.config.distScale;
-    this.distFromKerb = 100 / config.distScale;
-    this.beyondRearBumperDist = this.config.defaultSafetyGap;
+    this.r1_grossExtraParkingSpace = 1100 / this.config.distScale;
+    this.r1_startDistXToRearCarBumper = -300 / this.config.distScale;
+    this.r1_startDistYToRearCarSide = 500 / this.config.distScale;
+    this.r1_moveDProjectedDistFromRearCar = 1250 / this.config.distScale;
+    this.r1_distFromKerb = 100 / config.distScale;
+    this.r1_beyondRearBumperDist = this.config.defaultSafetyGap;
   }
 
   getRules({ manoeuvre, street, car, config }: IParams): {
@@ -49,7 +49,9 @@ export class RulesService {
     moveJCondition: TCondition;
     moveKCondition: TCondition;
     moveL: TMoveStraight | TMoveStraightOrArc;
-    moveN: TMoveStraight;
+    moveMCondition: TCondition;
+    moveN: TMoveStraight | TMoveStraightOrArc;
+    moveP: TMoveStraight;
   } {
     this.logger.log('getRules called', LoggingLevel.TRACE);
 
@@ -66,17 +68,26 @@ export class RulesService {
 
     /* Set the extra parking space (i.e the space between the front and rear cars minus the length of the car being parked, minus two safety gaps) to a fixed value for rules-based manoeuvres */
     const extraParkingSpace =
-      this.grossExtraParkingSpace - 2 * street.safetyGap;
+      this.r1_grossExtraParkingSpace - 2 * street.safetyGap;
 
     /* Starting distance car side is out from the front car */
     /* The starting side y-axis position to the PP is a fixed default minus the safety gap which meaans the car side is the fixed default distance out from the front car */
-    const startDistYToPivot = this.startDistYToRearCarSide - street.safetyGap;
+    const startDistYToPivot =
+      this.r1_startDistYToRearCarSide - street.safetyGap;
+
+    const midPoint =
+      street.rearCarFromLeft +
+      street.rearCarLength +
+      street.safetyGap +
+      car.length +
+      extraParkingSpace / 2;
 
     /* The switch statement sets different rules for each manoeuvre */
     switch (manoeuvre) {
       case EManoeuvre.Park4UsingRules1:
         /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
-        startDistXToPivot = this.startDistXToRearCarBumper + street.safetyGap;
+        startDistXToPivot =
+          this.r1_startDistXToRearCarBumper + street.safetyGap;
         /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. */
         moveDCondition = (carInUse: CarService, _tick: any) => {
           return (
@@ -89,7 +100,7 @@ export class RulesService {
                 /* Rear car corner x-axis value */
                 street.rearCarCorner.x -
                 /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
-                this.moveDProjectedDistFromRearCar,
+                this.r1_moveDProjectedDistFromRearCar,
             ) < 1
           );
         };
@@ -104,9 +115,9 @@ export class RulesService {
           const rearBumperRelativePosition =
             carInUse.readRearPortCorner.x - street.frontCarCorner.x;
           const beyondRearBumper =
-            rearBumperRelativePosition - this.beyondRearBumperDist < 0.1;
+            rearBumperRelativePosition - this.r1_beyondRearBumperDist < 0.1;
           const withinKerbDistance =
-            carInUse.readRearPortCorner.y - this.distFromKerb < 0.1;
+            carInUse.readRearPortCorner.y - this.r1_distFromKerb < 0.1;
           return tooCloseToRearCar || (beyondRearBumper && withinKerbDistance);
         };
         break;
@@ -195,13 +206,7 @@ export class RulesService {
         : false;
     };
 
-    /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is the final reverse rotation to the horizontal position. */
-    const midPoint =
-      street.rearCarFromLeft +
-      street.rearCarLength +
-      street.safetyGap +
-      car.length +
-      extraParkingSpace / 2;
+    /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is reverse rotation to the horizontal position. */
     const moveL = {
       type: (carInUse: CarService) => {
         return Math.abs(carInUse.readCarRotation) < horizontalTestAngle
@@ -223,8 +228,40 @@ export class RulesService {
       },
     };
 
-    /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is the final reverse rotation to the horizontal position. */
+    /* Keep turning the wheels until clockwise, stopping in the center position only if the car is horizontal */
+    const moveMCondition = (carInUse: CarService) => {
+      const isHorizontal =
+        Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+      return isHorizontal &&
+        Math.abs(carInUse.readFrontPortWheelRotation) < 0.01
+        ? true
+        : false;
+    };
+
+    /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is forward rotation to the horizontal position. */
     const moveN = {
+      type: (carInUse: CarService) => {
+        return Math.abs(carInUse.readCarRotation) < horizontalTestAngle
+          ? EMoveType.MoveStraight
+          : EMoveType.MoveArc;
+      },
+      fwdOrReverseFn: () => EDirection.Forward,
+      /* Return a large angle as the condition will stop the rotation */
+      deltaAngleFn: () => 0.5 * Math.PI,
+      deltaPositionFn: (carInUse: CarService) => {
+        return Math.abs(carInUse.readFrontStarboardCorner.x - midPoint);
+      },
+      condition: () => {
+        return (carInUse: CarService) => {
+          const pastHorizontal =
+            Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+          return pastHorizontal;
+        };
+      },
+    };
+
+    /* The move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. */
+    const moveP = {
       type: (): EMoveType.MoveStraight => EMoveType.MoveStraight,
       fwdOrReverseFn: (carInUse: CarService) =>
         carInUse.readFrontStarboardCorner.x - midPoint > 0
@@ -251,7 +288,9 @@ export class RulesService {
       moveJCondition,
       moveKCondition,
       moveL,
+      moveMCondition,
       moveN,
+      moveP,
     };
   }
 }

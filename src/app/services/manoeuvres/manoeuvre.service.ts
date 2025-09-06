@@ -1574,6 +1574,62 @@ export class ManoeuvreService {
   };
 
   /**
+   * @returns The car target steering wheel setting for the move.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  private getMoveMSteer = ({ manoeuvre }: IParams): ELock => {
+    this.logger.log('getMoveMSteer called', LoggingLevel.TRACE);
+    switch (manoeuvre) {
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+        return ELock.Center;
+      case EManoeuvre.Park4UsingRules1:
+      case EManoeuvre.Park4UsingRules2:
+        return ELock.Counterclockwise;
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+
+  /**
+   * @returns A condition function that takes as parameters a car service and
+   * a tick angle, and halts the related move if it returns true.
+   *
+   * @remarks This condition can stop the steering wheel movement e.g. stops the steering wheel on the center position rather than move all the way clockwise or anticlockwise.The condition function is tested by the move every tick and the move will stop when it returns true.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  private getMoveMCondition = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): TCondition => {
+    this.logger.log('getMoveMSteerCondition called', LoggingLevel.TRACE);
+    switch (manoeuvre) {
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+        /* These manoeuvres are not stopped by the condition function */
+        return () => false;
+      case EManoeuvre.Park4UsingRules1:
+      case EManoeuvre.Park4UsingRules2:
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
+          .moveMCondition;
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+
+  /**
    * @returns A final straight move for rules-based manoeuvres.
    *
    * @remarks For the Park4UsingRules manoeuvres it might be a final straight move to center the car.
@@ -1603,6 +1659,57 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
           .moveN;
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
+
+  /**
+   * @returns A move, which could be a straight move or an arc move.
+   *
+   * @remarks For most manoeuvres, the move is a straight move and moves the
+   * distance in unscaled units that positions the car as it finally moves
+   * forward or reverse into the middle of the parking space.  For the
+   * Park4UsingRules manoeuvres it might be a final reverse rotation
+   * to the horizontal position.
+   *
+   * @throws Error
+   * Thrown if an invalid manoeuvre is passed in.
+   */
+  private getMoveP = ({
+    manoeuvre,
+    street,
+    car,
+    config,
+  }: IParams): TMoveStraight | TMoveStraightOrArc => {
+    this.logger.log('getMoveL called', LoggingLevel.TRACE);
+    switch (manoeuvre) {
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+        return {
+          type: () => EMoveType.MoveStraight,
+          fwdOrReverseFn: () => EDirection.Forward,
+          deltaPositionFn: () =>
+            this.getExtraParkingSpace({ manoeuvre, street, car, config }) / 2,
+        };
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+        return {
+          type: () => EMoveType.MoveStraight,
+          fwdOrReverseFn: () => EDirection.Forward,
+          deltaPositionFn: () => 0,
+        };
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+        return {
+          type: () => EMoveType.MoveStraight,
+          fwdOrReverseFn: () => EDirection.Reverse,
+          deltaPositionFn: () =>
+            this.getExtraParkingSpace({ manoeuvre, street, car, config }) / 2,
+        };
+      case EManoeuvre.Park4UsingRules1:
+      case EManoeuvre.Park4UsingRules2:
+        return this.rulesService.getRules({ manoeuvre, street, car, config })
+          .moveP;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1796,7 +1903,19 @@ export class ManoeuvreService {
       } as TMoveStraight | TMoveArc,
       moveM: {
         type: () => EMoveType.Steer,
-        steeringWheelAngle: ELock.Center,
+        steeringWheelAngle: this.getMoveMSteer({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }),
+        condition: () =>
+          this.getMoveMCondition({
+            manoeuvre,
+            street,
+            car,
+            config,
+          }),
       } as TSteer,
       moveN: {
         type: this.getMoveN({ manoeuvre, street, car, config }).type,
@@ -1807,6 +1926,20 @@ export class ManoeuvreService {
         deltaPositionFn: this.getMoveN({ manoeuvre, street, car, config })
           .deltaPositionFn,
         condition: this.getMoveN({ manoeuvre, street, car, config }).condition,
+      } as TMoveStraight,
+      moveO: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveP: {
+        type: this.getMoveP({ manoeuvre, street, car, config }).type,
+        fwdOrReverseFn: this.getMoveP({ manoeuvre, street, car, config })
+          .fwdOrReverseFn,
+        deltaAngleFn: this.getMoveP({ manoeuvre, street, car, config })
+          .deltaAngleFn,
+        deltaPositionFn: this.getMoveP({ manoeuvre, street, car, config })
+          .deltaPositionFn,
+        condition: this.getMoveP({ manoeuvre, street, car, config }).condition,
       } as TMoveStraight,
     };
 
