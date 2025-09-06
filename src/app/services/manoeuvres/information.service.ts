@@ -174,7 +174,8 @@ export class InformationService {
         return {
           message:
             'Rule 2: Rotate until the inner side of the car is inline with a point ' +
-            this.rules.r1_moveDProjectedDistFromRearCar * this.config.distScale +
+            this.rules.r1_moveDProjectedDistFromRearCar *
+              this.config.distScale +
             'mm forward of the parked rear car',
           snackConfig: {
             duration: this.config.infoMessageDuration,

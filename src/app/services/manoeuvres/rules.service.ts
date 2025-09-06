@@ -30,12 +30,12 @@ export class RulesService {
     private logger: LoggerService,
     private config: ConfigService,
   ) {
-    this.r1_grossExtraParkingSpace = 1100 / this.config.distScale;
+    this.r1_grossExtraParkingSpace = 1200 / this.config.distScale;
     this.r1_startDistXToRearCarBumper = -300 / this.config.distScale;
     this.r1_startDistYToRearCarSide = 500 / this.config.distScale;
     this.r1_moveDProjectedDistFromRearCar = 1250 / this.config.distScale;
     this.r1_distFromKerb = 100 / config.distScale;
-    this.r1_beyondRearBumperDist = this.config.defaultSafetyGap;
+    this.r1_beyondRearBumperDist = -this.config.defaultSafetyGap;
   }
 
   getRules({ manoeuvre, street, car, config }: IParams): {
@@ -104,7 +104,7 @@ export class RulesService {
             ) < 1
           );
         };
-        /* If the rear outer corner gets closer to the rear car than the configured minimum distance then stop. Otherwise reverse until the car front inner corner is level or beyond the rear bumper of the front car + safety gap and the rear inner corner is within a given distance of the kerb. */
+        /* If the rear outer corner gets closer to the rear car than the configured minimum distance, or the rear inner corner is gets within a given distance of the kerb, or the car front inner corner is beyond the rear bumper of the front car by a given amount then stop */
         moveFCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
             carInUse.readRearStarboardCorner.x -
@@ -113,7 +113,7 @@ export class RulesService {
               distFromRearCarMin <
             1;
           const rearBumperRelativePosition =
-            carInUse.readRearPortCorner.x - street.frontCarCorner.x;
+            carInUse.readFrontPortCorner.x - street.frontCarCorner.x;
           const beyondRearBumper =
             rearBumperRelativePosition - this.r1_beyondRearBumperDist < 0.1;
           const withinKerbDistance =
