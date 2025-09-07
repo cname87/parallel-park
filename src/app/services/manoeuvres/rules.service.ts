@@ -34,9 +34,11 @@ export class RulesService {
     this.r1_startDistXToRearCarBumper = -300 / this.config.distScale;
     this.r1_startDistYToRearCarSide = 500 / this.config.distScale;
     this.r1_moveDProjectedDistFromRearCar = 1250 / this.config.distScale;
-    this.r1_distFromKerb = 100 / config.distScale;
+    this.r1_distFromKerb = 200 / config.distScale;
     this.r1_beyondRearBumperDist = -this.config.defaultSafetyGap;
   }
+
+  /* The getRules function returns the rules for the rules-based manoeuvres. Park4UsingRules1 is the key manoeuvre used for testing and coming up with an algorithm for parking. It has a stable implementation - see detail below. Park4UsingRules2 can be used for experimental testing and does not necessarily have a stable implementation. */
 
   getRules({ manoeuvre, street, car, config }: IParams): {
     extraParkingSpace: number;
@@ -88,7 +90,7 @@ export class RulesService {
         /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
         startDistXToPivot =
           this.r1_startDistXToRearCarBumper + street.safetyGap;
-        /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. */
+        /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. This is the most critical move in the manoeuvre. */
         moveDCondition = (carInUse: CarService, _tick: any) => {
           return (
             Math.abs(

@@ -46,6 +46,8 @@ export class ConfigService {
    * Within the program all distances are scaled.
    */
 
+  parkingMode = 'bay'; // 'parallel'; // 'parallel' | 'bay'
+
   /* All street defaults */
   defaultRearCarLength = 1000 / this.distScale;
   defaultRearCarWidth = 1904 / this.distScale;
@@ -174,6 +176,32 @@ export class ConfigService {
   allButtonTexts = new Map(this.manualModeRunTexts).set('main', 'RUN');
 
   constructor(@Inject(DOCUMENT) private document: Document) {
+    /* Update defaults if parking mode is parallel or bay */
+    if (this.parkingMode === 'parallel') {
+      this.defaultRearCarLength = 1000 / this.distScale;
+      this.defaultRearCarWidth = 1904 / this.distScale;
+      this.defaultRearCarFromLeft = 0 / this.distScale;
+      this.defaultFrontCarLength = 5290 / this.distScale;
+      this.defaultFrontCarWidth = 1904 / this.distScale;
+      this.defaultCarFromKerb = 150 / this.distScale;
+      this.defaultSafetyGap = 250 / this.distScale;
+      this.defaultExtraParkingSpace = 1000 / this.distScale;
+      this.defaultParkingSpaceLength =
+        this.defaultSafetyGap * 2 +
+        this.defaultExtraParkingSpace +
+        this.defaultFrontCarLength;
+    } else {
+      /* Used for bay parking */
+      this.defaultRearCarLength = 2000 / this.distScale;
+      this.defaultRearCarWidth = 5000 / this.distScale;
+      this.defaultRearCarFromLeft = 3000 / this.distScale;
+      this.defaultFrontCarLength = 2000 / this.distScale;
+      this.defaultFrontCarWidth = 5000 / this.distScale;
+      this.defaultCarFromKerb = 150 / this.distScale;
+      this.defaultSafetyGap = 250 / this.distScale;
+      this.defaultExtraParkingSpace = 0 / this.distScale;
+      this.defaultParkingSpaceLength = 2400 / this.distScale;
+    }
     /* Read canvas from index.html */
     this.canvas = this.document.getElementById('canvas') as HTMLCanvasElement;
     this.stage = new Stage(this.canvas);

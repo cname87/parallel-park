@@ -191,12 +191,14 @@ export const enum ECar {
   Fiat_Ducato_MWB_Van_2025 = 'Fiat_Ducato_MWB_Van_2025',
 }
 
+/* The manoeuvres are either automated (i.e. calculated optimally by the program) or manual (i.e. set by the user), or using rules (i.e. using rules and collision conditions rather than optimally calculated or manually set angles and distances) */
+/* NOTE:  Park4UsingRules1 is the key manoeuvre used for testing and coming up with an algorithm for parking. See the rules service file for detail on the rules used. */
 export const enum EManoeuvre {
   /* Automated / 2 rotations / 1 straight reverse
   - Reverse, rotate out by a minimum angle, then reverse straight, and then rotate in to parked */
   Park2Rotate1StraightMinAngle = 'Park2Rotate1StraightMinAngle',
   /* Automated / 2 rotations / no straight reverse
-  - Reverse, then rotate out and rotate in to parked with no straight reverse */
+  - Reverse, then rotate out, then rotate in to parked with no straight reverse */
   Park2Rotate0Straight = 'Park2Rotate0Straight',
   /* Automated / Fixed start position / 2 rotations / 1 straight reverse
   - Start from a fixed position, then rotate out, reverse, and rotate in to
@@ -212,11 +214,11 @@ export const enum EManoeuvre {
   Park3Rotate1StraightMinAngle = 'Park3Rotate1StraightMinAngle',
   /* Using Rules / Up to 4 rotations / 1 straight reverse
   /* Rotate in using rules and collision conditions rather than optimally
-  calculated angles and distances */
+  calculated or manually set angles and distances */
   Park4UsingRules1 = 'Park4UsingRules1',
   /* Using Rules / Up to 4 rotations / 1 straight reverse
   /* Rotate in using rules and collision conditions rather than optimally
-  calculated angles and distances */
+  calculated or manually set angles and distances */
   Park4UsingRules2 = 'Park4UsingRules2',
 }
 
