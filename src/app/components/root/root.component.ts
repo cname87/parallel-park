@@ -343,23 +343,30 @@ export class AppComponent implements AfterViewInit {
     if (manoeuvreService.manoeuvre$) {
       manoeuvreService.manoeuvre$
         .pipe(this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG))
-        .subscribe(
-          (manoeuvre: EManoeuvre) => (this.selectedManoeuvre = manoeuvre),
-        );
+        .subscribe((manoeuvre: EManoeuvre) => {
+          this.selectedManoeuvre = manoeuvre;
+          this.setupScreen(this.getCurrentScenario());
+        });
     }
 
     const carService = this.data.getCar();
     if (carService.car$) {
       carService.car$
         .pipe(this.logger.tapLog('Car chosen:', LoggingLevel.DEBUG))
-        .subscribe((car: ECar) => (this.carSetup = car));
+        .subscribe((car: ECar) => {
+          this.carSetup = car;
+          this.setupScreen(this.getCurrentScenario());
+        });
     }
 
     const streetService = this.data.getStreet();
     if (streetService.street$) {
       streetService.street$
         .pipe(this.logger.tapLog('Street chosen:', LoggingLevel.DEBUG))
-        .subscribe((street: EStreet) => (this.streetSetup = street));
+        .subscribe((street: EStreet) => {
+          this.streetSetup = street;
+          this.setupScreen(this.getCurrentScenario());
+        });
     }
 
     const modeService = this.data.getMode();

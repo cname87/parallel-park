@@ -89,9 +89,9 @@ export class ObjectsService {
 
     this.Custom_Street = {
       name: EStreet.Custom_Street,
-      rearCarWidth: 1000,
-      frontCarWidth: 1000,
-      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      rearCarWidth: 5000,
+      frontCarWidth: 5000,
+      carFromKerb: 0,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
       parkingSpace: 0,
     };

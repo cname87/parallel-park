@@ -46,7 +46,7 @@ export class ConfigService {
    * Within the program all distances are scaled.
    */
 
-  parkingMode = 'bay'; // 'parallel'; // 'parallel' | 'bay'
+  parkingMode = 'parallel'; // 'parallel' | 'bay'
 
   /* All street defaults */
   defaultRearCarLength = 1000 / this.distScale;
