@@ -10,7 +10,14 @@ import { MatRadioModule } from '@angular/material/radio';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, shareReplay, startWith } from 'rxjs/operators';
-import { EMode, IModeForm, IMode } from '../../shared/types';
+import {
+  ERunMode,
+  IRunModeForm,
+  IRunMode,
+  EParkMode,
+  IParkMode,
+  IParkModeForm,
+} from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ConfigService } from '../../services/config.service';
 
@@ -30,7 +37,6 @@ import { ConfigService } from '../../services/config.service';
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
     MatRadioModule,
   ],
 })
@@ -41,9 +47,12 @@ export class ModeComponent implements OnInit {
 
   /* Form variables */
   modeForm!: FormGroup;
-  #modeInitialFormValue: IModeForm;
-  #mode$!: Observable<EMode>;
-  #mode!: IMode;
+  #runModeInitialFormValue: IRunModeForm;
+  #parkModeInitialFormValue: IParkModeForm;
+  #runMode$!: Observable<ERunMode>;
+  #runMode!: IRunMode;
+  #parkMode$!: Observable<EParkMode>;
+  #parkMode!: IParkMode;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -53,23 +62,40 @@ export class ModeComponent implements OnInit {
     this.#runLoopTest = this.config.runLoopTest;
     /* Note that the radio group formControlName is 'mode' */
     if (this.#runLoopTest === true) {
-      this.#modeInitialFormValue = { mode: EMode.Loop };
+      this.#runModeInitialFormValue = { runMode: ERunMode.Loop };
     } else {
-      this.#modeInitialFormValue = { mode: EMode.Single };
+      this.#runModeInitialFormValue = { runMode: ERunMode.Single };
     }
+    this.#parkModeInitialFormValue = { parkMode: EParkMode.Parallel };
   }
 
   ngOnInit(): void {
-    this.modeForm = this.formBuilder.group(this.#modeInitialFormValue);
-    this.#mode$ = this.modeForm.valueChanges.pipe(
-      startWith(this.#modeInitialFormValue),
-      map((modeFormValue: IModeForm) => modeFormValue.mode),
+    /* Initialize the form */
+    this.modeForm = this.formBuilder.group({
+      runMode: [this.#runModeInitialFormValue.runMode],
+      parkMode: [this.#parkModeInitialFormValue.parkMode],
+    });
+
+    this.#runMode$ = this.modeForm.valueChanges.pipe(
+      startWith({ runMode: this.#runModeInitialFormValue.runMode }),
+      map((modeFormValue: { runMode: ERunMode }) => modeFormValue.runMode),
       shareReplay(1),
     );
-    this.#mode = {
+    this.#runMode = {
       modeForm: this.modeForm,
-      mode$: this.#mode$,
+      runMode$: this.#runMode$,
     };
-    this.data.setMode(this.#mode);
+    this.data.setRunMode(this.#runMode);
+
+    this.#parkMode$ = this.modeForm.valueChanges.pipe(
+      startWith({ parkMode: this.#parkModeInitialFormValue.parkMode }),
+      map((modeFormValue: { parkMode: EParkMode }) => modeFormValue.parkMode),
+      shareReplay(1),
+    );
+    this.#parkMode = {
+      modeForm: this.modeForm,
+      parkMode$: this.#parkMode$,
+    };
+    this.data.setParkMode(this.#parkMode);
   }
 }

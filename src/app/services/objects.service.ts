@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   ECar,
-  EMode,
+  ERunMode,
   EManoeuvre,
   EStreet,
   TCarSetup,
@@ -230,7 +230,7 @@ export class ObjectsService {
     wheelLength: 686,
   };
 
-  readonly modes: EMode[] = [EMode.Loop, EMode.Single, EMode.Keyboard];
+  readonly modes: ERunMode[] = [ERunMode.Loop, ERunMode.Single, ERunMode.Keyboard];
 
   readonly manoeuvres: Array<[EManoeuvre, string]> = [
     [

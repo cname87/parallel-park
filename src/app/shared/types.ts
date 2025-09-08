@@ -47,19 +47,33 @@ export interface IButton {
   buttonLastClick$: Observable<EButtonStatus>;
 }
 
-export const enum EMode {
+export const enum ERunMode {
   Loop = 'Loop',
   Single = 'Single',
   Keyboard = 'Keyboard',
 }
 
-export interface IModeForm {
-  mode: EMode;
+export const enum EParkMode {
+  Parallel = 'Parallel',
+  Bay = 'Bay',
 }
 
-export interface IMode {
+export interface IRunModeForm {
+  runMode: ERunMode;
+}
+
+export interface IParkModeForm {
+  parkMode: EParkMode;
+}
+
+export interface IRunMode {
   modeForm: FormGroup;
-  mode$: Observable<EMode>;
+  runMode$: Observable<ERunMode>;
+}
+
+export interface IParkMode {
+  modeForm: FormGroup;
+  parkMode$: Observable<EParkMode>;
 }
 
 export interface ICustomCarForm {

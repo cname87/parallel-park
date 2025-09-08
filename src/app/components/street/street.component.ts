@@ -13,7 +13,7 @@ import {
   shareReplay,
   startWith,
 } from 'rxjs/operators';
-import { EMode, EStreet, IStreet, IStreetForm } from '../../shared/types';
+import { ERunMode, EStreet, IStreet, IStreetForm } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
 
@@ -71,8 +71,8 @@ export class StreetComponent implements OnInit {
     this.data.setStreet(this.street);
 
     /* Customise input heading and hint messages */
-    this.data.getMode().mode$.subscribe((value: EMode) => {
-      if (value === EMode.Keyboard) {
+    this.data.getRunMode().runMode$.subscribe((value: ERunMode) => {
+      if (value === ERunMode.Keyboard) {
         this.message = 'Select a front car width';
         this.hint = "Select 'Custom' to set up a custom front car width";
       } else {

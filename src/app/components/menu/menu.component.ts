@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { Component } from '@angular/core';
-import { EButtonStatus, ECar, EMode, EStreet } from '../../shared/types';
+import { EButtonStatus, ECar, ERunMode, EStreet } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ModeComponent } from '../mode/mode.component';
 import { ButtonComponent } from '../button/button.component';
@@ -53,7 +53,7 @@ export class MenuComponent implements AfterViewInit {
    */
   ngAfterViewInit(): void {
     let buttonStatus: EButtonStatus;
-    let mode: EMode;
+    let mode: ERunMode;
     let car: ECar;
     let street: EStreet;
 
@@ -69,19 +69,19 @@ export class MenuComponent implements AfterViewInit {
       });
     }
 
-    const modeObj = this.data.getMode();
-    if (modeObj && modeObj.mode$) {
-      modeObj.mode$.subscribe((value: EMode) => {
+    const modeObj = this.data.getRunMode();
+    if (modeObj && modeObj.runMode$) {
+      modeObj.runMode$.subscribe((value: ERunMode) => {
         mode = value;
-        if (mode === EMode.Loop && buttonStatus === EButtonStatus.Run) {
+        if (mode === ERunMode.Loop && buttonStatus === EButtonStatus.Run) {
           this.showScenarioForm = 'block';
           this.showCustomCarForm = 'none';
           this.showCustomStreetForm = 'none';
         }
-        if (mode === EMode.Single && buttonStatus === EButtonStatus.Run) {
+        if (mode === ERunMode.Single && buttonStatus === EButtonStatus.Run) {
           this.showScenarioForm = 'block';
         }
-        if (mode === EMode.Keyboard && buttonStatus === EButtonStatus.Run) {
+        if (mode === ERunMode.Keyboard && buttonStatus === EButtonStatus.Run) {
           this.showScenarioForm = 'block';
         }
       });
@@ -109,8 +109,8 @@ export class MenuComponent implements AfterViewInit {
         if (status === EButtonStatus.Run) {
           this.showManualMode = false;
           switch (mode) {
-            case EMode.Single:
-            case EMode.Keyboard:
+            case ERunMode.Single:
+            case ERunMode.Keyboard:
               this.showScenarioForm = 'block';
               if (car === ECar.Custom_Car) {
                 this.showCustomCarForm = 'block';
@@ -132,10 +132,10 @@ export class MenuComponent implements AfterViewInit {
           this.showCustomCarForm = 'none';
           this.showCustomStreetForm = 'none';
           switch (mode) {
-            case EMode.Loop:
+            case ERunMode.Loop:
               this.showScenarioForm = 'block';
               break;
-            case EMode.Keyboard:
+            case ERunMode.Keyboard:
               this.showManualMode = true;
               break;
             default:

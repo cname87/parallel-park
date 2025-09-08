@@ -14,7 +14,7 @@ import {
   startWith,
 } from 'rxjs/operators';
 import {
-  EMode,
+  ERunMode,
   EManoeuvre,
   IManoeuvre,
   IManoeuvreForm,
@@ -78,8 +78,8 @@ export class ManoeuvreComponent implements OnInit {
     this.data.setManoeuvre(this.manoeuvre);
 
     /* Customise input heading and hint messages */
-    this.data.getMode().mode$.subscribe((value: EMode) => {
-      if (value === EMode.Keyboard) {
+    this.data.getRunMode().runMode$.subscribe((value: ERunMode) => {
+      if (value === ERunMode.Keyboard) {
         this.message = 'Select a manoeuvre, which sets the parking space width';
         this.hint = 'The set of possible parking manoeuvres';
       } else {

@@ -5,10 +5,11 @@ import {
   ICar,
   ICustomCar,
   ICustomStreet,
-  IMode,
+  IRunMode,
   IManoeuvre,
   IStreet,
   TButtonNames,
+  IParkMode,
 } from '../shared/types';
 
 /**
@@ -23,14 +24,16 @@ export class DataService {
   #manoeuvre!: IManoeuvre;
   #car!: ICar;
   #street!: IStreet;
-  #mode!: IMode;
+  #runMode!: IRunMode;
+  #parkMode!: IParkMode;
   #customCar!: ICustomCar;
   #customStreet!: ICustomStreet;
   #stopMoveCalled$!: Observable<boolean>;
 
   #buttons = new Map();
 
-  getMode = (): IMode => this.#mode;
+  getRunMode = (): IRunMode => this.#runMode;
+  getParkMode = (): IParkMode => this.#parkMode;
   getManoeuvre = (): IManoeuvre => this.#manoeuvre;
   getCar = (): ICar => this.#car;
   getStreet = (): IStreet => this.#street;
@@ -38,8 +41,11 @@ export class DataService {
   getCustomStreet = (): ICustomStreet => this.#customStreet;
   getStopMoveCalled = (): Observable<boolean> => this.#stopMoveCalled$;
 
-  setMode = (group: IMode): void => {
-    this.#mode = group;
+  setRunMode = (group: IRunMode): void => {
+    this.#runMode = group;
+  };
+  setParkMode = (parkMode: IParkMode): void => {
+    this.#parkMode = parkMode;
   };
   setManoeuvre = (manoeuvre: IManoeuvre): void => {
     this.#manoeuvre = manoeuvre;

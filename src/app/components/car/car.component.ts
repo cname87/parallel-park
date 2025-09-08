@@ -13,7 +13,7 @@ import {
   shareReplay,
   startWith,
 } from 'rxjs/operators';
-import { ECar, EMode, ICar, ICarForm } from '../../shared/types';
+import { ECar, ERunMode, ICar, ICarForm } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
 
@@ -71,8 +71,8 @@ export class CarComponent implements OnInit {
     this.data.setCar(this.car);
 
     /* Customise input heading and hint messages */
-    this.data.getMode().mode$.subscribe((value: EMode) => {
-      if (value === EMode.Keyboard) {
+    this.data.getRunMode().runMode$.subscribe((value: ERunMode) => {
+      if (value === ERunMode.Keyboard) {
         this.message = 'Select a car to park';
         this.hint = 'Select a custom car to set custom dimensions';
       } else {

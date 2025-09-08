@@ -24,26 +24,14 @@ Note: Global style, as material elements, e.g. mat-form-field, are part of Angul
 .mat-mdc-select-panel {
   background-color: $colorBackground !important;
 }
-
-/* Make radio button scalable */
-$smallRadioSize: clamp(1rem, 2vw, 2rem);
-.smallRadio .mat-radio-container{
-  height: $smallRadioSize;
-  width: $smallRadioSize;
-}
-.smallRadio .mat-radio-outer-circle{
-  height: $smallRadioSize;
-  width: $smallRadioSize;
-}
-.smallRadio .mat-radio-inner-circle{
-  height: $smallRadioSize;
-  width: $smallRadioSize;
-}
-.smallRadio .mat-radio-button .mat-radio-ripple{
-  height: 20px;
-  width: 20px;
-  left: calc(50% - $smallRadioSize);
-  top: calc(50% - $smallRadioSize);
+/* Highlight radio button groups with a box */
+.smallRadio {
+  background: $colorBackground;
+  border: 2px solid $colorPrimary;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 // Customize spacing between mat-select dropdown options

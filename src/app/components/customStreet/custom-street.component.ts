@@ -15,7 +15,7 @@ import {
   distinctUntilChanged,
 } from 'rxjs/operators';
 import {
-  EMode,
+  ERunMode,
   EStreet,
   ICustomStreet,
   ICustomStreetForm,
@@ -154,8 +154,8 @@ export class CustomStreetComponent implements OnInit {
       this.objects.Custom_Street = street;
     });
 
-    this.data.getMode().mode$.subscribe((value: EMode) => {
-      if (value === EMode.Keyboard) {
+    this.data.getRunMode().runMode$.subscribe((value: ERunMode) => {
+      if (value === ERunMode.Keyboard) {
         this.customStreetForm.controls['parkingSpace'].enable();
       } else {
         this.customStreetForm.controls['parkingSpace'].disable();

@@ -8,7 +8,7 @@ import { Subject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
   EButtonStatus,
-  EMode,
+  ERunMode,
   ISnackOpen,
   LoggingLevel,
 } from '../shared/types';
@@ -41,16 +41,16 @@ export class SnackbarService {
   public info$: Observable<MatSnackBarRef<TextOnlySnackBar>> =
     this.#infoSubject.asObservable();
   #buttonLastClickStatus = EButtonStatus.Reset;
-  #mode = EMode.Keyboard;
+  #mode = ERunMode.Keyboard;
 
   /* Subscribe to track the operation mode */
   public trackMode(): void {
     this.data
-      .getMode()
-      .mode$.pipe(
+      .getRunMode()
+      .runMode$.pipe(
         this.logger.tapLog('Snackbar Service Mode click:', LoggingLevel.DEBUG),
       )
-      .subscribe((data: EMode) => {
+      .subscribe((data: ERunMode) => {
         this.#mode = data;
       });
   }
@@ -85,7 +85,7 @@ export class SnackbarService {
       )}m`;
       /* Run pause notice only when running in single scenario mode & a pause message not already showing */
       if (
-        this.#mode === EMode.Single &&
+        this.#mode === ERunMode.Single &&
         this.#buttonLastClickStatus === EButtonStatus.Run &&
         !this.#pause
       ) {

@@ -14,7 +14,7 @@ import { SnackbarService } from '../../services/snackbar.service';
 import {
   EButtonStatus,
   ECar,
-  EMode,
+  ERunMode,
   EManoeuvre,
   EStreet,
   IPark,
@@ -51,7 +51,7 @@ export class AppComponent implements AfterViewInit {
     this.defaultScenario = this.objects.scenarios[0];
   }
   /* Operation mode */
-  private mode = EMode.Single;
+  private mode = ERunMode.Single;
   /* Detects main button click */
   private isMainButtonClicked = false;
   /* Stores the main button status when last clicked */
@@ -308,7 +308,7 @@ export class AppComponent implements AfterViewInit {
 
     /* Put in a short delay between manoeuvres when in loop mode*/
     if (
-      this.mode === EMode.Loop &&
+      this.mode === ERunMode.Loop &&
       this.mainButtonLastClickStatus !== EButtonStatus.Reset
     ) {
       await this.runEventLoop(1000);
@@ -369,11 +369,11 @@ export class AppComponent implements AfterViewInit {
         });
     }
 
-    const modeService = this.data.getMode();
-    if (modeService.mode$) {
-      modeService.mode$
+    const modeService = this.data.getRunMode();
+    if (modeService.runMode$) {
+      modeService.runMode$
         .pipe(this.logger.tapLog('Mode chosen:', LoggingLevel.DEBUG))
-        .subscribe((data: EMode) => {
+        .subscribe((data: ERunMode) => {
           this.mode = data;
         });
     }
@@ -407,7 +407,7 @@ export class AppComponent implements AfterViewInit {
       }
 
       /* Reset all if the loop mode is selected */
-      if (this.mode === EMode.Loop) {
+      if (this.mode === ERunMode.Loop) {
         // Defensive: getManoeuvre() may be undefined
         const manoeuvreService = this.data.getManoeuvre();
         if (
@@ -434,12 +434,12 @@ export class AppComponent implements AfterViewInit {
         scenario = this.getCurrentScenario();
         this.setupScreen(scenario);
         // Disable all form controls (except mode)
-        this.data.getMode().modeForm.enable({ emitEvent: false });
+        this.data.getRunMode().modeForm.enable({ emitEvent: false });
         manoeuvreService.manoeuvreForm.disable({ emitEvent: false });
         carService.carForm.disable({ emitEvent: false });
         streetService.streetForm.disable({ emitEvent: false });
       } else {
-        this.data.getMode().modeForm.enable({ emitEvent: false });
+        this.data.getRunMode().modeForm.enable({ emitEvent: false });
         this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
         this.data.getCar().carForm.enable({ emitEvent: false });
         this.data.getStreet().streetForm.enable({ emitEvent: false });
@@ -461,14 +461,14 @@ export class AppComponent implements AfterViewInit {
         ) {
           invalid = true;
           this.data.getButton('main').disable();
-          this.data.getMode().modeForm.disable({ emitEvent: false });
+          this.data.getRunMode().modeForm.disable({ emitEvent: false });
           this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
           this.data.getCar().carForm.disable({ emitEvent: false });
           this.data.getStreet().streetForm.disable({ emitEvent: false });
         } else if (invalid === true) {
           invalid = false;
           this.data.getButton('main').enableRun();
-          this.data.getMode().modeForm.enable({ emitEvent: false });
+          this.data.getRunMode().modeForm.enable({ emitEvent: false });
           this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
           this.data.getCar().carForm.enable({ emitEvent: false });
           this.data.getStreet().streetForm.enable({ emitEvent: false });
@@ -476,7 +476,7 @@ export class AppComponent implements AfterViewInit {
       } while (this.isMainButtonClicked === false);
 
       /* Disable all form controls */
-      this.data.getMode().modeForm.disable({ emitEvent: false });
+      this.data.getRunMode().modeForm.disable({ emitEvent: false });
       this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
       this.data.getCar().carForm.disable({ emitEvent: false });
       this.data.getStreet().streetForm.disable({ emitEvent: false });
@@ -488,7 +488,7 @@ export class AppComponent implements AfterViewInit {
       await this.runEventLoop();
 
       switch (this.mode) {
-        case EMode.Keyboard:
+        case ERunMode.Keyboard:
           /* Read updated scenario */
           scenario = this.getCurrentScenario();
           this.setupScreen(scenario);
@@ -502,11 +502,11 @@ export class AppComponent implements AfterViewInit {
           /* Cancel keyboard operation */
           this.keyMove.cancelKeyboard();
           break;
-        case EMode.Loop:
+        case ERunMode.Loop:
           const scenarios = this.objects.scenarios;
           await this.runPlaylist(scenarios);
           break;
-        case EMode.Single:
+        case ERunMode.Single:
           /* Read updated scenario */
           scenario = this.getCurrentScenario();
           await this.runPlaylist([scenario]);
