@@ -162,12 +162,14 @@ export type TCarSetup = {
 
 export type TStreetSetup = {
   name: string;
-  rearCarLength?: number;
+  rearCarFromLeft: number;
+  rearCarLength: number;
   rearCarWidth: number;
+  parkingSpace: number;
+  frontCarLength: number;
   frontCarWidth: number;
   carFromKerb: number;
   safetyGap: number;
-  parkingSpace: number;
 };
 
 /* Car is moving forward or in reverse */
@@ -247,6 +249,11 @@ export const enum EStreet {
   Width_2073mm = 'Width_2073mm',
   Width_2426mm = 'Width_2426mm',
   Custom_Street = 'Custom_Street',
+  Bay_2400mm = 'Bay_2400mm',
+}
+
+export const enum EBay {
+  Parking_Bay = 'Parking_Bay',
 }
 
 export type TScenario = {

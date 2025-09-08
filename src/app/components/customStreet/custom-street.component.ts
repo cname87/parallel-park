@@ -132,6 +132,9 @@ export class CustomStreetComponent implements OnInit {
       map((streetForm: ICustomStreetForm) => {
         const result: TStreetSetup = {
           name: EStreet.Custom_Street,
+          rearCarFromLeft: 0,
+          rearCarLength: 1000,
+          frontCarLength: 5000,
           rearCarWidth: streetForm.frontCarWidth,
           frontCarWidth: streetForm.frontCarWidth,
           carFromKerb: streetForm.distFromKerb,

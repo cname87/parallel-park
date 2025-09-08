@@ -14,10 +14,10 @@ import {
   startWith,
 } from 'rxjs/operators';
 import {
-  ERunMode,
   EManoeuvre,
   IManoeuvre,
   IManoeuvreForm,
+  EParkMode,
 } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
@@ -77,13 +77,13 @@ export class ManoeuvreComponent implements OnInit {
     };
     this.data.setManoeuvre(this.manoeuvre);
 
-    /* Customise input heading and hint messages */
-    this.data.getRunMode().runMode$.subscribe((value: ERunMode) => {
-      if (value === ERunMode.Keyboard) {
+    /* Customise input heading and hint messages for keyboard mode */
+    this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
+      if (value === EParkMode.Parallel) {
         this.message = 'Select a manoeuvre, which sets the parking space width';
         this.hint = 'The set of possible parking manoeuvres';
-      } else {
-        this.message = 'Select a parking manoeuvre';
+      } else if (value === EParkMode.Bay) {
+        this.message = 'Select a manoeuvre';
         this.hint = 'The set of possible parking manoeuvres';
       }
     });

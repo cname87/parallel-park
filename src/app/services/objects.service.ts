@@ -9,6 +9,7 @@ import {
   TStreetSetup,
 } from '../shared/types';
 import { ConfigService } from './config.service';
+import { DataService } from './data.service';
 
 /**
  * Stores all the cars, streets and manoeuvres.
@@ -26,81 +27,106 @@ export class ObjectsService {
   public Width_2426mm: TStreetSetup;
   public Custom_Street: TStreetSetup;
 
-  constructor(public config: ConfigService) {
+  constructor(
+    public config: ConfigService,
+    public data: DataService,
+  ) {
+    //
     this.Width_1904mm = {
-      name: EStreet.Width_1904mm,
-      rearCarWidth: 1904,
       /* Same as 2005 VW T5 van */
+      name: EStreet.Width_1904mm,
+      rearCarFromLeft: 0,
+      rearCarLength: 1000,
+      rearCarWidth: 1904,
+      frontCarLength: 5000,
       frontCarWidth: 1904,
+      parkingSpace: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-      parkingSpace: 0,
     };
 
     this.Width_1852mm = {
       /* Same as 2020 Mercedes E Class Estate */
       name: EStreet.Width_1852mm,
+      rearCarFromLeft: 0,
+      rearCarLength: 1000,
       rearCarWidth: 1852,
+      frontCarLength: 5000,
       frontCarWidth: 1852,
+      parkingSpace: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-      parkingSpace: 0,
     };
 
     this.Width_1795mm = {
       /* Same as 2020 Hyundai i30 */
       name: EStreet.Width_1795mm,
+      rearCarFromLeft: 0,
+      rearCarLength: 1000,
       rearCarWidth: 1795,
+      frontCarLength: 5000,
       frontCarWidth: 1795,
+      parkingSpace: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-      parkingSpace: 0,
     };
 
     this.Width_1595mm = {
-      name: EStreet.Width_1595mm,
-      rearCarWidth: 1450,
       /* Same as 2020 Kia Picanto - narrowest car */
+      name: EStreet.Width_1595mm,
+      rearCarFromLeft: 0,
+      rearCarLength: 1000,
+      rearCarWidth: 1595,
+      frontCarLength: 5000,
       frontCarWidth: 1595,
+      parkingSpace: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-      parkingSpace: 0,
     };
 
     this.Width_2073mm = {
-      name: EStreet.Width_2073mm,
-      rearCarWidth: 2073,
       /* Same as 2020 Landrover Discovery Sport */
+      name: EStreet.Width_2073mm,
+      rearCarFromLeft: 0,
+      rearCarLength: 1000,
+      rearCarWidth: 2073,
+      frontCarLength: 5000,
       frontCarWidth: 2073,
+      parkingSpace: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-      parkingSpace: 0,
     };
 
     this.Width_2426mm = {
-      name: EStreet.Width_2426mm,
-      rearCarWidth: 2426,
       /* Same as 2020 VW Crafter - widest van */
+      name: EStreet.Width_2426mm,
+      rearCarFromLeft: 0,
+      rearCarLength: 1000,
+      rearCarWidth: 2426,
+      frontCarLength: 5000,
       frontCarWidth: 2426,
+      parkingSpace: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-      parkingSpace: 0,
     };
 
     this.Custom_Street = {
+      /* To be set by user in a form */
       name: EStreet.Custom_Street,
-      rearCarLength: 6000,
-      rearCarWidth: 3000,
-      frontCarWidth: 3000,
-      carFromKerb: 0,
-      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      rearCarFromLeft: 0,
+      rearCarLength: 1000,
+      rearCarWidth: 2426,
+      frontCarLength: 5000,
+      frontCarWidth: 2426,
       parkingSpace: 0,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
   }
 
   get scenarios(): Array<TScenario> {
     const scenarios: Array<TScenario> = [];
-    for (const street of this.streets) {
+    for (const street of this.parallelStreets) {
       for (const car of this.cars) {
         for (const manoeuvre of this.manoeuvres) {
           scenarios.push({
@@ -230,7 +256,23 @@ export class ObjectsService {
     wheelLength: 686,
   };
 
-  readonly modes: ERunMode[] = [ERunMode.Loop, ERunMode.Single, ERunMode.Keyboard];
+  Bay_2400mm: TStreetSetup = {
+    name: EStreet.Bay_2400mm,
+    rearCarFromLeft: 3000,
+    rearCarLength: 2000,
+    rearCarWidth: 3000,
+    frontCarLength: 2000,
+    frontCarWidth: 3000,
+    parkingSpace: 2400,
+    carFromKerb: 0,
+    safetyGap: 100,
+  };
+
+  readonly modes: ERunMode[] = [
+    ERunMode.Loop,
+    ERunMode.Single,
+    ERunMode.Keyboard,
+  ];
 
   readonly manoeuvres: Array<[EManoeuvre, string]> = [
     [
@@ -270,7 +312,7 @@ export class ObjectsService {
     [ECar.Custom_Car, 'Custom Car'],
   ];
 
-  readonly streets: Array<[EStreet, string]> = [
+  readonly parallelStreets: Array<[EStreet, string]> = [
     [EStreet.Width_1904mm, 'Front Car Width: 1904mm'],
     [EStreet.Width_1852mm, 'Front Car Width: 1852mm'],
     [EStreet.Width_1795mm, 'Front Car Width: 1795mm'],
@@ -278,5 +320,9 @@ export class ObjectsService {
     [EStreet.Width_2073mm, 'Front Car Width: 2073mm'],
     [EStreet.Width_2426mm, 'Front Car Width: 2426mm'],
     [EStreet.Custom_Street, 'Custom Front Car Width'],
+  ];
+
+  readonly bayStreets: Array<[EStreet, string]> = [
+    [EStreet.Bay_2400mm, 'Bay Parking 2400mm'],
   ];
 }

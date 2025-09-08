@@ -71,23 +71,25 @@ export class StreetService {
   public frontCarGap = new createjs.Shape();
 
   public update({
+    rearCarFromLeft,
     rearCarLength,
     rearCarWidth,
+    parkingSpace,
+    frontCarLength,
     frontCarWidth,
     carFromKerb,
     safetyGap,
-    parkingSpace,
   }: Omit<TStreetSetup, 'name'>): void {
     /* External updates are unscaled */
-    if (rearCarLength) {
-      this.rearCarLength = rearCarLength / this.config.distScale;
-    }
+    this.rearCarFromLeft = rearCarFromLeft / this.config.distScale;
+    this.rearCarLength = rearCarLength / this.config.distScale;
     this.rearCarWidth = rearCarWidth / this.config.distScale;
+    /* This may be overwritten. */
+    this.parkingSpaceLength = parkingSpace / this.config.distScale;
+    this.frontCarLength = frontCarLength / this.config.distScale;
     this.frontCarWidth = frontCarWidth / this.config.distScale;
     this.carFromKerb = carFromKerb / this.config.distScale;
     this.safetyGap = safetyGap / this.config.distScale;
-    /* This may be overwritten. */
-    this.parkingSpaceLength = parkingSpace / this.config.distScale;
   }
 
   /* Draw the street based on a provided parking space length */

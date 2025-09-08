@@ -13,7 +13,7 @@ import {
   shareReplay,
   startWith,
 } from 'rxjs/operators';
-import { ERunMode, EStreet, IStreet, IStreetForm } from '../../shared/types';
+import { EParkMode, EStreet, IStreet, IStreetForm } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
 
@@ -49,7 +49,7 @@ export class StreetComponent implements OnInit {
     private data: DataService,
     private objects: ObjectsService,
   ) {
-    this.streets = this.objects.streets;
+    this.streets = this.objects.parallelStreets;
     /* Note that the select group formControlName is 'street' */
     this.streetInitialFormValue = {
       street: EStreet.Width_1904mm,
@@ -57,6 +57,18 @@ export class StreetComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //
+    /* Get the parking mode - parallel parking or bay parking */
+    this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
+      if (value === EParkMode.Parallel) {
+        this.streets = this.objects.parallelStreets;
+        this.streetForm.setValue({ street: EStreet.Width_1904mm });
+      } else if (value === EParkMode.Bay) {
+        this.streets = this.objects.bayStreets;
+        this.streetForm.setValue({ street: EStreet.Bay_2400mm });
+      }
+    });
+
     this.streetForm = this.formBuilder.group(this.streetInitialFormValue);
     this.street$ = this.streetForm.valueChanges.pipe(
       startWith(this.streetInitialFormValue),
@@ -70,14 +82,15 @@ export class StreetComponent implements OnInit {
     };
     this.data.setStreet(this.street);
 
-    /* Customise input heading and hint messages */
-    this.data.getRunMode().runMode$.subscribe((value: ERunMode) => {
-      if (value === ERunMode.Keyboard) {
-        this.message = 'Select a front car width';
-        this.hint = "Select 'Custom' to set up a custom front car width";
-      } else {
+    /* Customise input heading and hint messages for keyboard mode */
+    /* * Note: Can reference custom street when fully implemented */
+    this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
+      if (value === EParkMode.Parallel) {
         this.message = 'Select a front car width';
         this.hint = 'The set of available front car widths';
+      } else if (value === EParkMode.Bay) {
+        this.message = 'Select a bay width';
+        this.hint = 'The set of available bay widths';
       }
     });
   }
