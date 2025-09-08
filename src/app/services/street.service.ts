@@ -22,6 +22,7 @@ export class StreetService {
   public safetyGap: number;
   public wheelLength: number;
   public wheelWidth: number;
+  public bayWidth: number;
 
   /* Set and get the parking space length */
   public parkingSpaceLength: number;
@@ -57,6 +58,7 @@ export class StreetService {
     this.parkingSpaceLength = this.config.defaultParkingSpaceLength;
     this.wheelLength = this.config.defaultWheelLength;
     this.wheelWidth = this.config.defaultWheelWidth;
+    this.bayWidth = this.config.defaultBayWidth;
     /* Calculated */
     this.parkingSpaceFromLeft = this.rearCarFromLeft + this.rearCarLength;
     this.frontCarFromLeft = this.parkingSpaceFromLeft + this.parkingSpaceLength;
@@ -69,6 +71,7 @@ export class StreetService {
   public frontCarGap = new createjs.Shape();
 
   public update({
+    rearCarLength,
     rearCarWidth,
     frontCarWidth,
     carFromKerb,
@@ -76,6 +79,9 @@ export class StreetService {
     parkingSpace,
   }: Omit<TStreetSetup, 'name'>): void {
     /* External updates are unscaled */
+    if (rearCarLength) {
+      this.rearCarLength = rearCarLength / this.config.distScale;
+    }
     this.rearCarWidth = rearCarWidth / this.config.distScale;
     this.frontCarWidth = frontCarWidth / this.config.distScale;
     this.carFromKerb = carFromKerb / this.config.distScale;

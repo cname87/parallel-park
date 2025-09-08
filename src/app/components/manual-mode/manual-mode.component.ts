@@ -25,7 +25,6 @@ import { ButtonComponent } from '../button/button.component';
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
     ButtonComponent,
   ],
 })

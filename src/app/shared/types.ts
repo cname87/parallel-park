@@ -148,6 +148,7 @@ export type TCarSetup = {
 
 export type TStreetSetup = {
   name: string;
+  rearCarLength?: number;
   rearCarWidth: number;
   frontCarWidth: number;
   carFromKerb: number;
@@ -220,6 +221,8 @@ export const enum EManoeuvre {
   /* Rotate in using rules and collision conditions rather than optimally
   calculated or manually set angles and distances */
   Park4UsingRules2 = 'Park4UsingRules2',
+  /* Bay parking manoeuvre */
+  BayPark1 = 'BayPark1',
 }
 
 export const enum EStreet {

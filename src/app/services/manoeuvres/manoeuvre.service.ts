@@ -401,6 +401,8 @@ export class ManoeuvreService {
           config,
         });
         break;
+      case EManoeuvre.BayPark1:
+        return street.bayWidth;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -889,6 +891,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
           .startDistXToPivot;
+      case EManoeuvre.BayPark1:
+        return 0;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -976,6 +980,8 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
           .startDistYToPivot;
+      case EManoeuvre.BayPark1:
+        return 500;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1056,6 +1062,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park4UsingRules1:
       case EManoeuvre.Park4UsingRules2:
+      case EManoeuvre.BayPark1:
         const value = {
           x:
             this.getPivot({ manoeuvre, street, car, config }).x +
@@ -1067,7 +1074,6 @@ export class ManoeuvreService {
         this.logger.log(`Starting position X: ${value.x}`, LoggingLevel.TRACE);
         this.logger.log(`Starting position Y: ${value.y}`, LoggingLevel.TRACE);
         return value;
-
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1736,6 +1742,12 @@ export class ManoeuvreService {
       car,
       config,
     });
+
+    // TEMP
+    if (manoeuvre === EManoeuvre.BayPark1) {
+      manoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
+    }
+
     const movie: TMovie = {
       moveFirstSteer: {
         type: () => EMoveType.Steer,

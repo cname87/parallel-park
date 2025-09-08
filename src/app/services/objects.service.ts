@@ -89,8 +89,9 @@ export class ObjectsService {
 
     this.Custom_Street = {
       name: EStreet.Custom_Street,
-      rearCarWidth: 5000,
-      frontCarWidth: 5000,
+      rearCarLength: 6000,
+      rearCarWidth: 3000,
+      frontCarWidth: 3000,
       carFromKerb: 0,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
       parkingSpace: 0,
@@ -254,6 +255,7 @@ export class ObjectsService {
     ],
     [EManoeuvre.Park4UsingRules1, 'Park By Rule 1'],
     [EManoeuvre.Park4UsingRules2, 'Park By Rule 2'],
+    [EManoeuvre.BayPark1, 'Park in a Bay 1'],
   ];
 
   readonly cars: Array<[ECar, string]> = [
