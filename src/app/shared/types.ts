@@ -251,10 +251,7 @@ export const enum EStreet {
   Width_2426mm = 'Width_2426mm',
   Custom_Street = 'Custom_Street',
   Bay_2400mm = 'Bay_2400mm',
-}
-
-export const enum EBay {
-  Parking_Bay = 'Parking_Bay',
+  Bay_2200mm = 'Bay_2200mm',
 }
 
 export type TScenario = {

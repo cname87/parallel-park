@@ -20,6 +20,7 @@ import {
 } from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ConfigService } from '../../services/config.service';
+import { ScreenService } from '../../services/screen.service';
 
 /**
  * Displays the mode menu.
@@ -58,6 +59,7 @@ export class ModeComponent implements OnInit {
     private formBuilder: FormBuilder,
     private data: DataService,
     private config: ConfigService,
+    private screen: ScreenService,
   ) {
     this.#runLoopTest = this.config.runLoopTest;
     /* Note that the radio group formControlName is 'mode' */

@@ -263,14 +263,27 @@ export class ObjectsService {
     wheelLength: 686,
   };
 
+  Bay_2200mm: TStreetSetup = {
+    name: EStreet.Bay_2200mm,
+    type: 'bay',
+    rearCarFromLeft: 3000,
+    rearCarLength: 2000,
+    rearCarWidth: 1000,
+    frontCarLength: 2000,
+    frontCarWidth: 1000,
+    parkingSpaceLength: 2200,
+    carFromKerb: 0,
+    safetyGap: 100,
+  };
+
   Bay_2400mm: TStreetSetup = {
     name: EStreet.Bay_2400mm,
     type: 'bay',
     rearCarFromLeft: 3000,
     rearCarLength: 2000,
-    rearCarWidth: 2000,
+    rearCarWidth: 1000,
     frontCarLength: 2000,
-    frontCarWidth: 2000,
+    frontCarWidth: 1000,
     parkingSpaceLength: 2400,
     carFromKerb: 0,
     safetyGap: 100,
@@ -335,5 +348,6 @@ export class ObjectsService {
 
   readonly bayStreets: Array<[EStreet, string]> = [
     [EStreet.Bay_2400mm, 'Bay Parking 2400mm'],
+    [EStreet.Bay_2200mm, 'Bay Parking 2200mm'],
   ];
 }

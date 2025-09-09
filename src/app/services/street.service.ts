@@ -79,6 +79,7 @@ export class StreetService {
   public frontCarGap = new createjs.Shape();
 
   public updateStreet({
+    type,
     rearCarFromLeft,
     rearCarLength,
     rearCarWidth,
@@ -88,6 +89,7 @@ export class StreetService {
     carFromKerb,
     safetyGap,
   }: Omit<TStreetSetup, 'name'>): void {
+    this.type = type;
     /* External updates are unscaled */
     this.rearCarFromLeft = rearCarFromLeft / this.config.distScale;
     this.rearCarLength = rearCarLength / this.config.distScale;
@@ -108,9 +110,6 @@ export class StreetService {
     type: 'parallel' | 'bay';
     parkingSpaceLength: number;
   }): void {
-    // Clear previous shapes from the stage
-    // this.config.stage.removeAllChildren();
-    // this.config.stage.update();
     /* Update parking space length with calculated length */
     this.parkingSpaceLength = parkingSpaceLength;
     /* Repeat all calculated properties */
@@ -121,10 +120,10 @@ export class StreetService {
     this.frontCarFromTop = this.carFromKerb;
     /* Set internal car colors based on type */
     if (type === 'parallel') {
-      this.internalCarColor = 'Blue';
+      this.internalCarColor = this.borderColor;
     } else if (type === 'bay') {
       /* Hide the internal lines by making them the same color as the car */
-      this.internalCarColor = 'Red';
+      this.internalCarColor = this.carColor;
     }
     /* Create the rear car the safetey gap shape */
     this.rearCarGap.set({ regX: 0, regY: 0 });
