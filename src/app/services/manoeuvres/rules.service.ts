@@ -154,6 +154,44 @@ export class RulesService {
           return tooCloseToRearCar || withinKerbDistance;
         };
         break;
+
+      case EManoeuvre.BayPark1:
+        /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
+        startDistXToPivot =
+          this.r1_startDistXToRearCarBumper + street.safetyGap;
+        /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. This is the most critical move in the manoeuvre. */
+        moveDCondition = (carInUse: CarService, _tick: any) => {
+          return (
+            Math.abs(
+              /* Rear axle x-axis value */
+              carInUse.readRearPortAxleSide.x -
+                /* How far the car will move in the x-axis direction before it intersects the kerb */
+                carInUse.readRearPortAxleSide.y /
+                  Math.tan(carInUse.readCarRotation) -
+                /* Rear car corner x-axis value */
+                street.rearCarCorner.x -
+                /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
+                this.r1_moveDProjectedDistFromRearCar,
+            ) < 1
+          );
+        };
+        /* If the rear outer corner gets closer to the rear car than the configured minimum distance, or the rear inner corner is gets within a given distance of the kerb, or the car front inner corner is beyond the rear bumper of the front car by a given amount then stop */
+        moveFCondition = (carInUse: CarService, _tick: any) => {
+          const tooCloseToRearCar =
+            carInUse.readRearStarboardCorner.x -
+              street.rearCarCorner.x -
+              street.safetyGap -
+              distFromRearCarMin <
+            1;
+          const rearBumperRelativePosition =
+            carInUse.readFrontPortCorner.x - street.frontCarCorner.x;
+          const beyondRearBumper =
+            rearBumperRelativePosition - this.r1_beyondRearBumperDist < 0.1;
+          const withinKerbDistance =
+            carInUse.readRearPortCorner.y - this.r1_distFromKerb < 0.1;
+          return tooCloseToRearCar || (beyondRearBumper && withinKerbDistance);
+        };
+        break;
       default:
         throw new Error('Unexpected manoeuvre');
     }

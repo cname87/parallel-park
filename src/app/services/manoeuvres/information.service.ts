@@ -107,6 +107,10 @@ export class InformationService {
         return {
           message: 'Rule 1: TBC',
         };
+      case EManoeuvre.BayPark1:
+        return {
+          message: 'TBC',
+        };
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -127,6 +131,7 @@ export class InformationService {
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.BayPark1:
         return {
           message: '',
         };
@@ -167,6 +172,7 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.BayPark1:
         return {
           message: '',
         };
@@ -217,6 +223,7 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.BayPark1:
         return {
           message: '',
         };
@@ -259,6 +266,7 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.BayPark1:
         return {
           message: '',
         };
@@ -297,6 +305,7 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.BayPark1:
         return {
           message: '',
         };
@@ -335,6 +344,7 @@ export class InformationService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.BayPark1:
         return {
           message: '',
         };
