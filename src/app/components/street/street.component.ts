@@ -58,7 +58,8 @@ export class StreetComponent implements OnInit {
 
   ngOnInit(): void {
     //
-    /* Initailise dependent on the parking mode - parallel parking or bay parking */
+    this.streetForm = this.formBuilder.group(this.streetInitialFormValue);
+    /* Initialise dependent on the parking mode - parallel parking or bay parking */
     this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
       if (value === EParkMode.Parallel) {
         this.streets = this.objects.parallelStreets;
@@ -73,7 +74,6 @@ export class StreetComponent implements OnInit {
       }
     });
 
-    this.streetForm = this.formBuilder.group(this.streetInitialFormValue);
     this.street$ = this.streetForm.valueChanges.pipe(
       startWith(this.streetInitialFormValue),
       map((streetFormValue: IStreetForm) => streetFormValue.street),

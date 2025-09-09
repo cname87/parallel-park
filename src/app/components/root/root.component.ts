@@ -96,7 +96,7 @@ export class AppComponent implements AfterViewInit {
 
     /* Modify the street instance to contain the properties of the basic street.
     Note: The parking space length may be zero and therefore set later. */
-    this.street.update(this.objects[scenario.streetSetup]);
+    this.street.updateStreet(this.objects[scenario.streetSetup]);
 
     /* Print the grid */
     this.grid.createGrid();
@@ -118,6 +118,7 @@ export class AppComponent implements AfterViewInit {
 
     /* Print the street layout setting the parking space length */
     this.street.drawStreet({
+      type: this.street.type,
       parkingSpaceLength: this.street.parkingSpaceLength,
     });
 

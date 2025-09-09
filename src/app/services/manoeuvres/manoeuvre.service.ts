@@ -408,7 +408,7 @@ export class ManoeuvreService {
         break;
       case EManoeuvre.BayPark1:
         /* Return the bay width set by the chosen street*/
-        return street.bayWidth;
+        return street.parkingSpaceLength;
       default:
         throw new Error('Unexpected manoeuvre');
     }

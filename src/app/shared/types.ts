@@ -162,10 +162,11 @@ export type TCarSetup = {
 
 export type TStreetSetup = {
   name: string;
+  type: 'parallel' | 'bay';
   rearCarFromLeft: number;
   rearCarLength: number;
   rearCarWidth: number;
-  parkingSpace: number;
+  parkingSpaceLength: number;
   frontCarLength: number;
   frontCarWidth: number;
   carFromKerb: number;

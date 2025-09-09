@@ -63,7 +63,8 @@ export class ManoeuvreComponent implements OnInit {
 
   ngOnInit(): void {
     //
-    /* Initailise dependent on the parking mode - parallel parking or bay parking */
+    this.manoeuvreForm = this.formBuilder.group(this.manoeuvreInitialFormValue);
+    /* Initialise dependent on the parking mode - parallel parking or bay parking */
     this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
       if (value === EParkMode.Parallel) {
         this.manoeuvres = this.objects.parallelManoeuvres;
@@ -78,7 +79,6 @@ export class ManoeuvreComponent implements OnInit {
       }
     });
 
-    this.manoeuvreForm = this.formBuilder.group(this.manoeuvreInitialFormValue);
     this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
       startWith(this.manoeuvreInitialFormValue),
       map((manoeuvreFormValue: IManoeuvreForm) => manoeuvreFormValue.manoeuvre),

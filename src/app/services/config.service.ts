@@ -47,6 +47,7 @@ export class ConfigService {
    */
 
   /* All street defaults */
+  defaultStreetType: 'parallel' | 'bay' = 'parallel';
   defaultRearCarLength = 1000 / this.distScale;
   defaultRearCarWidth = 1904 / this.distScale;
   defaultRearCarFromLeft = 0 / this.distScale;

@@ -35,12 +35,13 @@ export class ObjectsService {
     this.Width_1904mm = {
       /* Same as 2005 VW T5 van */
       name: EStreet.Width_1904mm,
+      type: 'parallel',
       rearCarFromLeft: 0,
       rearCarLength: 1000,
       rearCarWidth: 1904,
       frontCarLength: 5000,
       frontCarWidth: 1904,
-      parkingSpace: 0,
+      parkingSpaceLength: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -48,12 +49,13 @@ export class ObjectsService {
     this.Width_1852mm = {
       /* Same as 2020 Mercedes E Class Estate */
       name: EStreet.Width_1852mm,
+      type: 'parallel',
       rearCarFromLeft: 0,
       rearCarLength: 1000,
       rearCarWidth: 1852,
       frontCarLength: 5000,
       frontCarWidth: 1852,
-      parkingSpace: 0,
+      parkingSpaceLength: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -61,12 +63,13 @@ export class ObjectsService {
     this.Width_1795mm = {
       /* Same as 2020 Hyundai i30 */
       name: EStreet.Width_1795mm,
+      type: 'parallel',
       rearCarFromLeft: 0,
       rearCarLength: 1000,
       rearCarWidth: 1795,
       frontCarLength: 5000,
       frontCarWidth: 1795,
-      parkingSpace: 0,
+      parkingSpaceLength: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -74,12 +77,13 @@ export class ObjectsService {
     this.Width_1595mm = {
       /* Same as 2020 Kia Picanto - narrowest car */
       name: EStreet.Width_1595mm,
+      type: 'parallel',
       rearCarFromLeft: 0,
       rearCarLength: 1000,
       rearCarWidth: 1595,
       frontCarLength: 5000,
       frontCarWidth: 1595,
-      parkingSpace: 0,
+      parkingSpaceLength: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -87,12 +91,13 @@ export class ObjectsService {
     this.Width_2073mm = {
       /* Same as 2020 Landrover Discovery Sport */
       name: EStreet.Width_2073mm,
+      type: 'parallel',
       rearCarFromLeft: 0,
       rearCarLength: 1000,
       rearCarWidth: 2073,
       frontCarLength: 5000,
       frontCarWidth: 2073,
-      parkingSpace: 0,
+      parkingSpaceLength: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -100,12 +105,13 @@ export class ObjectsService {
     this.Width_2426mm = {
       /* Same as 2020 VW Crafter - widest van */
       name: EStreet.Width_2426mm,
+      type: 'parallel',
       rearCarFromLeft: 0,
       rearCarLength: 1000,
       rearCarWidth: 2426,
       frontCarLength: 5000,
       frontCarWidth: 2426,
-      parkingSpace: 0,
+      parkingSpaceLength: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -113,12 +119,13 @@ export class ObjectsService {
     this.Custom_Street = {
       /* To be set by user in a form */
       name: EStreet.Custom_Street,
+      type: 'parallel',
       rearCarFromLeft: 0,
       rearCarLength: 1000,
       rearCarWidth: 2426,
       frontCarLength: 5000,
       frontCarWidth: 2426,
-      parkingSpace: 0,
+      parkingSpaceLength: 0,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -258,12 +265,13 @@ export class ObjectsService {
 
   Bay_2400mm: TStreetSetup = {
     name: EStreet.Bay_2400mm,
+    type: 'bay',
     rearCarFromLeft: 3000,
     rearCarLength: 2000,
-    rearCarWidth: 3000,
+    rearCarWidth: 2000,
     frontCarLength: 2000,
-    frontCarWidth: 3000,
-    parkingSpace: 2400,
+    frontCarWidth: 2000,
+    parkingSpaceLength: 2400,
     carFromKerb: 0,
     safetyGap: 100,
   };

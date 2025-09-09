@@ -83,7 +83,7 @@ export class CustomStreetComponent implements OnInit {
       frontCarWidth: this.objects.Custom_Street.frontCarWidth,
       distFromKerb: this.objects.Custom_Street.carFromKerb,
       safetyGap: this.objects.Custom_Street.safetyGap,
-      parkingSpace: this.objects.Custom_Street.parkingSpace,
+      parkingSpace: this.objects.Custom_Street.parkingSpaceLength,
     };
 
     this.customStreetForm = this.fb.group({
@@ -132,6 +132,7 @@ export class CustomStreetComponent implements OnInit {
       map((streetForm: ICustomStreetForm) => {
         const result: TStreetSetup = {
           name: EStreet.Custom_Street,
+          type: 'parallel',
           rearCarFromLeft: 0,
           rearCarLength: 1000,
           frontCarLength: 5000,
@@ -139,7 +140,7 @@ export class CustomStreetComponent implements OnInit {
           frontCarWidth: streetForm.frontCarWidth,
           carFromKerb: streetForm.distFromKerb,
           safetyGap: streetForm.safetyGap,
-          parkingSpace: streetForm.parkingSpace,
+          parkingSpaceLength: streetForm.parkingSpace,
         };
         return result;
       }),
