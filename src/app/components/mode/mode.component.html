@@ -4,66 +4,70 @@
   <form
     [formGroup]="modeForm"
   >
-    <mat-radio-group
-      formControlName="parkMode"
-      class="smallRadio"
-      color="primary"
-      aria-label="Select an option"
-      fxLayout="row"
-      fxLayoutAlign="flex-left"
-      fxLayoutGap="1rem"
-    >
 
-      <mat-radio-button
-        value="Parallel"
+    <div fxLayout="row" fxLayoutGap="2rem" fxLayoutAlign="flex-left center">
+
+      <mat-radio-group
+        formControlName="parkMode"
+        class="smallRadio"
+        color="primary"
+        aria-label="Select an option"
+        fxFlex="0 1 auto"
+        fxLayout="row"
+        fxLayoutAlign="flex-left"
+        fxLayoutGap="1rem"
+      >
+
+        <mat-radio-button
+          value="Parallel"
+          fxFlex="1 1 auto"
+          >
+          <span class="spans">
+            Parallel Parking Mode
+          </span>
+        </mat-radio-button>
+
+        <mat-radio-button
+        value="Bay"
         fxFlex="1 1 auto"
         >
-        <span class="spans">
-          Parallel Parking Mode
-        </span>
-      </mat-radio-button>
+          <span class="spans">
+            Bay Parking Mode
+          </span>
+        </mat-radio-button>
 
-      <mat-radio-button
-      value="Bay"
-      fxFlex="1 1 auto"
+      </mat-radio-group>
+
+      <mat-radio-group
+        formControlName="runMode"
+        class="smallRadio"
+        color="primary"
+        aria-label="Select an option"
+        fxFlex="0 1 auto"
+        fxLayout="row"
+        fxLayoutAlign="flex-left"
+        fxLayoutGap="1rem"
       >
-        <span class="spans">
-          Bay Parking Mode
-        </span>
-      </mat-radio-button>
 
-    </mat-radio-group>
+        <mat-radio-button
+          value="Single"
+          fxFlex="1 1 auto"
+          >
+          <span class="spans">
+            Automatic Mode
+          </span>
+        </mat-radio-button>
 
-    <mat-radio-group
-      formControlName="runMode"
-      class="smallRadio"
-      color="primary"
-      aria-label="Select an option"
-      fxLayout="row"
-      fxLayoutAlign="flex-left"
-      fxLayoutGap="1rem"
-    >
-
-      <mat-radio-button
-        value="Single"
+        <mat-radio-button
+        value="Keyboard"
         fxFlex="1 1 auto"
         >
-        <span class="spans">
-          Automatic Mode
-        </span>
-      </mat-radio-button>
-
-      <mat-radio-button
-      value="Keyboard"
-      fxFlex="1 1 auto"
-      >
-        <span class="spans">
-          Keyboard Mode
-        </span>
-      </mat-radio-button>
-
-    </mat-radio-group>
+          <span class="spans">
+            Keyboard Mode
+          </span>
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
   </form>
-
-  </div>
+</div>
 

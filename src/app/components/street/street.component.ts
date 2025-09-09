@@ -52,20 +52,24 @@ export class StreetComponent implements OnInit {
     this.streets = this.objects.parallelStreets;
     /* Note that the select group formControlName is 'street' */
     this.streetInitialFormValue = {
-      street: EStreet.Width_1904mm,
+      street: this.streets[0][0],
     };
   }
 
   ngOnInit(): void {
     //
-    /* Get the parking mode - parallel parking or bay parking */
+    /* Initailise dependent on the parking mode - parallel parking or bay parking */
     this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
       if (value === EParkMode.Parallel) {
         this.streets = this.objects.parallelStreets;
         this.streetForm.setValue({ street: EStreet.Width_1904mm });
+        this.message = 'Select a front car width';
+        this.hint = 'The set of available front car widths';
       } else if (value === EParkMode.Bay) {
         this.streets = this.objects.bayStreets;
         this.streetForm.setValue({ street: EStreet.Bay_2400mm });
+        this.message = 'Select a bay width';
+        this.hint = 'The set of available bay widths';
       }
     });
 
@@ -81,17 +85,5 @@ export class StreetComponent implements OnInit {
       street$: this.street$,
     };
     this.data.setStreet(this.street);
-
-    /* Customise input heading and hint messages for keyboard mode */
-    /* * Note: Can reference custom street when fully implemented */
-    this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
-      if (value === EParkMode.Parallel) {
-        this.message = 'Select a front car width';
-        this.hint = 'The set of available front car widths';
-      } else if (value === EParkMode.Bay) {
-        this.message = 'Select a bay width';
-        this.hint = 'The set of available bay widths';
-      }
-    });
   }
 }

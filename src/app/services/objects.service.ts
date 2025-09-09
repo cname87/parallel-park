@@ -128,7 +128,7 @@ export class ObjectsService {
     const scenarios: Array<TScenario> = [];
     for (const street of this.parallelStreets) {
       for (const car of this.cars) {
-        for (const manoeuvre of this.manoeuvres) {
+        for (const manoeuvre of this.parallelManoeuvres) {
           scenarios.push({
             manoeuvre: manoeuvre[0],
             carSetup: car[0],
@@ -274,7 +274,7 @@ export class ObjectsService {
     ERunMode.Keyboard,
   ];
 
-  readonly manoeuvres: Array<[EManoeuvre, string]> = [
+  readonly parallelManoeuvres: Array<[EManoeuvre, string]> = [
     [
       EManoeuvre.Park2Rotate1StraightMinAngle,
       'No Forward Pull-In; Minimum Angle Turn-In',
@@ -297,6 +297,9 @@ export class ObjectsService {
     ],
     [EManoeuvre.Park4UsingRules1, 'Park By Rule 1'],
     [EManoeuvre.Park4UsingRules2, 'Park By Rule 2'],
+  ];
+
+  readonly bayManoeuvres: Array<[EManoeuvre, string]> = [
     [EManoeuvre.BayPark1, 'Park in a Bay 1'],
   ];
 

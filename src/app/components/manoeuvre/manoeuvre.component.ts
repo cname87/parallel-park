@@ -54,8 +54,7 @@ export class ManoeuvreComponent implements OnInit {
     private data: DataService,
     private objects: ObjectsService,
   ) {
-    this.manoeuvres = this.objects.manoeuvres;
-
+    this.manoeuvres = this.objects.parallelManoeuvres;
     /* Note that the select group formControlName is 'manoeuvre' */
     this.manoeuvreInitialFormValue = {
       manoeuvre: this.manoeuvres[0][0],
@@ -63,6 +62,22 @@ export class ManoeuvreComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //
+    /* Initailise dependent on the parking mode - parallel parking or bay parking */
+    this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
+      if (value === EParkMode.Parallel) {
+        this.manoeuvres = this.objects.parallelManoeuvres;
+        this.manoeuvreForm.setValue({ manoeuvre: EManoeuvre.Park4UsingRules1 });
+        this.message = 'Select a manoeuvre, which sets the parking space width';
+        this.hint = 'The set of possible parking manoeuvres';
+      } else if (value === EParkMode.Bay) {
+        this.manoeuvres = this.objects.bayManoeuvres;
+        this.manoeuvreForm.setValue({ manoeuvre: EManoeuvre.BayPark1 });
+        this.message = 'Select a manoeuvre';
+        this.hint = 'The set of possible parking manoeuvres';
+      }
+    });
+
     this.manoeuvreForm = this.formBuilder.group(this.manoeuvreInitialFormValue);
     this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
       startWith(this.manoeuvreInitialFormValue),
@@ -76,16 +91,5 @@ export class ManoeuvreComponent implements OnInit {
       manoeuvreInitialFormValue: this.manoeuvreInitialFormValue,
     };
     this.data.setManoeuvre(this.manoeuvre);
-
-    /* Customise input heading and hint messages for keyboard mode */
-    this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
-      if (value === EParkMode.Parallel) {
-        this.message = 'Select a manoeuvre, which sets the parking space width';
-        this.hint = 'The set of possible parking manoeuvres';
-      } else if (value === EParkMode.Bay) {
-        this.message = 'Select a manoeuvre';
-        this.hint = 'The set of possible parking manoeuvres';
-      }
-    });
   }
 }
