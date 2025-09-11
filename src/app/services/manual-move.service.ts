@@ -143,21 +143,26 @@ export class ManualMoveService {
             this.#running = true;
             this.#resetToStreetRunning = true;
             this.logger.log(`${event.key} pressed`, LoggingLevel.TRACE);
+            // const startPosition: TPoint = {
+            //   x:
+            //     this.street.rearCarFromLeft +
+            //     this.street.rearCarLength +
+            //     this.street.parkingSpaceLength +
+            //     this.config.defaultCarRearForwardFromRearOfFrontCar +
+            //     this.car.length,
+            //   y:
+            //     this.street.carFromKerb +
+            //     this.street.frontCarWidth +
+            //     this.street.safetyGap +
+            //     this.config.defaultCarOutFromSafetyOfFrontCar +
+            //     this.car.width,
+            // };
+            // this.car.draw(startPosition, 0);
             const startPosition: TPoint = {
-              x:
-                this.street.rearCarFromLeft +
-                this.street.rearCarLength +
-                this.street.parkingSpaceLength +
-                this.config.defaultCarRearForwardFromRearOfFrontCar +
-                this.car.length,
-              y:
-                this.street.carFromKerb +
-                this.street.frontCarWidth +
-                this.street.safetyGap +
-                this.config.defaultCarOutFromSafetyOfFrontCar +
-                this.car.width,
+              x: this.street.rearCarFromLeft + 50 + 60,
+              y: this.car.length,
             };
-            this.car.draw(startPosition, 0);
+            this.car.draw(startPosition, Math.PI / 2);
             /* Trigger key up and reset all buttons (as no stop move is called) */
             await this.#keyup({ key: EButtonLabels.Start });
             Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
