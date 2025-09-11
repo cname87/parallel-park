@@ -159,7 +159,10 @@ export class ManualMoveService {
             // };
             // this.car.draw(startPosition, 0);
             const startPosition: TPoint = {
-              x: this.street.rearCarFromLeft + 50 + 60,
+              x:
+                this.street.rearCarFromLeft +
+                this.street.rearCarLength +
+                175 / this.config.distScale,
               y: this.car.length,
             };
             this.car.draw(startPosition, Math.PI / 2);
