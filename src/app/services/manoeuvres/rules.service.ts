@@ -95,10 +95,10 @@ export class RulesService {
           return (
             Math.abs(
               /* Rear axle x-axis value */
-              carInUse.readRearPortAxleSide.x -
+              carInUse.rearPortAxleSide.x -
                 /* How far the car will move in the x-axis direction before it intersects the kerb */
-                carInUse.readRearPortAxleSide.y /
-                  Math.tan(carInUse.readCarRotation) -
+                carInUse.rearPortAxleSide.y /
+                  Math.tan(carInUse.carRotation) -
                 /* Rear car corner x-axis value */
                 street.rearCarCorner.x -
                 /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
@@ -109,17 +109,17 @@ export class RulesService {
         /* If the rear outer corner gets closer to the rear car than the configured minimum distance, or the rear inner corner is gets within a given distance of the kerb, or the car front inner corner is beyond the rear bumper of the front car by a given amount then stop */
         moveFCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
-            carInUse.readRearStarboardCorner.x -
+            carInUse.rearStarboardCorner.x -
               street.rearCarCorner.x -
               street.safetyGap -
               distFromRearCarMin <
             1;
           const rearBumperRelativePosition =
-            carInUse.readFrontPortCorner.x - street.frontCarCorner.x;
+            carInUse.frontPortCorner.x - street.frontCarCorner.x;
           const beyondRearBumper =
             rearBumperRelativePosition - this.r1_beyondRearBumperDist < 0.1;
           const withinKerbDistance =
-            carInUse.readRearPortCorner.y - this.r1_distFromKerb < 0.1;
+            carInUse.rearPortCorner.y - this.r1_distFromKerb < 0.1;
           return tooCloseToRearCar || (beyondRearBumper && withinKerbDistance);
         };
         break;
@@ -135,7 +135,7 @@ export class RulesService {
               street.frontCarWidth +
               config.defaultSafetyGap +
               startDistYToPivot -
-              carInUse.readRearPortAxleSide.y >=
+              carInUse.rearPortAxleSide.y >=
             distRearPortAxleMove
           );
         };
@@ -143,14 +143,14 @@ export class RulesService {
         /* NOTE: The rear port corner distance to the kerb will vary with the rear overhang of the car so this figure must be adjusted for each chosen car.  You could use the rear axle distance to the kerb which does not vary between cars but this is harder to judge as a driver. */
         moveFCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
-            carInUse.readRearStarboardCorner.x -
+            carInUse.rearStarboardCorner.x -
               street.rearCarCorner.x -
               street.safetyGap -
               distFromRearCarMin <
             1;
           const distFromKerb = 250 / config.distScale;
           const withinKerbDistance =
-            carInUse.readRearPortCorner.y - distFromKerb < 0.1;
+            carInUse.rearPortCorner.y - distFromKerb < 0.1;
           return tooCloseToRearCar || withinKerbDistance;
         };
         break;
@@ -164,10 +164,10 @@ export class RulesService {
           return (
             Math.abs(
               /* Rear axle x-axis value */
-              carInUse.readRearPortAxleSide.x -
+              carInUse.rearPortAxleSide.x -
                 /* How far the car will move in the x-axis direction before it intersects the kerb */
-                carInUse.readRearPortAxleSide.y /
-                  Math.tan(carInUse.readCarRotation) -
+                carInUse.rearPortAxleSide.y /
+                  Math.tan(carInUse.carRotation) -
                 /* Rear car corner x-axis value */
                 street.rearCarCorner.x -
                 /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
@@ -178,17 +178,17 @@ export class RulesService {
         /* If the rear outer corner gets closer to the rear car than the configured minimum distance, or the rear inner corner is gets within a given distance of the kerb, or the car front inner corner is beyond the rear bumper of the front car by a given amount then stop */
         moveFCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
-            carInUse.readRearStarboardCorner.x -
+            carInUse.rearStarboardCorner.x -
               street.rearCarCorner.x -
               street.safetyGap -
               distFromRearCarMin <
             1;
           const rearBumperRelativePosition =
-            carInUse.readFrontPortCorner.x - street.frontCarCorner.x;
+            carInUse.frontPortCorner.x - street.frontCarCorner.x;
           const beyondRearBumper =
             rearBumperRelativePosition - this.r1_beyondRearBumperDist < 0.1;
           const withinKerbDistance =
-            carInUse.readRearPortCorner.y - this.r1_distFromKerb < 0.1;
+            carInUse.rearPortCorner.y - this.r1_distFromKerb < 0.1;
           return tooCloseToRearCar || (beyondRearBumper && withinKerbDistance);
         };
         break;
@@ -199,21 +199,21 @@ export class RulesService {
     car, touches the kerb, or is horizontal */
     const moveHCondition = (carInUse: CarService, _tick: unknown) => {
       const tooCloseToRearCar =
-        carInUse.readRearStarboardCorner.x -
+        carInUse.rearStarboardCorner.x -
           street.rearCarCorner.x -
           street.safetyGap -
           distFromRearCarMin <
         1;
-      const touchesKerb = carInUse.readRearPortCorner.y <= 0;
+      const touchesKerb = carInUse.rearPortCorner.y <= 0;
       const isHorizontal =
-        Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+        Math.abs(carInUse.carRotation) < horizontalTestAngle;
       return tooCloseToRearCar || touchesKerb || isHorizontal;
     };
 
     /* Keep turnng the wheels until counter-clockwise, stopping in the center position only if the car is horizontal */
     const moveICondition = (carInUse: CarService) => {
-      return Math.abs(carInUse.readCarRotation) < horizontalTestAngle &&
-        Math.abs(carInUse.readFrontPortWheelRotation) < 0.01
+      return Math.abs(carInUse.carRotation) < horizontalTestAngle &&
+        Math.abs(carInUse.frontPortWheelRotation) < 0.01
         ? true
         : false;
     };
@@ -225,23 +225,23 @@ export class RulesService {
       if (collision && typeof tick === 'number') {
         /* Clear collision */
         do {
-          carInUse.readCarRotation -= tick;
+          carInUse.carRotation -= tick;
         } while (this.calc.checkCollision(carInUse, true));
         {
-          carInUse.readCarRotation -= tick;
+          carInUse.carRotation -= tick;
         }
       }
       const isHorizontal =
-        Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+        Math.abs(carInUse.carRotation) < horizontalTestAngle;
       return collision || isHorizontal;
     };
 
     /* Keep turning the wheels until clockwise, stopping in the center position only if the car is horizontal */
     const moveKCondition = (carInUse: CarService) => {
       const isHorizontal =
-        Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+        Math.abs(carInUse.carRotation) < horizontalTestAngle;
       return isHorizontal &&
-        Math.abs(carInUse.readFrontPortWheelRotation) < 0.01
+        Math.abs(carInUse.frontPortWheelRotation) < 0.01
         ? true
         : false;
     };
@@ -249,7 +249,7 @@ export class RulesService {
     /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is reverse rotation to the horizontal position. */
     const moveL = {
       type: (carInUse: CarService) => {
-        return Math.abs(carInUse.readCarRotation) < horizontalTestAngle
+        return Math.abs(carInUse.carRotation) < horizontalTestAngle
           ? EMoveType.MoveStraight
           : EMoveType.MoveArc;
       },
@@ -257,12 +257,12 @@ export class RulesService {
       /* Return a large angle as the condition will stop the rotation */
       deltaAngleFn: () => 0.5 * Math.PI,
       deltaPositionFn: (carInUse: CarService) => {
-        return Math.abs(carInUse.readFrontStarboardCorner.x - midPoint);
+        return Math.abs(carInUse.frontStarboardCorner.x - midPoint);
       },
       condition: () => {
         return (carInUse: CarService) => {
           const pastHorizontal =
-            Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+            Math.abs(carInUse.carRotation) < horizontalTestAngle;
           return pastHorizontal;
         };
       },
@@ -271,9 +271,9 @@ export class RulesService {
     /* Keep turning the wheels until clockwise, stopping in the center position only if the car is horizontal */
     const moveMCondition = (carInUse: CarService) => {
       const isHorizontal =
-        Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+        Math.abs(carInUse.carRotation) < horizontalTestAngle;
       return isHorizontal &&
-        Math.abs(carInUse.readFrontPortWheelRotation) < 0.01
+        Math.abs(carInUse.frontPortWheelRotation) < 0.01
         ? true
         : false;
     };
@@ -281,7 +281,7 @@ export class RulesService {
     /* If the car is horizontal, the move is a straight move and positions the car as it moves forward or reverse into the middle of the parking space. If the car is not horizontal then it is forward rotation to the horizontal position. */
     const moveN = {
       type: (carInUse: CarService) => {
-        return Math.abs(carInUse.readCarRotation) < horizontalTestAngle
+        return Math.abs(carInUse.carRotation) < horizontalTestAngle
           ? EMoveType.MoveStraight
           : EMoveType.MoveArc;
       },
@@ -289,12 +289,12 @@ export class RulesService {
       /* Return a large angle as the condition will stop the rotation */
       deltaAngleFn: () => 0.5 * Math.PI,
       deltaPositionFn: (carInUse: CarService) => {
-        return Math.abs(carInUse.readFrontStarboardCorner.x - midPoint);
+        return Math.abs(carInUse.frontStarboardCorner.x - midPoint);
       },
       condition: () => {
         return (carInUse: CarService) => {
           const pastHorizontal =
-            Math.abs(carInUse.readCarRotation) < horizontalTestAngle;
+            Math.abs(carInUse.carRotation) < horizontalTestAngle;
           return pastHorizontal;
         };
       },
@@ -304,11 +304,11 @@ export class RulesService {
     const moveP = {
       type: (): EMoveType.MoveStraight => EMoveType.MoveStraight,
       fwdOrReverseFn: (carInUse: CarService) =>
-        carInUse.readFrontStarboardCorner.x - midPoint > 0
+        carInUse.frontStarboardCorner.x - midPoint > 0
           ? EDirection.Reverse
           : EDirection.Forward,
       deltaPositionFn: (carInUse: CarService) => {
-        return Math.abs(carInUse.readFrontStarboardCorner.x - midPoint);
+        return Math.abs(carInUse.frontStarboardCorner.x - midPoint);
       },
       condition: () => {
         return (_carInUse: CarService) => {

@@ -188,7 +188,7 @@ export const enum ELock {
 }
 
 /* The steering wheel angle varies from -1 for a fully anticlockwise locked wheel to +1 for a fully clockwise locked wheel */
-export type TSteerAngle = ELock | number;
+export type TSteeringAngle = ELock | number;
 
 /* The direction of rotation of the car.  This can be derived from the sign of the steering wheel angle number, which is typed by TSteer. */
 export const enum ERotateDirection {
@@ -300,7 +300,7 @@ export type TMoveStraightOrArc = {
 
 export type TSteer = {
   type: (car: CarService) => EMoveType.Steer;
-  steeringWheelAngle: TSteerAngle;
+  steeringWheelAngle: TSteeringAngle;
   condition?: (car: CarService) => TCondition;
   message?: ISnackOpen;
   speed?: number;

@@ -157,7 +157,7 @@ export class ManualMoveService {
                 this.config.defaultCarOutFromSafetyOfFrontCar +
                 this.car.width,
             };
-            this.car.draw(startPosition);
+            this.car.draw(startPosition, 0);
             /* Trigger key up and reset all buttons (as no stop move is called) */
             await this.#keyup({ key: EButtonLabels.Start });
             Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
@@ -179,7 +179,7 @@ export class ManualMoveService {
                 this.car.length,
               y: this.street.carFromKerb + this.car.width,
             };
-            this.car.draw(startPosition);
+            this.car.draw(startPosition, 0);
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;

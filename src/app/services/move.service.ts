@@ -15,7 +15,7 @@ import {
   TMoveStraight,
   TPoint,
   TSteer,
-  TSteerAngle,
+  TSteeringAngle,
 } from '../shared/types';
 import { CalculationService } from './calculation.service';
 import { CarService } from './car.service';
@@ -102,12 +102,12 @@ export class MoveService {
         this.logger.log('Front wheels stopped at:');
         this.logger.log(
           `Front startboard wheel angle: ${Math.round(
-            this.car.readFrontStarboardWheelRotation * this.config.RAD_TO_DEG,
+            this.car.frontStarboardWheelRotation * this.config.RAD_TO_DEG,
           )} degrees`,
         );
         this.logger.log(
           `Front port wheel angle: ${Math.round(
-            this.car.readFrontPortWheelRotation * this.config.RAD_TO_DEG,
+            this.car.frontPortWheelRotation * this.config.RAD_TO_DEG,
           )} degrees`,
         );
         break;
@@ -115,14 +115,14 @@ export class MoveService {
         this.logger.log(`Rotation move stopped at:`);
         this.logger.log(
           `Car Rotation: ${this.config.round(
-            this.car.readCarRotation * this.config.RAD_TO_DEG,
+            this.car.carRotation * this.config.RAD_TO_DEG,
           )} degrees`,
         );
         // Show snackbar message
         this.snackBar.dismiss();
         this.snack.open({
           message: `Rotation move stopped at ${this.config.round(
-            this.car.readCarRotation * this.config.RAD_TO_DEG,
+            this.car.carRotation * this.config.RAD_TO_DEG,
           )} degrees`,
           snackConfig: {
             duration: this.config.infoMessageDuration + 3000,
@@ -133,14 +133,12 @@ export class MoveService {
         });
         this.logger.log(
           `Car Starboard-Side Corner X: ${this.config.round(
-            (this.car.readFrontStarboardCorner.x * this.config.distScale) /
-              1000,
+            (this.car.frontStarboardCorner.x * this.config.distScale) / 1000,
           )}m`,
         );
         this.logger.log(
           `Car Starboard-Side Corner Y: ${this.config.round(
-            (this.car.readFrontStarboardCorner.y * this.config.distScale) /
-              1000,
+            (this.car.frontStarboardCorner.y * this.config.distScale) / 1000,
           )}m`,
         );
         break;
@@ -148,14 +146,12 @@ export class MoveService {
         this.logger.log(`Straight move stopped at:`);
         this.logger.log(
           `Car Starboard-Side Corner X: ${this.config.round(
-            (this.car.readFrontStarboardCorner.x * this.config.distScale) /
-              1000,
+            (this.car.frontStarboardCorner.x * this.config.distScale) / 1000,
           )}m`,
         );
         this.logger.log(
           `Car Starboard-Side Corner Y: ${this.config.round(
-            (this.car.readFrontStarboardCorner.y * this.config.distScale) /
-              1000,
+            (this.car.frontStarboardCorner.y * this.config.distScale) / 1000,
           )}m`,
         );
         break;
@@ -163,29 +159,27 @@ export class MoveService {
         this.logger.log(`Keyboard move stopped`);
         this.logger.log(
           `Front startboard wheel angle: ${Math.round(
-            this.car.readFrontStarboardWheelRotation * this.config.RAD_TO_DEG,
+            this.car.frontStarboardWheelRotation * this.config.RAD_TO_DEG,
           )} degrees`,
         );
         this.logger.log(
           `Front port wheel angle: ${Math.round(
-            this.car.readFrontPortWheelRotation * this.config.RAD_TO_DEG,
+            this.car.frontPortWheelRotation * this.config.RAD_TO_DEG,
           )} degrees`,
         );
         this.logger.log(
           `Car Rotation: ${this.config.round(
-            this.car.readCarRotation * this.config.RAD_TO_DEG,
+            this.car.carRotation * this.config.RAD_TO_DEG,
           )} degrees`,
         );
         this.logger.log(
           `Car Starboard-Side Corner X: ${this.config.round(
-            (this.car.readFrontStarboardCorner.x * this.config.distScale) /
-              1000,
+            (this.car.frontStarboardCorner.x * this.config.distScale) / 1000,
           )}m`,
         );
         this.logger.log(
           `Car Starboard-Side Corner Y: ${this.config.round(
-            (this.car.readFrontStarboardCorner.y * this.config.distScale) /
-              1000,
+            (this.car.frontStarboardCorner.y * this.config.distScale) / 1000,
           )}m`,
         );
         break;
@@ -248,9 +242,9 @@ export class MoveService {
       createjs.Ticker.framerate = this.config.FPS;
       const tickTime = 1 / this.config.FPS;
       const tickMoveX =
-        fwdOrReverse * speed * tickTime * Math.cos(this.car.readCarRotation);
+        fwdOrReverse * speed * tickTime * Math.cos(this.car.carRotation);
       const tickMoveY =
-        fwdOrReverse * speed * tickTime * Math.sin(this.car.readCarRotation);
+        fwdOrReverse * speed * tickTime * Math.sin(this.car.carRotation);
       const tickMove = {
         x: tickMoveX,
         y: tickMoveY,
@@ -262,8 +256,8 @@ export class MoveService {
       };
 
       /* Calculate the distance to move */
-      const totalMoveX = deltaPosition * Math.cos(this.car.readCarRotation);
-      const totalMoveY = deltaPosition * Math.sin(this.car.readCarRotation);
+      const totalMoveX = deltaPosition * Math.cos(this.car.carRotation);
+      const totalMoveY = deltaPosition * Math.sin(this.car.carRotation);
       const distanceToMove: TPoint = {
         x: fwdOrReverse * totalMoveX,
         y: fwdOrReverse * totalMoveY,
@@ -377,8 +371,8 @@ export class MoveService {
   }: TMoveArc): Promise<void> {
     /* When wheels are straight, e.g. for a keyboard call, the call is passed to a move straight call */
     if (
-      this.car.readFrontStarboardWheelRotation === 0 ||
-      this.car.readFrontPortWheelRotation === 0
+      this.car.frontStarboardWheelRotation === 0 ||
+      this.car.frontPortWheelRotation === 0
     ) {
       await this.moveStraight({
         type: () => EMoveType.MoveStraight,
@@ -412,9 +406,9 @@ export class MoveService {
       const fwdOrReverse = fwdOrReverseFn(this.car);
       let deltaAngle = deltaAngleFn(this.car);
 
-      let steeringWheelAngle: TSteerAngle = 0;
+      let steeringWheelAngle: TSteeringAngle = 0;
       const rotationDirection: ERotateDirection = Math.sign(
-        this.car.readFrontStarboardWheelRotation,
+        this.car.frontStarboardWheelRotation,
       );
       let angleSign = 0;
 
@@ -431,8 +425,7 @@ export class MoveService {
       ) {
         angleSign = -1;
         steeringWheelAngle =
-          this.car.readFrontPortWheelRotation /
-          this.car.maxFrontPortWheelAngle();
+          this.car.frontPortWheelRotation / this.car.maxFrontPortWheelAngle();
       }
       /* If going forward with clockwise steeringwheel the angle moved by the car will be positive */
       if (
@@ -441,18 +434,17 @@ export class MoveService {
       ) {
         angleSign = +1;
         steeringWheelAngle =
-          this.car.readFrontStarboardWheelRotation /
+          this.car.frontStarboardWheelRotation /
           this.car.maxFrontStarboardWheelAngle();
       }
-      /* If going reverse with counterclockwise steeringwheel the angle moved by he car will be positive */
+      /* If going reverse with counterclockwise steering wheel the angle moved by he car will be positive */
       if (
         fwdOrReverse === EDirection.Reverse &&
         rotationDirection === ERotateDirection.Counterclockwise
       ) {
         angleSign = +1;
         steeringWheelAngle =
-          this.car.readFrontPortWheelRotation /
-          this.car.maxFrontPortWheelAngle();
+          this.car.frontPortWheelRotation / this.car.maxFrontPortWheelAngle();
       }
       /* If going reverse with clockwise steeringwheel the angle moved by the car will be negative */
       if (
@@ -461,14 +453,14 @@ export class MoveService {
       ) {
         angleSign = -1;
         steeringWheelAngle =
-          this.car.readFrontStarboardWheelRotation /
+          this.car.frontStarboardWheelRotation /
           this.car.maxFrontStarboardWheelAngle();
       }
       deltaAngle = angleSign * deltaAngle;
 
       /* Move and change the center of rotation if necessary */
-      this.car.moveCenterOfRotation(steeringWheelAngle);
-      this.car.changeCentersOfRotation(steeringWheelAngle);
+      this.car.setCenterOfRotation(steeringWheelAngle);
+      this.car.swapCentersOfRotation(steeringWheelAngle);
 
       /* Calculate the angle turned in 1 tick */
       createjs.Ticker.framerate = this.config.FPS;
@@ -478,7 +470,7 @@ export class MoveService {
       const tickAngle = tickMove / this.car.turningRadius(steeringWheelAngle);
 
       /* Calculate the start end angle */
-      const startAngle = this.car.readCarRotation;
+      const startAngle = this.car.carRotation;
       const endAngle = startAngle + deltaAngle;
 
       /**
@@ -495,12 +487,12 @@ export class MoveService {
 
           const slowRamp = this.getSlowRamp(tickNumber++);
 
-          const leftToMove = endAngle - this.car.readCarRotation;
+          const leftToMove = endAngle - this.car.carRotation;
           if (Math.abs(leftToMove) < Math.abs(tickAngle)) {
             /* Don't overshoot the required distance */
-            this.car.readCarRotation = endAngle;
+            this.car.carRotation = endAngle;
           } else {
-            this.car.readCarRotation += slowRamp * tickAngle;
+            this.car.carRotation += slowRamp * tickAngle;
           }
 
           this.config.stage.update();
@@ -534,15 +526,15 @@ export class MoveService {
           /* Note: Caution comparing floating point numbers */
           const bigNum = 100000;
           const complete =
-            Math.round(this.car.readCarRotation * bigNum) ===
+            Math.round(this.car.carRotation * bigNum) ===
             Math.round(endAngle * bigNum);
           if (collision) {
             /* Clear collision */
             do {
-              this.car.readCarRotation -= tickAngle;
+              this.car.carRotation -= tickAngle;
             } while (this.calc.checkCollision(this.car, true));
             {
-              this.car.readCarRotation -= tickAngle;
+              this.car.carRotation -= tickAngle;
             }
           }
           if (
@@ -603,9 +595,8 @@ export class MoveService {
       const tickTime = 1 / this.config.FPS;
       const radiansPerTick = tickTime / speed;
       const starboardAngleToMove =
-        frontStarboardAngle - this.car.readFrontStarboardWheelRotation;
-      const portAngleToMove =
-        frontPortAngle - this.car.readFrontPortWheelRotation;
+        frontStarboardAngle - this.car.frontStarboardWheelRotation;
+      const portAngleToMove = frontPortAngle - this.car.frontPortWheelRotation;
       const starboardSteerLOrR = Math.sign(starboardAngleToMove);
       const portSteerLOrR = Math.sign(portAngleToMove);
       const speedRatio =
@@ -626,7 +617,7 @@ export class MoveService {
             return;
           }
           /* Check whether the starboard wheel rotation is positive or negative i.e. on the inner or outer side of the turning circle, and scale the rotation speed of the two wheels accordingly */
-          switch (Math.sign(this.car.readFrontStarboardWheelRotation)) {
+          switch (Math.sign(this.car.frontStarboardWheelRotation)) {
             case +1:
               starboardTurnPerTick = starboardSteerLOrR * radiansPerTick;
               portTurnPerTick = (portSteerLOrR * radiansPerTick) / speedRatio;
@@ -647,20 +638,20 @@ export class MoveService {
           /* Move the wheels */
           if (
             Math.abs(
-              this.car.readFrontStarboardWheelRotation - frontStarboardAngle,
+              this.car.frontStarboardWheelRotation - frontStarboardAngle,
             ) >= Math.abs(starboardTurnPerTick)
           ) {
-            this.car.readFrontStarboardWheelRotation += starboardTurnPerTick;
+            this.car.frontStarboardWheelRotation += starboardTurnPerTick;
           } else {
-            this.car.readFrontStarboardWheelRotation = frontStarboardAngle;
+            this.car.frontStarboardWheelRotation = frontStarboardAngle;
           }
           if (
-            Math.abs(this.car.readFrontPortWheelRotation - frontPortAngle) >=
+            Math.abs(this.car.frontPortWheelRotation - frontPortAngle) >=
             Math.abs(portTurnPerTick)
           ) {
-            this.car.readFrontPortWheelRotation += portTurnPerTick;
+            this.car.frontPortWheelRotation += portTurnPerTick;
           } else {
-            this.car.readFrontPortWheelRotation = frontPortAngle;
+            this.car.frontPortWheelRotation = frontPortAngle;
           }
           this.config.stage.update();
           /* Check if the stop condition is met */
@@ -669,9 +660,9 @@ export class MoveService {
           /* Note: Caution comparing floating point numbers */
           const bigNum = 100000;
           const complete =
-            Math.round(this.car.readFrontStarboardWheelRotation * bigNum) ===
+            Math.round(this.car.frontStarboardWheelRotation * bigNum) ===
               Math.round(frontStarboardAngle * bigNum) &&
-            Math.round(this.car.readFrontPortWheelRotation * bigNum) ===
+            Math.round(this.car.frontPortWheelRotation * bigNum) ===
               Math.round(frontPortAngle * bigNum);
           if (
             stop ||

@@ -61,10 +61,10 @@ export class CalculationService {
 
     /* Test for a collision between each car corner and the rear and front cars, and the canvas edges */
     const corners: TPoint[] = [
-      car.readFrontStarboardCorner,
-      car.readFrontPortCorner,
-      car.readRearStarboardCorner,
-      car.readRearPortCorner,
+      car.frontStarboardCorner,
+      car.frontPortCorner,
+      car.rearStarboardCorner,
+      car.rearPortCorner,
     ];
     const testForCollision = (corner: TPoint) => {
       if (

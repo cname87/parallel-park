@@ -114,10 +114,8 @@ export class ScreenService {
     /* Print the axis values (on top of the street) */
     this.grid.addAxesValues();
 
-    /* Add the car to the street in its start position */
-    this.car.draw({
-      ...manoeuvre.startPosition,
-    });
+    /* Add the car to the street in its start position, with an initial angle */
+    this.car.draw({ ...manoeuvre.startPosition }, 0);
 
     return manoeuvre;
   }
@@ -253,10 +251,10 @@ export class ScreenService {
 
         this.logger.setLoggingLevel(currentLoggingLevel);
       };
-      if (Math.abs(this.car.readCarRotation) > this.config.errorParkAngle) {
+      if (Math.abs(this.car.carRotation) > this.config.errorParkAngle) {
         this.logger.log(
           `Park Fail:\nCar Rotation is ${this.config.round(
-            this.car.readCarRotation * this.config.RAD_TO_DEG,
+            this.car.carRotation * this.config.RAD_TO_DEG,
             0,
           )} degrees`,
           LoggingLevel.ERROR,
@@ -264,13 +262,12 @@ export class ScreenService {
         parkingError = true;
       }
       if (
-        Math.round(this.car.readFrontPortCorner.y) >
-        this.config.errorDistFromKerb
+        Math.round(this.car.frontPortCorner.y) > this.config.errorDistFromKerb
       ) {
         this.logger.log(
           `Park Fail:\nDistance from kerb to front port corner is ' +
           ${this.config.round(
-            this.car.readFrontPortCorner.y * this.config.distScale,
+            this.car.frontPortCorner.y * this.config.distScale,
             0,
           )}mm`,
           LoggingLevel.ERROR,
@@ -278,13 +275,12 @@ export class ScreenService {
         parkingError = true;
       }
       if (
-        Math.round(this.car.readRearPortCorner.y) >
-        this.config.errorDistFromKerb
+        Math.round(this.car.rearPortCorner.y) > this.config.errorDistFromKerb
       ) {
         this.logger.log(
           `Park Fail:\nDistance from kerb to rear port corner is ' +
           ${this.config.round(
-            this.car.readRearPortCorner.y * this.config.distScale,
+            this.car.rearPortCorner.y * this.config.distScale,
             0,
           )}mm`,
           LoggingLevel.ERROR,
