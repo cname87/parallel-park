@@ -31,6 +31,9 @@ Note: Global style, as material elements, e.g. mat-form-field, are part of Angul
   padding: 8px;
   margin-top: 8px;
   margin-bottom: 8px;
+  &:hover {
+    background-color: color.adjust($colorBackground, $lightness: 5%);
+  }
 }
 
 // Customize spacing between mat-select dropdown options
@@ -85,8 +88,11 @@ Note: Global style, as material elements, e.g. mat-form-field, are part of Angul
   min-height: 0;
   padding-left: 1vw;
   padding-right: 1vw;
-  border-radius: 0.5rem; /* Rounded corners */
+  border-radius: 0.5rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
   background: $colorBackground;
   transition: color 0.2s, background-color 0.2s;
+  &:hover {
+    background-color: color.adjust($colorBackground, $lightness: 5%);
+  }
 }

@@ -3,9 +3,3 @@
 button[mat-raised-button] {
   @include styles.button-container;
 }
-
-button[mat-raised-button]:hover,
-button[mat-raised-button]:focus {
-  color: styles.$colorAccent;
-  background-color: styles.$colorBackground
-}

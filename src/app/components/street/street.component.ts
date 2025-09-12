@@ -31,7 +31,6 @@ import { ObjectsService } from '../../services/objects.service';
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
   ],
 })
 export class StreetComponent implements OnInit, OnDestroy {
@@ -58,10 +57,8 @@ export class StreetComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // 1. Build form.
     this.streetForm = this.formBuilder.group(this.streetInitialFormValue);
 
-    // 2. Create observable pipeline BEFORE any programmatic setValue calls.
     this.street$ = this.streetForm.valueChanges.pipe(
       startWith(this.streetInitialFormValue),
       map((streetFormValue: IStreetForm) => streetFormValue.street),
@@ -69,14 +66,12 @@ export class StreetComponent implements OnInit, OnDestroy {
       shareReplay(1),
     );
 
-    // 3. Register (form observable) struct with data service early.
     this.street = {
       streetForm: this.streetForm,
       street$: this.street$,
     };
     this.data.setStreet(this.street);
 
-    // 4. React to park mode changes.
     this.data
       .getParkMode()
       .parkMode$.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
@@ -89,7 +84,6 @@ export class StreetComponent implements OnInit, OnDestroy {
           this.setStreetIfDifferent(newVal);
         } else if (value === EParkMode.Bay) {
           this.streets = this.objects.bayStreets;
-          // This will now emit through valueChanges because pipeline already exists.
           const newVal = EStreet.Bay_2400mm;
           this.message = 'Select a bay width';
           this.hint = 'The set of available bay widths';

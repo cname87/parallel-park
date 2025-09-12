@@ -4,9 +4,18 @@
   <form
     [formGroup]="modeForm"
   >
-
-    <div fxLayout="row" fxLayoutGap="2rem" fxLayoutAlign="flex-left center">
-
+    <div
+      fxLayout="row"
+      fxLayout.xs="column"
+      fxLayout.sm="column"
+      fxLayoutGap="2rem"
+      fxLayoutGap.xs="0rem"
+      fxLayoutGap.sm="0.25rem"
+      fxLayoutGap.md="0.5rem"
+      fxLayoutAlign="flex-left center"
+      fxLayoutAlign.xs="center center"
+      fxLayoutAlign.sm="center center"
+    >
       <mat-radio-group
         formControlName="parkMode"
         class="smallRadio"
@@ -16,6 +25,8 @@
         fxLayout="row"
         fxLayoutAlign="flex-left"
         fxLayoutGap="1rem"
+        fxLayoutGap.xs="0.1rem"
+        fxLayoutGap.sm="0.5rem"
       >
 
         <mat-radio-button
@@ -47,6 +58,8 @@
         fxLayout="row"
         fxLayoutAlign="flex-left"
         fxLayoutGap="1rem"
+        fxLayoutGap.xs="0.1rem"
+        fxLayoutGap.sm="0.5rem"
       >
 
         <mat-radio-button
