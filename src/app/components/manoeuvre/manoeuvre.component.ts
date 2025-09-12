@@ -64,6 +64,20 @@ export class ManoeuvreComponent implements OnInit {
   ngOnInit(): void {
     //
     this.manoeuvreForm = this.formBuilder.group(this.manoeuvreInitialFormValue);
+
+    this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
+      startWith(this.manoeuvreInitialFormValue),
+      map((manoeuvreFormValue: IManoeuvreForm) => manoeuvreFormValue.manoeuvre),
+      distinctUntilChanged(),
+      shareReplay(1),
+    );
+    this.manoeuvre = {
+      manoeuvreForm: this.manoeuvreForm,
+      manoeuvre$: this.manoeuvre$,
+      manoeuvreInitialFormValue: this.manoeuvreInitialFormValue,
+    };
+    this.data.setManoeuvre(this.manoeuvre);
+
     /* Initialise dependent on the parking mode - parallel parking or bay parking */
     this.data.getParkMode().parkMode$.subscribe((value: EParkMode) => {
       if (value === EParkMode.Parallel) {
@@ -78,18 +92,5 @@ export class ManoeuvreComponent implements OnInit {
         this.hint = 'The set of possible parking manoeuvres';
       }
     });
-
-    this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
-      startWith(this.manoeuvreInitialFormValue),
-      map((manoeuvreFormValue: IManoeuvreForm) => manoeuvreFormValue.manoeuvre),
-      distinctUntilChanged(),
-      shareReplay(1),
-    );
-    this.manoeuvre = {
-      manoeuvreForm: this.manoeuvreForm,
-      manoeuvre$: this.manoeuvre$,
-      manoeuvreInitialFormValue: this.manoeuvreInitialFormValue,
-    };
-    this.data.setManoeuvre(this.manoeuvre);
   }
 }

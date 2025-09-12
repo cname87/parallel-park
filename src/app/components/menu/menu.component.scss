@@ -1,5 +1,4 @@
 @use 'src/styles/styles.scss' as styles;
-@use 'sass:color';
 
 div.mode * {
   min-width: 0;
@@ -11,9 +10,6 @@ a.link {
 
 }
 a.link:hover,
-a.link:focus {
-  background-color: color.adjust(styles.$colorBackground, $lightness: 5%);
-}
 
 div.selects * {
   min-width: 0;

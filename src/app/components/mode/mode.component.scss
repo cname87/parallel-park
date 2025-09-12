@@ -11,9 +11,6 @@ mat-radio-button.mat-radio-button{
   margin-bottom: 0.25rem;
   font-size: styles.$fontDefault;
   overflow-wrap: normal;
-  &:hover {
-    background-color: color.adjust(styles.$colorBackground, $lightness: 5%);
-  }
 }
 
 mat-radio-group mat-radio-button:last-child {

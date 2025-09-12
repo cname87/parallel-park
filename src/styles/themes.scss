@@ -1,12 +1,10 @@
 /* Custom Material themes */
 
-@import '~@angular/material/theming';
+@use '@angular/material' as mat;
+@use './main-theme.scss' as theme;
 
 /* common styles - ensure this is only imported once in the application */
-@include mat-core();
-
-/* import local custom theme - includes $theme variable */
-@import './main-theme.scss';
+@include mat.core();
 
 /* style material components with imported theme */
-@include angular-material-theme($theme);
+@include mat.all-component-themes(theme.$theme);
