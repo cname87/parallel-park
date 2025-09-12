@@ -1,32 +1,44 @@
 <div
   class="mode"
-  fxLayout="row wrap"
-  fxLayoutAlign="center"
-  fxLayoutGap="1.5rem"
+  fxLayout="row"
+  fxLayoutAlign= "space-evenly"
 >
 
-<a
-  class="link"
-  fxFlex="0 1 auto"
-  href="https://github.com/cname87/parallel-park/blob/master/README.md"
-  target="_blank"
-  rel="noopener noreferrer"
-  aria-label="Open project README in new tab"
->
-  README
-</a>
+  <div
+    class="readme"
+    fxFlex="0 1 auto"
+    fxLayoutAlign="center center"
+  >
+    <a
+      class="link"
+      href="https://github.com/cname87/parallel-park/blob/master/README.md"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Open project README in new tab"
+    >
+      README
+    </a>
+  </div>
 
-<app-mode
-  fxFlex="0 1 auto"
->
-</app-mode>
+  <app-mode
+    fxFlex="0 1 auto"
+  >
+  </app-mode>
 
-<app-button
-  fxFlex="0 1 auto"
-  buttonName='main'
->
-</app-button>
 
+  <div
+    fxFlex="0 1 auto"
+    fxLayoutAlign="center center"
+  >
+    <div
+      class="run-button-container"
+    >
+      <app-button
+        buttonName='main'
+      >
+      </app-button>
+    </div>
+  </div>
 </div>
 
 <div

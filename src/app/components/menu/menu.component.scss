@@ -5,12 +5,9 @@ div.mode * {
 }
 
 a.link {
-  font-size: clamp(0.65rem, 2vw, 1.3rem);
-  height: clamp(1.2rem, 2vw, 1.8rem);
-  margin-top: 0.5rem;
+  @include styles.button-container;
   text-decoration: underline;
-  color: styles.$colorPrimary;
-  transition: color 0.2s;
+
 }
 a.link:hover,
 a.link:focus {
@@ -29,3 +26,4 @@ div.custom * {
 .custom {
   margin-top: 0rem;
 }
+

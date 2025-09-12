@@ -1,22 +1,7 @@
 @use 'src/styles/styles.scss' as styles;
 
 button[mat-raised-button] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(0.65rem, 2vw, 1.3rem);
-  font-weight: normal;
-  height: clamp(1.2rem, 2vw, 1.8rem);
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-  margin-left: 0rem;
-  margin-right: 0rem;
-  width: clamp(3rem, 16vw, 10rem);
-  min-width: 0;
-  min-height: 0;
-  padding-left: 1vw;
-  padding-right: 1vw;
-  transition: color 0.2s, background-color 0.2s;
+  @include styles.button-container;
 }
 
 button[mat-raised-button]:hover,

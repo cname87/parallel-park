@@ -27,8 +27,7 @@ Note: Global style, as material elements, e.g. mat-form-field, are part of Angul
 /* Highlight radio button groups with a box */
 .smallRadio {
   background: $colorBackground;
-  border: 2px solid $colorPrimary;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   padding: 8px;
   margin-top: 8px;
   margin-bottom: 8px;
@@ -62,10 +61,32 @@ Note: Global style, as material elements, e.g. mat-form-field, are part of Angul
   margin-bottom: 0.1rem;
   font-size : $fontDefault;
   background: $colorBackground; /* Default background color */
-  border-radius: 0.25rem; /* Rounded corners */
+  border-radius: 0.5rem; /* Rounded corners */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
   transition: background-color 0.3s ease; /* Smooth transition for background color */
   &:hover {
     background-color: color.adjust($colorBackground, $lightness: 5%);
   }
+}
+
+@mixin button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.3rem, 4vw, 2.6rem);
+  font-weight: normal;
+  height: clamp(2.4rem, 4vw, 3.6rem);
+  width: clamp(6rem, 32vw, 10rem);
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  margin-left: 0rem;
+  margin-right: 0rem;
+  min-width: 0;
+  min-height: 0;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  border-radius: 0.5rem; /* Rounded corners */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  background: $colorBackground;
+  transition: color 0.2s, background-color 0.2s;
 }
