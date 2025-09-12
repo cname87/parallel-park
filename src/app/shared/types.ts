@@ -48,7 +48,6 @@ export interface IButton {
 }
 
 export const enum ERunMode {
-  Loop = 'Loop',
   Single = 'Single',
   Keyboard = 'Keyboard',
 }
@@ -102,7 +101,7 @@ export interface ICustomStreet {
 }
 
 export interface IManoeuvreForm {
-  manoeuvre: EManoeuvre;
+  manoeuvre: EManoeuvre | EDistOut;
 }
 
 export interface IPark {
@@ -113,8 +112,7 @@ export interface IPark {
 
 export interface IManoeuvre {
   manoeuvreForm: FormGroup;
-  manoeuvre$: Observable<EManoeuvre>;
-  manoeuvreInitialFormValue: IManoeuvreForm;
+  manoeuvre$: Observable<EManoeuvre | EDistOut>;
 }
 
 export interface IParams {
@@ -161,7 +159,7 @@ export type TCarSetup = {
 };
 
 export type TStreetSetup = {
-  name: string;
+  name: EStreet;
   type: 'parallel' | 'bay';
   rearCarFromLeft: number;
   rearCarLength: number;
@@ -171,6 +169,11 @@ export type TStreetSetup = {
   frontCarWidth: number;
   carFromKerb: number;
   safetyGap: number;
+};
+
+export type TDistOut = {
+  name: EDistOut;
+  distance: number;
 };
 
 /* Car is moving forward or in reverse */
@@ -252,6 +255,29 @@ export const enum EStreet {
   Custom_Street = 'Custom_Street',
   Bay_2400mm = 'Bay_2400mm',
   Bay_2200mm = 'Bay_2200mm',
+}
+
+export const enum EDistOut {
+  Out_100mm = 'Out_100mm',
+  Out_200mm = 'Out_200mm',
+  Out_300mm = 'Out_300mm',
+  Out_400mm = 'Out_400mm',
+  Out_500mm = 'Out_500mm',
+  Out_600mm = 'Out_600mm',
+  Out_700mm = 'Out_700mm',
+  Out_800mm = 'Out_800mm',
+  Out_900mm = 'Out_900mm',
+  Out_1000mm = 'Out_1000mm',
+  Out_1100mm = 'Out_1100mm',
+  Out_1200mm = 'Out_1200mm',
+  Out_1300mm = 'Out_1300mm',
+  Out_1400mm = 'Out_1400mm',
+  Out_1500mm = 'Out_1500mm',
+  Out_1600mm = 'Out_1600mm',
+  Out_1700mm = 'Out_1700mm',
+  Out_1800mm = 'Out_1800mm',
+  Out_1900mm = 'Out_1900mm',
+  Out_2000mm = 'Out_2000mm',
 }
 
 export type TScenario = {

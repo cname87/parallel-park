@@ -42,10 +42,6 @@ import { ScreenService } from '../../services/screen.service';
   ],
 })
 export class ModeComponent implements OnInit {
-  //
-  /* Set to true to start in loop mode for testing */
-  #runLoopTest: boolean;
-
   /* Form variables */
   modeForm!: FormGroup;
   #runModeInitialFormValue: IRunModeForm;
@@ -61,13 +57,7 @@ export class ModeComponent implements OnInit {
     private config: ConfigService,
     private screen: ScreenService,
   ) {
-    this.#runLoopTest = this.config.runLoopTest;
-    /* Note that the radio group formControlName is 'mode' */
-    if (this.#runLoopTest === true) {
-      this.#runModeInitialFormValue = { runMode: ERunMode.Loop };
-    } else {
-      this.#runModeInitialFormValue = { runMode: ERunMode.Single };
-    }
+    this.#runModeInitialFormValue = { runMode: ERunMode.Single };
     this.#parkModeInitialFormValue = { parkMode: EParkMode.Parallel };
   }
 

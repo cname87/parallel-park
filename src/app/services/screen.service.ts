@@ -291,14 +291,6 @@ export class ScreenService {
         manoeuvreInfo();
       }
     }
-
-    /* Put in a short delay between manoeuvres when in loop mode*/
-    if (
-      this.mode === ERunMode.Loop &&
-      this.mainButtonLastClickStatus !== EButtonStatus.Reset
-    ) {
-      await this.runEventLoop(1000);
-    }
   }
 
   /**
@@ -393,44 +385,11 @@ export class ScreenService {
         this.setupScreen(scenario);
       }
 
-      /* Reset all if the loop mode is selected */
-      if (this.mode === ERunMode.Loop) {
-        // Defensive: getManoeuvre() may be undefined
-        const manoeuvreService = this.data.getManoeuvre();
-        if (
-          manoeuvreService.manoeuvreForm &&
-          manoeuvreService.manoeuvreInitialFormValue
-        ) {
-          manoeuvreService.manoeuvreForm.setValue(
-            manoeuvreService.manoeuvreInitialFormValue,
-          );
-        }
-        const carService = this.data.getCar();
-        if (carService.carForm) {
-          carService.carForm.setValue({
-            car: ECar.VW_T5_LWB_Van_2005,
-          });
-        }
-        const streetService = this.data.getStreet();
-        if (streetService.streetForm) {
-          streetService.streetForm.setValue({
-            street: EStreet.Width_1904mm,
-          });
-        }
-        /* Repaint screen to the defaults */
-        scenario = this.getCurrentScenario();
-        this.setupScreen(scenario);
-        // Disable all form controls (except mode)
-        this.data.getRunMode().modeForm.enable({ emitEvent: false });
-        manoeuvreService.manoeuvreForm.disable({ emitEvent: false });
-        carService.carForm.disable({ emitEvent: false });
-        streetService.streetForm.disable({ emitEvent: false });
-      } else {
-        this.data.getRunMode().modeForm.enable({ emitEvent: false });
-        this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
-        this.data.getCar().carForm.enable({ emitEvent: false });
-        this.data.getStreet().streetForm.enable({ emitEvent: false });
-      }
+      /* Enable all form controls */
+      this.data.getRunMode().modeForm.enable({ emitEvent: false });
+      this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
+      this.data.getCar().carForm.enable({ emitEvent: false });
+      this.data.getStreet().streetForm.enable({ emitEvent: false });
 
       /* Set button mode to 'Run' */
       this.data.getButton('main').enableRun();
@@ -488,10 +447,6 @@ export class ScreenService {
           } while (this.isMainButtonClicked === false);
           /* Cancel keyboard operation */
           this.keyMove.cancelKeyboard();
-          break;
-        case ERunMode.Loop:
-          const scenarios = this.objects.scenarios;
-          await this.runPlaylist(scenarios);
           break;
         case ERunMode.Single:
           /* Read updated scenario */

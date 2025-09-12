@@ -187,7 +187,7 @@ export class ManoeuvreService {
    * This applies only to those manoeuvres where the car reverses back until it touches the rear car before it is parallel and then rotates forward and inwards to the parked position. This returns a shorter parking space than a manoeuvre where the car rotates back all the way to a parallel position.
    *
    * @remarks
-   * Calculation of the collision angle requires the parked kerb distance, but getParkedKerbDistance calls this getCollisionAngle method for the relevant manoeuvre sresulting in an infinite loop, so an estimate is made - see comment below.
+   * Calculation of the collision angle requires the parked kerb distance, but getParkedKerbDistance calls this getCollisionAngle method for the relevant manoeuvres resulting in an infinite loop, so an estimate is made - see comment below.
    *
    * See {@link http://www.talljerome.com/NOLA/parallelparking/attempt3.html}
    *

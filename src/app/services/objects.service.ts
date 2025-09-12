@@ -7,6 +7,8 @@ import {
   TCarSetup,
   TScenario,
   TStreetSetup,
+  EDistOut,
+  TDistOut,
 } from '../shared/types';
 import { ConfigService } from './config.service';
 import { DataService } from './data.service';
@@ -153,6 +155,8 @@ export class ObjectsService {
    * See https://www.tyres.ie/tyres-calculator for tyre sizes.
    */
 
+  readonly modes: ERunMode[] = [ERunMode.Single, ERunMode.Keyboard];
+
   readonly Fiat_Ducato_MWB_Van_2025: TCarSetup = {
     name: ECar.Fiat_Ducato_MWB_Van_2025,
     minTurningRadius: 6250, // 12.5m turning circle
@@ -289,12 +293,86 @@ export class ObjectsService {
     safetyGap: 100,
   };
 
-  readonly modes: ERunMode[] = [
-    ERunMode.Loop,
-    ERunMode.Single,
-    ERunMode.Keyboard,
-  ];
-
+  Out_100mm: TDistOut = {
+    name: EDistOut.Out_100mm,
+    distance: 100,
+  };
+  Out_200mm: TDistOut = {
+    name: EDistOut.Out_200mm,
+    distance: 200,
+  };
+  Out_300mm: TDistOut = {
+    name: EDistOut.Out_300mm,
+    distance: 300,
+  };
+  Out_400mm: TDistOut = {
+    name: EDistOut.Out_400mm,
+    distance: 400,
+  };
+  Out_500mm: TDistOut = {
+    name: EDistOut.Out_500mm,
+    distance: 500,
+  };
+  Out_600mm: TDistOut = {
+    name: EDistOut.Out_600mm,
+    distance: 600,
+  };
+  Out_700mm: TDistOut = {
+    name: EDistOut.Out_700mm,
+    distance: 700,
+  };
+  Out_800mm: TDistOut = {
+    name: EDistOut.Out_800mm,
+    distance: 800,
+  };
+  Out_900mm: TDistOut = {
+    name: EDistOut.Out_900mm,
+    distance: 900,
+  };
+  Out_1000mm: TDistOut = {
+    name: EDistOut.Out_1000mm,
+    distance: 1000,
+  };
+  Out_1100mm: TDistOut = {
+    name: EDistOut.Out_1100mm,
+    distance: 1100,
+  };
+  Out_1200mm: TDistOut = {
+    name: EDistOut.Out_1200mm,
+    distance: 1200,
+  };
+  Out_1300mm: TDistOut = {
+    name: EDistOut.Out_1300mm,
+    distance: 1300,
+  };
+  Out_1400mm: TDistOut = {
+    name: EDistOut.Out_1400mm,
+    distance: 1400,
+  };
+  Out_1500mm: TDistOut = {
+    name: EDistOut.Out_1500mm,
+    distance: 1500,
+  };
+  Out_1600mm: TDistOut = {
+    name: EDistOut.Out_1600mm,
+    distance: 1600,
+  };
+  Out_1700mm: TDistOut = {
+    name: EDistOut.Out_1700mm,
+    distance: 1700,
+  };
+  Out_1800mm: TDistOut = {
+    name: EDistOut.Out_1800mm,
+    distance: 1800,
+  };
+  Out_1900mm: TDistOut = {
+    name: EDistOut.Out_1900mm,
+    distance: 1900,
+  };
+  Out_2000mm: TDistOut = {
+    name: EDistOut.Out_2000mm,
+    distance: 2000,
+  };
   readonly parallelManoeuvres: Array<[EManoeuvre, string]> = [
     [
       EManoeuvre.Park2Rotate1StraightMinAngle,
@@ -349,5 +427,28 @@ export class ObjectsService {
   readonly bayStreets: Array<[EStreet, string]> = [
     [EStreet.Bay_2400mm, 'Bay Parking 2400mm'],
     [EStreet.Bay_2200mm, 'Bay Parking 2200mm'],
+  ];
+
+  readonly distancesOut: Array<[EDistOut, string]> = [
+    [EDistOut.Out_100mm, '100mm'],
+    [EDistOut.Out_200mm, '200mm'],
+    [EDistOut.Out_300mm, '300mm'],
+    [EDistOut.Out_400mm, '400mm'],
+    [EDistOut.Out_500mm, '500mm'],
+    [EDistOut.Out_600mm, '600mm'],
+    [EDistOut.Out_700mm, '700mm'],
+    [EDistOut.Out_800mm, '800mm'],
+    [EDistOut.Out_900mm, '900mm'],
+    [EDistOut.Out_1000mm, '1000mm'],
+    [EDistOut.Out_1100mm, '1100mm'],
+    [EDistOut.Out_1200mm, '1200mm'],
+    [EDistOut.Out_1300mm, '1300mm'],
+    [EDistOut.Out_1400mm, '1400mm'],
+    [EDistOut.Out_1500mm, '1500mm'],
+    [EDistOut.Out_1600mm, '1600mm'],
+    [EDistOut.Out_1700mm, '1700mm'],
+    [EDistOut.Out_1800mm, '1800mm'],
+    [EDistOut.Out_1900mm, '1900mm'],
+    [EDistOut.Out_2000mm, '2000mm'],
   ];
 }
