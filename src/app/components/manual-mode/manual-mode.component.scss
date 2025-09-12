@@ -1,0 +1,7 @@
+@use 'src/styles/styles.scss' as styles;
+
+:host {
+  --button-font-size: clamp(0.6rem, 2vw, 1.2rem);
+  --button-height: clamp(1.5rem, 3vw, 2.5rem);
+  --button-width: clamp(4rem, 16vw, 10rem);
+}

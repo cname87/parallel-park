@@ -73,10 +73,10 @@ Note: Global style, as material elements, e.g. mat-form-field, are part of Angul
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(1.3rem, 4vw, 2.6rem);
+  font-size: var(--button-font-size, clamp(1.3rem, 4vw, 2.6rem));
   font-weight: normal;
-  height: clamp(2.4rem, 4vw, 3.6rem);
-  width: clamp(6rem, 32vw, 10rem);
+  height: var(--button-height, clamp(2.4rem, 4vw, 3.6rem));
+  width: var(--button-width, clamp(6rem, 32vw, 10rem));
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
   margin-left: 0rem;

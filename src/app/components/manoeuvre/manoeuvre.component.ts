@@ -69,7 +69,7 @@ export class ManoeuvreComponent implements OnInit {
       if (value === EParkMode.Parallel) {
         this.manoeuvres = this.objects.parallelManoeuvres;
         this.manoeuvreForm.setValue({ manoeuvre: EManoeuvre.Park4UsingRules1 });
-        this.message = 'Select a manoeuvre, which sets the parking space width';
+        this.message = 'Select a manoeuvre';
         this.hint = 'The set of possible parking manoeuvres';
       } else if (value === EParkMode.Bay) {
         this.manoeuvres = this.objects.bayManoeuvres;
