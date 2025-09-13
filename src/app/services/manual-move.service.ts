@@ -35,14 +35,14 @@ export class ManualMoveService {
   #keydown!: (event: any) => Promise<void>;
   #keyup!: (event: any) => Promise<void>;
 
-  #moveForwardSteerClockwise: TMoveStraight | TMoveArc = {
+  #moveForward: TMoveStraight | TMoveArc = {
     type: () => EMoveType.MoveArc,
     fwdOrReverseFn: () => EDirection.Forward,
     deltaAngleFn: () => this.#infinite,
     deltaPositionFn: () => this.#infinite,
   };
 
-  #moveReverseSteerClockwise: TMoveArc = {
+  #moveReverse: TMoveArc = {
     type: () => EMoveType.MoveArc,
     fwdOrReverseFn: () => EDirection.Reverse,
     deltaAngleFn: () => this.#infinite,
@@ -54,19 +54,19 @@ export class ManualMoveService {
     steeringWheelAngle: ELock.Center,
   };
 
-  #steerCounterlockwise: TSteer = {
-    type: () => EMoveType.Steer,
-    steeringWheelAngle: ELock.Counterclockwise,
-  };
-
   #steerClockwise: TSteer = {
     type: () => EMoveType.Steer,
     steeringWheelAngle: ELock.Clockwise,
   };
 
+  #steerCounterlockwise: TSteer = {
+    type: () => EMoveType.Steer,
+    steeringWheelAngle: ELock.Counterclockwise,
+  };
+
   #running: boolean;
-  #moveForwardSteerClockwiseRunning: boolean;
-  #moveReverseSteerClockwiseRunning: boolean;
+  #moveForwardRunning: boolean;
+  #moveReverseRunning: boolean;
   #steerCenterRunning: boolean;
   #steerClockwiseRunning: boolean;
   #steerCounterlockwiseRunning: boolean;
@@ -81,36 +81,40 @@ export class ManualMoveService {
     private logger: LoggerService,
     private data: DataService,
   ) {
-    /* Lock out repeated moves from one keypress */
+    /* Use to lock out repeated moves from one keypress */
     this.#running = false;
     /* Use individual flags to lock out all but the key in operation when you are releasing a key */
-    this.#moveForwardSteerClockwiseRunning = false;
-    this.#moveReverseSteerClockwiseRunning = false;
+    this.#moveForwardRunning = false;
+    this.#moveReverseRunning = false;
     this.#steerCenterRunning = false;
     this.#steerClockwiseRunning = false;
     this.#steerCounterlockwiseRunning = false;
     this.#resetToStreetRunning = false;
     this.#resetToParkedRunning = false;
+    /* Keydown events */
     this.#keydown = async (event: any): Promise<void> => {
       switch (event.key) {
+        /* Move forward and steer clockwise */
         case EButtonLabels.Forward:
-          if (!this.#running && !this.#moveForwardSteerClockwiseRunning) {
+          if (!this.#running && !this.#moveForwardRunning) {
             this.#running = true;
-            this.#moveForwardSteerClockwiseRunning = true;
+            this.#moveForwardRunning = true;
             this.logger.log(`${event.key} pressed`, LoggingLevel.TRACE);
-            await this.mover.routeMove(this.#moveForwardSteerClockwise);
+            await this.mover.routeMove(this.#moveForward);
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
+        /* Move in reverse and steer clockwise */
         case EButtonLabels.Back:
-          if (!this.#running && !this.#moveReverseSteerClockwiseRunning) {
+          if (!this.#running && !this.#moveReverseRunning) {
             this.#running = true;
-            this.#moveReverseSteerClockwiseRunning = true;
+            this.#moveReverseRunning = true;
             this.logger.log(`${event.key} pressed`, LoggingLevel.TRACE);
-            await this.mover.routeMove(this.#moveReverseSteerClockwise);
+            await this.mover.routeMove(this.#moveReverse);
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
+        /* Steer counterclockwise */
         case EButtonLabels.Left:
           if (!this.#running && !this.#steerCounterlockwiseRunning) {
             this.#running = true;
@@ -120,6 +124,7 @@ export class ManualMoveService {
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
+        /* Steer center */
         case EButtonLabels.Center:
           if (!this.#running && !this.#steerCenterRunning) {
             this.#running = true;
@@ -129,6 +134,7 @@ export class ManualMoveService {
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
+        /* Steer clockwise */
         case EButtonLabels.Right:
           if (!this.#running && !this.#steerClockwiseRunning) {
             this.#running = true;
@@ -138,26 +144,12 @@ export class ManualMoveService {
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
+        /* Move the car to the start position and reset all */
         case EButtonLabels.Start:
           if (!this.#running && !this.#resetToStreetRunning) {
             this.#running = true;
             this.#resetToStreetRunning = true;
             this.logger.log(`${event.key} pressed`, LoggingLevel.TRACE);
-            // const startPosition: TPoint = {
-            //   x:
-            //     this.street.rearCarFromLeft +
-            //     this.street.rearCarLength +
-            //     this.street.parkingSpaceLength +
-            //     this.config.defaultCarRearForwardFromRearOfFrontCar +
-            //     this.car.length,
-            //   y:
-            //     this.street.carFromKerb +
-            //     this.street.frontCarWidth +
-            //     this.street.safetyGap +
-            //     this.config.defaultCarOutFromSafetyOfFrontCar +
-            //     this.car.width,
-            // };
-            // this.car.draw(startPosition, 0);
             const startPosition: TPoint = {
               x:
                 this.street.rearCarFromLeft +
@@ -174,12 +166,13 @@ export class ManualMoveService {
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
+        /* Move the car to the parked position and reset all */
         case EButtonLabels.Park:
           if (!this.#running && !this.#resetToParkedRunning) {
             this.#running = true;
             this.#resetToParkedRunning = true;
             this.logger.log(`${event.key} pressed`, LoggingLevel.TRACE);
-            const startPosition: TPoint = {
+            const parkPosition: TPoint = {
               x:
                 this.street.rearCarFromLeft +
                 this.street.rearCarLength +
@@ -187,26 +180,31 @@ export class ManualMoveService {
                 this.car.length,
               y: this.street.carFromKerb + this.car.width,
             };
-            this.car.draw(startPosition, 0);
+            this.car.draw(parkPosition, 0);
+            await this.#keyup({ key: EButtonLabels.Start });
+            Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
+              this.data.getButton(item).enableRun(),
+            );
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
       }
     };
+    /* Stop ticker on key up */
     this.#keyup = async (event) => {
       switch (event.key) {
         case EButtonLabels.Forward:
-          if (this.#moveForwardSteerClockwiseRunning) {
+          if (this.#moveForwardRunning) {
             this.#running = false;
-            this.#moveForwardSteerClockwiseRunning = false;
+            this.#moveForwardRunning = false;
             this.logger.log(`${event.key} released`, LoggingLevel.TRACE);
             createjs.Ticker.dispatchEvent('stop');
           }
           break;
         case EButtonLabels.Back:
-          if (this.#moveReverseSteerClockwiseRunning) {
+          if (this.#moveReverseRunning) {
             this.#running = false;
-            this.#moveReverseSteerClockwiseRunning = false;
+            this.#moveReverseRunning = false;
             this.logger.log(`${event.key} released`, LoggingLevel.TRACE);
             createjs.Ticker.dispatchEvent('stop');
           }
@@ -257,6 +255,7 @@ export class ManualMoveService {
 
   #subscriptions: Subscription[] = [];
 
+  /* Tracks the stop move called observable to reset after a stop move */
   #enableStop = (keyToPress: string): Subscription => {
     /* Subscribe to reset after any move stop */
     return this.data.getStopMoveCalled().subscribe(() => {
@@ -267,8 +266,8 @@ export class ManualMoveService {
     });
   };
 
+  /* Tracks the main button to identify when RUN or RESET is clicked */
   #enableButton = (key: TButtonNames, keyToPress: string): Subscription => {
-    //
     /* Subscribe to track the button status from the last click */
     return this.data
       .getButton(key)
@@ -292,6 +291,7 @@ export class ManualMoveService {
       });
   };
 
+  /* Called externally to start listening for keyboard events */
   runKeyboard(): void {
     this.logger.log(`Running keyboard operation`, LoggingLevel.TRACE);
     window.addEventListener('keydown', this.#keydown, true);
@@ -304,6 +304,7 @@ export class ManualMoveService {
     }
   }
 
+  /* Called externally to stop listening for keyboard events */
   cancelKeyboard(): void {
     this.logger.log(`Cancelling keyboard operation`, LoggingLevel.DEBUG);
     window.removeEventListener('keydown', this.#keydown, true);

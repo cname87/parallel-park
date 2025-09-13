@@ -5,7 +5,7 @@
     >
       <mat-label>{{ message }}</mat-label>
       <mat-select
-        formControlName="street"
+        [formControlName]="FORM_FIELD_NAMES.street"
       >
         <mat-option
           *ngFor="let street of streets"

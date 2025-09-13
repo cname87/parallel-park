@@ -116,7 +116,7 @@ export interface IManoeuvre {
 }
 
 export interface IParams {
-  manoeuvre: EManoeuvre;
+  manoeuvre: EManoeuvre | EDistOut;
   street: StreetService;
   car: CarService;
   config: ConfigService;

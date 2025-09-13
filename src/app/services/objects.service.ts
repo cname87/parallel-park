@@ -424,31 +424,40 @@ export class ObjectsService {
     [EStreet.Custom_Street, 'Custom Front Car Width'],
   ];
 
+  readonly parallelSpaces: Array<[EStreet, string]> = [
+    [EStreet.Width_1904mm, 'Front Car Width: 1904mm / Parking Space: 5400mm'],
+    [EStreet.Width_1852mm, 'Front Car Width: 1852mm / Parking Space: 5400mm'],
+    [EStreet.Width_1795mm, 'Front Car Width: 1795mm / Parking Space: 5400mm'],
+    [EStreet.Width_1595mm, 'Front Car Width: 1595mm / Parking Space: 5400mm'],
+    [EStreet.Width_2073mm, 'Front Car Width: 2073mm / Parking Space: 5400mm'],
+    [EStreet.Width_2426mm, 'Front Car Width: 2426mm / Parking Space: 5400mm'],
+  ];
+
   readonly bayStreets: Array<[EStreet, string]> = [
     [EStreet.Bay_2400mm, 'Bay Parking 2400mm'],
     [EStreet.Bay_2200mm, 'Bay Parking 2200mm'],
   ];
 
   readonly distancesOut: Array<[EDistOut, string]> = [
-    [EDistOut.Out_100mm, '100mm'],
-    [EDistOut.Out_200mm, '200mm'],
-    [EDistOut.Out_300mm, '300mm'],
-    [EDistOut.Out_400mm, '400mm'],
-    [EDistOut.Out_500mm, '500mm'],
-    [EDistOut.Out_600mm, '600mm'],
-    [EDistOut.Out_700mm, '700mm'],
-    [EDistOut.Out_800mm, '800mm'],
-    [EDistOut.Out_900mm, '900mm'],
-    [EDistOut.Out_1000mm, '1000mm'],
-    [EDistOut.Out_1100mm, '1100mm'],
-    [EDistOut.Out_1200mm, '1200mm'],
-    [EDistOut.Out_1300mm, '1300mm'],
-    [EDistOut.Out_1400mm, '1400mm'],
-    [EDistOut.Out_1500mm, '1500mm'],
-    [EDistOut.Out_1600mm, '1600mm'],
-    [EDistOut.Out_1700mm, '1700mm'],
-    [EDistOut.Out_1800mm, '1800mm'],
-    [EDistOut.Out_1900mm, '1900mm'],
-    [EDistOut.Out_2000mm, '2000mm'],
+    [EDistOut.Out_100mm, 'Start Out 100mm'],
+    [EDistOut.Out_200mm, 'Start Out 200mm'],
+    [EDistOut.Out_300mm, 'Start Out 300mm'],
+    [EDistOut.Out_400mm, 'Start Out 400mm'],
+    [EDistOut.Out_500mm, 'Start Out 500mm'],
+    [EDistOut.Out_600mm, 'Start Out 600mm'],
+    [EDistOut.Out_700mm, 'Start Out 700mm'],
+    [EDistOut.Out_800mm, 'Start Out 800mm'],
+    [EDistOut.Out_900mm, 'Start Out 900mm'],
+    [EDistOut.Out_1000mm, 'Start Out 1000mm'],
+    [EDistOut.Out_1100mm, 'Start Out 1100mm'],
+    [EDistOut.Out_1200mm, 'Start Out 1200mm'],
+    [EDistOut.Out_1300mm, 'Start Out 1300mm'],
+    [EDistOut.Out_1400mm, 'Start Out 1400mm'],
+    [EDistOut.Out_1500mm, 'Start Out 1500mm'],
+    [EDistOut.Out_1600mm, 'Start Out 1600mm'],
+    [EDistOut.Out_1700mm, 'Start Out 1700mm'],
+    [EDistOut.Out_1800mm, 'Start Out 1800mm'],
+    [EDistOut.Out_1900mm, 'Start Out 1900mm'],
+    [EDistOut.Out_2000mm, 'Start Out 2000mm'],
   ];
 }

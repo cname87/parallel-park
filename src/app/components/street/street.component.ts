@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, combineLatest } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
@@ -13,7 +13,13 @@ import {
   startWith,
   takeUntil,
 } from 'rxjs/operators';
-import { EParkMode, EStreet, IStreet, IStreetForm } from '../../shared/types';
+import {
+  EParkMode,
+  EStreet,
+  IStreet,
+  IStreetForm,
+  ERunMode,
+} from '../../shared/types';
 import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
 
@@ -34,6 +40,11 @@ import { ObjectsService } from '../../services/objects.service';
   ],
 })
 export class StreetComponent implements OnInit, OnDestroy {
+  /* Set the form field names as constants */
+  readonly FORM_FIELD_NAMES = {
+    street: 'street' as const,
+  } as const;
+
   streets: Array<[EStreet, string]>;
   streetForm!: FormGroup;
   /* Note that the select group formControlName is 'street' */
@@ -56,6 +67,13 @@ export class StreetComponent implements OnInit, OnDestroy {
     };
   }
 
+  private setStreetIfDifferent(newStreet: EStreet) {
+    const current = (this.streetForm.value as IStreetForm).street;
+    if (current !== newStreet) {
+      this.streetForm.setValue({ street: newStreet }, { emitEvent: true });
+    }
+  }
+
   ngOnInit(): void {
     this.streetForm = this.formBuilder.group(this.streetInitialFormValue);
 
@@ -72,32 +90,40 @@ export class StreetComponent implements OnInit, OnDestroy {
     };
     this.data.setStreet(this.street);
 
-    this.data
-      .getParkMode()
-      .parkMode$.pipe(distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((value: EParkMode) => {
-        if (value === EParkMode.Parallel) {
-          this.streets = this.objects.parallelStreets;
-          const newVal = EStreet.Width_1904mm;
-          this.message = 'Select a front car width';
-          this.hint = 'The set of available front car widths';
-          this.setStreetIfDifferent(newVal);
-        } else if (value === EParkMode.Bay) {
+    /* Combined subscription for both parking mode and run mode */
+    combineLatest([
+      this.data.getParkMode().parkMode$,
+      this.data.getRunMode().runMode$,
+    ])
+      .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(([parkMode, runMode]: [EParkMode, ERunMode]) => {
+        /* Handle parkMode changes */
+        if (runMode === ERunMode.Automated) {
+          if (parkMode === EParkMode.Parallel) {
+            this.streets = this.objects.parallelStreets;
+            this.streetForm.setValue({
+              [this.FORM_FIELD_NAMES.street]: this.streets[0][0],
+            });
+            this.message = 'Select a front car width';
+            this.hint = 'The set of possible front car widths';
+          } else if (parkMode === EParkMode.Bay) {
+            this.streets = this.objects.bayStreets;
+            this.streetForm.setValue({
+              [this.FORM_FIELD_NAMES.street]: this.streets[0][0],
+            });
+            this.message = 'Select a bay width';
+            this.hint = 'The set of possible bay widths';
+          }
+          /* Or handle keyboard mode */
+        } else if (runMode === ERunMode.Keyboard) {
           this.streets = this.objects.bayStreets;
-          const newVal = EStreet.Bay_2400mm;
-          this.message = 'Select a bay width';
-          this.hint = 'The set of available bay widths';
-          this.setStreetIfDifferent(newVal);
+          this.streetForm.setValue({
+            [this.FORM_FIELD_NAMES.street]: this.streets[0][0],
+          });
+          this.message = 'Select a distance out from the parked car';
+          this.hint = 'The set of possible distances out from the parked car';
         }
       });
-  }
-
-  private setStreetIfDifferent(newStreet: EStreet) {
-    const current = (this.streetForm.value as IStreetForm).street;
-    if (current !== newStreet) {
-      // Default emitEvent is true; explicit for clarity.
-      this.streetForm.setValue({ street: newStreet }, { emitEvent: true });
-    }
   }
 
   ngOnDestroy(): void {

@@ -64,7 +64,7 @@ export class MoveService {
     this.data.setStopMoveCalled(this.#stopMoveCalled$);
   }
 
-  /* Track the button status */
+  /* Track the main button status */
   /* Called by the root program when the button is enabled */
   public trackButton(): void {
     this.data

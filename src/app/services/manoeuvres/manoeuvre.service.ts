@@ -14,10 +14,12 @@ import {
   TSteer,
   TMoveStraightOrArc,
   TMovie,
+  EDistOut,
 } from '../../shared/types';
 import { CarService } from '../car.service';
 import { ConfigService } from '../config.service';
 import { LoggerService } from '../logger.service';
+import { ObjectsService } from '../objects.service';
 import { InformationService } from './information.service';
 import { RulesService } from './rules.service';
 
@@ -170,6 +172,7 @@ export class ManoeuvreService {
     private config: ConfigService,
     private car: CarService,
     private rulesService: RulesService,
+    private objects: ObjectsService,
   ) {
     /* Unscaled distances in mm for the setManual manoeuvre */
     this.setManualExtraParkingSpace = 2000;
@@ -391,30 +394,40 @@ export class ManoeuvreService {
     this.logger.log('getParkingSpace called', LoggingLevel.TRACE);
 
     let extraParkingSpace = 0;
-    switch (manoeuvre) {
-      case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightFixedStart:
-      case EManoeuvre.Park2Rotate1StraightMinAngle:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park4UsingRules1:
-      case EManoeuvre.Park4UsingRules2:
-        extraParkingSpace = this.getExtraParkingSpace({
-          manoeuvre,
-          street,
-          car,
-          config,
-        });
-        break;
-      case EManoeuvre.BayPark1:
-        /* Return the bay width set by the chosen street*/
-        return street.parkingSpaceLength;
-      default:
-        throw new Error('Unexpected manoeuvre');
+
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use the street parking space value directly */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      return street.parkingSpaceLength;
+      /* Handle automated manoeuvres */
+    } else {
+      switch (manoeuvre as EManoeuvre) {
+        case EManoeuvre.Park2Rotate0Straight:
+        case EManoeuvre.Park2Rotate1StraightFixedStart:
+        case EManoeuvre.Park2Rotate1StraightMinAngle:
+        case EManoeuvre.Park2Rotate1StraightSetManual:
+        case EManoeuvre.Park3Rotate1StraightMinAngle:
+        case EManoeuvre.Park4UsingRules1:
+        case EManoeuvre.Park4UsingRules2:
+          extraParkingSpace = this.getExtraParkingSpace({
+            manoeuvre,
+            street,
+            car,
+            config,
+          });
+          const parkingSpace =
+            2 * street.safetyGap + car.length + extraParkingSpace;
+          this.logger.log(`Parking space: ${parkingSpace}`, LoggingLevel.TRACE);
+          return parkingSpace;
+        case EManoeuvre.BayPark1:
+          /* Return the bay width set by the chosen street*/
+          return street.parkingSpaceLength;
+        default:
+          throw new Error('Unexpected manoeuvre');
+      }
     }
-    const parkingSpace = 2 * street.safetyGap + car.length + extraParkingSpace;
-    this.logger.log(`Parking space: ${parkingSpace}`, LoggingLevel.TRACE);
-    return parkingSpace;
   };
 
   /**
@@ -816,9 +829,6 @@ export class ManoeuvreService {
   /**
    * @returns The x-axis distance, in unscaled mm, from the rear bumper of the
    * car to a y-axis line through the PP just before the car rotates in.
-   *
-   * @throws Error
-   * Thrown if an invalid manoeuvre is passed in.
    */
   private getStartDistFromRearToPivot = ({
     manoeuvre,
@@ -828,6 +838,15 @@ export class ManoeuvreService {
   }: IParams): number => {
     this.logger.log('getStartDistFromRearToPivot called', LoggingLevel.TRACE);
 
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      return 1000 / config.distScale;
+    }
+
+    /* Handle automated manoeuvres */
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
@@ -919,17 +938,26 @@ export class ManoeuvreService {
   }: IParams): number => {
     this.logger.log('getStartDistSideToPivot called', LoggingLevel.TRACE);
 
-    switch (manoeuvre) {
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      return this.objects[manoeuvre as EDistOut].distance / config.distScale;
+    }
+
+    /* Handle automated manoeuvres */
+    switch (manoeuvre as EManoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         /* It calculates by adding the distance the IC is out in the y-axis
-        direction before rotating, to the distance the IC moves in the y-axis
-        direction when the car rotates back to being parallel with the x-axis.
-        */
+          direction before rotating, to the distance the IC moves in the y-axis
+          direction when the car rotates back to being parallel with the x-axis.
+          */
         /* This is the distance that the car corner, that is closest to the
-        front parked car, is out (in the y-axis direction) from the parked car
-        just after it has turned and is about to reverse, i.e. when its rear
-        axle is at the PP. */
+          front parked car, is out (in the y-axis direction) from the parked car
+          just after it has turned and is about to reverse, i.e. when its rear
+          axle is at the PP. */
         const cornerOutYFromFrontCar =
           car.rearAxleToFront *
             Math.sin(
@@ -937,12 +965,12 @@ export class ManoeuvreService {
             ) +
           street.safetyGap;
         /* This is the angle between the CoR and the IC when the car has
-        returned to be parallel to the x-axis. (Angles are measured positive in
-        the clockwise direction which is the case throughout this application).
-        This can be derived by looking at the car when parallel to the x-axis.
-        The angle between the x-axis and a line from the CoR to the IC is PI/2
-        - where a is the angle fromed by a line from the rear axle to the COR
-        and a line from the CoR to the IC. */
+          returned to be parallel to the x-axis. (Angles are measured positive in
+          the clockwise direction which is the case throughout this application).
+          This can be derived by looking at the car when parallel to the x-axis.
+          The angle between the x-axis and a line from the CoR to the IC is PI/2
+          - where a is the angle fromed by a line from the rear axle to the COR
+          and a line from the CoR to the IC. */
         const endAngleRads =
           1.5 * Math.PI -
           Math.atan(
@@ -957,10 +985,10 @@ export class ManoeuvreService {
           config,
         });
         /* The turned angle is added to the end angle as the starting angle is
-        further clockwise than the end angle */
+          further clockwise than the end angle */
         const startAngleRads = endAngleRads + turnedAngleRads;
         /* Formula to find the Y direction move for a chord (where the angles
-        are with respect to the a-axis). */
+          are with respect to the a-axis). */
         const distMovedYDuringTurn =
           car.frontInnerCornerTurningRadius(ELock.Counterclockwise) *
           (Math.sin(endAngleRads) - Math.sin(startAngleRads));
@@ -969,7 +997,7 @@ export class ManoeuvreService {
         return cornerOutYFromFrontCar - distMovedYDuringTurn - distPivotYToCar;
       case EManoeuvre.Park2Rotate0Straight:
         /* This is the distance the car side is at in the y-axis direction,
-        i.e. the distance from the kerb and the distance moved */
+          i.e. the distance from the kerb and the distance moved */
         const distSideY =
           this.getParkedKerbDistance({ manoeuvre, street, car, config }) +
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y +
@@ -1060,29 +1088,17 @@ export class ManoeuvreService {
     config,
   }: IParams): TPoint => {
     this.logger.log('getStartPosition called', LoggingLevel.TRACE);
-    switch (manoeuvre) {
-      case EManoeuvre.Park2Rotate1StraightMinAngle:
-      case EManoeuvre.Park3Rotate1StraightMinAngle:
-      case EManoeuvre.Park2Rotate0Straight:
-      case EManoeuvre.Park2Rotate1StraightSetManual:
-      case EManoeuvre.Park2Rotate1StraightFixedStart:
-      case EManoeuvre.Park4UsingRules1:
-      case EManoeuvre.Park4UsingRules2:
-      case EManoeuvre.BayPark1:
-        const value = {
-          x:
-            this.getPivot({ manoeuvre, street, car, config }).x +
-            this.getStartRelativePosition({ manoeuvre, street, car, config }).x,
-          y:
-            this.getPivot({ manoeuvre, street, car, config }).y +
-            this.getStartRelativePosition({ manoeuvre, street, car, config }).y,
-        };
-        this.logger.log(`Starting position X: ${value.x}`, LoggingLevel.TRACE);
-        this.logger.log(`Starting position Y: ${value.y}`, LoggingLevel.TRACE);
-        return value;
-      default:
-        throw new Error('Unexpected manoeuvre');
-    }
+    const value = {
+      x:
+        this.getPivot({ manoeuvre, street, car, config }).x +
+        this.getStartRelativePosition({ manoeuvre, street, car, config }).x,
+      y:
+        this.getPivot({ manoeuvre, street, car, config }).y +
+        this.getStartRelativePosition({ manoeuvre, street, car, config }).y,
+    };
+    this.logger.log(`Starting position X: ${value.x}`, LoggingLevel.TRACE);
+    this.logger.log(`Starting position Y: ${value.y}`, LoggingLevel.TRACE);
+    return value;
   };
 
   /**
@@ -1743,6 +1759,100 @@ export class ManoeuvreService {
   };
 
   /**
+   * @returns An empty movie object with minimal moves for keyboard mode
+   */
+  private createEmptyMovie(): TMovie {
+    return {
+      moveFirstSteer: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+        message: undefined,
+      },
+      moveB: {
+        type: () => EMoveType.MoveStraight,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+        deltaAngleFn: () => 0,
+        message: undefined,
+      },
+      moveC: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveD: {
+        type: () => EMoveType.MoveArc,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+        deltaAngleFn: () => 0,
+        message: undefined,
+      },
+      moveE: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveF: {
+        type: () => EMoveType.MoveStraight,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+        deltaAngleFn: () => 0,
+        message: undefined,
+      },
+      moveG: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveH: {
+        type: () => EMoveType.MoveArc,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+        deltaAngleFn: () => 0,
+        message: undefined,
+      },
+      moveI: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveJ: {
+        type: () => EMoveType.MoveArc,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+        deltaAngleFn: () => 0,
+        message: undefined,
+      },
+      moveK: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveL: {
+        type: () => EMoveType.MoveStraight,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+        message: undefined,
+      },
+      moveM: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveN: {
+        type: () => EMoveType.MoveStraight,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+      },
+      moveO: {
+        type: () => EMoveType.Steer,
+        steeringWheelAngle: ELock.Center,
+      },
+      moveP: {
+        type: () => EMoveType.MoveStraight,
+        fwdOrReverseFn: () => EDirection.NoMove,
+        deltaPositionFn: () => 0,
+      },
+    };
+  }
+
+  /**
+   * @returns The set of data that defines a complete manoeuvre - see
+  /**
    * @returns The set of data that defines a complete manoeuvre - see
    * IPark description.
    */
@@ -1763,6 +1873,18 @@ export class ManoeuvreService {
       car,
       config,
     });
+
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      return {
+        parkingSpaceLength,
+        startPosition,
+        movie: this.createEmptyMovie(),
+      };
+    }
 
     const movie: TMovie = {
       moveFirstSteer: {

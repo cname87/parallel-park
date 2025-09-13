@@ -1,6 +1,11 @@
 /* eslint-disable max-len */
 import { Injectable } from '@angular/core';
-import { EManoeuvre, ISnackOpen, LoggingLevel } from '../../shared/types';
+import {
+  EDistOut,
+  EManoeuvre,
+  ISnackOpen,
+  LoggingLevel,
+} from '../../shared/types';
 import { LoggerService } from '../logger.service';
 import { ConfigService } from '../config.service';
 import { CarService } from '../car.service';
@@ -8,7 +13,7 @@ import { StreetService } from '../street.service';
 import { RulesService } from './rules.service';
 
 interface IParams {
-  readonly manoeuvre: EManoeuvre;
+  readonly manoeuvre: EManoeuvre | EDistOut;
   readonly street: StreetService;
   readonly car: CarService;
   readonly config: ConfigService;

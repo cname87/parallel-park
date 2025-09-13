@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,12 +6,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, combineLatest, Subject } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
   shareReplay,
   startWith,
+  takeUntil,
 } from 'rxjs/operators';
 import {
   EManoeuvre,
@@ -42,7 +43,7 @@ import { ObjectsService } from '../../services/objects.service';
     MatOptionModule,
   ],
 })
-export class ManoeuvreComponent implements OnInit {
+export class ManoeuvreComponent implements OnInit, OnDestroy {
   /* Set the form field names as constants */
   readonly FORM_FIELD_NAMES = {
     manoeuvre: 'manoeuvre' as const,
@@ -55,6 +56,7 @@ export class ManoeuvreComponent implements OnInit {
   private manoeuvre!: IManoeuvre;
   public message = '';
   public hint = '';
+  private destroy$ = new Subject<void>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -91,34 +93,41 @@ export class ManoeuvreComponent implements OnInit {
     combineLatest([
       this.data.getParkMode().parkMode$,
       this.data.getRunMode().runMode$,
-    ]).subscribe(([parkMode, runMode]: [EParkMode, ERunMode]) => {
-      /* Handle parkMode changes */
-      if (runMode === ERunMode.Automated) {
-        if (parkMode === EParkMode.Parallel) {
-          this.manoeuvres = this.objects.parallelManoeuvres;
+    ])
+      .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(([parkMode, runMode]: [EParkMode, ERunMode]) => {
+        /* Handle parkMode changes */
+        if (runMode === ERunMode.Automated) {
+          if (parkMode === EParkMode.Parallel) {
+            this.manoeuvres = this.objects.parallelManoeuvres;
+            this.manoeuvreForm.setValue({
+              [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
+            });
+            this.message = 'Select a manoeuvre';
+            this.hint = 'The set of possible parking manoeuvres';
+          } else if (parkMode === EParkMode.Bay) {
+            this.manoeuvres = this.objects.bayManoeuvres;
+            this.manoeuvreForm.setValue({
+              [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
+            });
+            this.message = 'Select a manoeuvre';
+            this.hint = 'The set of possible parking manoeuvres';
+          }
+          /* Or handle keyboard mode */
+        } else if (runMode === ERunMode.Keyboard) {
+          console.log('Setting distances out');
+          this.manoeuvres = this.objects.distancesOut;
           this.manoeuvreForm.setValue({
             [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
           });
-          this.message = 'Select a manoeuvre';
-          this.hint = 'The set of possible parking manoeuvres';
-        } else if (parkMode === EParkMode.Bay) {
-          this.manoeuvres = this.objects.bayManoeuvres;
-          this.manoeuvreForm.setValue({
-            [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
-          });
-          this.message = 'Select a manoeuvre';
-          this.hint = 'The set of possible parking manoeuvres';
+          this.message = 'Select a distance out from the parked car';
+          this.hint = 'The set of possible distances out from the parked car';
         }
-        /* Or handle keyboard mode */
-      } else if (runMode === ERunMode.Keyboard) {
-        console.log('Setting distances out');
-        this.manoeuvres = this.objects.distancesOut;
-        this.manoeuvreForm.setValue({
-          [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
-        });
-        this.message = 'Select a distance out from the parked car';
-        this.hint = 'The set of possible distances out from the parked car';
-      }
-    });
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

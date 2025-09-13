@@ -90,9 +90,7 @@ export class ScreenService {
     /* Print the grid */
     this.grid.createGrid();
 
-    /* Run the parking calculations getting a manoeuvre containing set of moves.
-    The returned object contains the parking space length, a minimum kerb distance (if necessary),
-    the start position and the set of moves. */
+    /* Run the parking calculations getting a manoeuvre containing set of moves. The returned object contains the parking space length, the start position and the set of moves. */
     const manoeuvre = this.manoeuvre.getManoeuvre({
       manoeuvre: scenario.manoeuvre,
       street: this.street,
@@ -305,10 +303,7 @@ export class ScreenService {
     this.data
       .getButton('main')
       .buttonLastClick$.pipe(
-        this.logger.tapLog(
-          'ScreenService main button click detected',
-          LoggingLevel.DEBUG,
-        ),
+        this.logger.tapLog('Main button click detected', LoggingLevel.DEBUG),
       )
       .subscribe((status: EButtonStatus) => {
         this.mainButtonLastClickStatus = status;
