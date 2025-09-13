@@ -30,7 +30,7 @@
       >
 
         <mat-radio-button
-          value="Parallel"
+          [value]="parkModeParallel"
           fxFlex="1 1 auto"
           >
           <span class="spans">
@@ -39,7 +39,7 @@
         </mat-radio-button>
 
         <mat-radio-button
-        value="Bay"
+        [value]="parkModeBay"
         fxFlex="1 1 auto"
         >
           <span class="spans">
@@ -63,7 +63,7 @@
       >
 
         <mat-radio-button
-          value="Automated"
+          [value]="runModeAutomated"
           fxFlex="1 1 auto"
           >
           <span class="spans">
@@ -72,7 +72,7 @@
         </mat-radio-button>
 
         <mat-radio-button
-        value="Keyboard"
+        [value]="runModeKeyboard"
         fxFlex="1 1 auto"
         >
           <span class="spans">

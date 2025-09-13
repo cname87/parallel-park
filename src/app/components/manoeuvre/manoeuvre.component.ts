@@ -25,9 +25,7 @@ import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
 
 /**
- * Displays the manoeuvre menu. The manoeuvre menu can contain either a set of
- * parking manoeuvres (for automated run mode) or a set of distances out (for
- * keyboard run mode).
+ Displays the manoeuvre menu. The manoeuvre menu can contain either a set of parking manoeuvres (for automated run mode) or a set of start distances out from the parked car (for keyboard run mode).
  */
 
 @Component({
@@ -45,6 +43,11 @@ import { ObjectsService } from '../../services/objects.service';
   ],
 })
 export class ManoeuvreComponent implements OnInit {
+  /* Set the form field names as constants */
+  readonly FORM_FIELD_NAMES = {
+    manoeuvre: 'manoeuvre' as const,
+  } as const;
+
   manoeuvres: Array<[EManoeuvre | EDistOut, string]>;
   manoeuvreForm!: FormGroup;
   private manoeuvreInitialFormValue: IManoeuvreForm;
@@ -58,20 +61,23 @@ export class ManoeuvreComponent implements OnInit {
     private data: DataService,
     private objects: ObjectsService,
   ) {
+    /* Initial values */
     this.manoeuvres = this.objects.parallelManoeuvres;
     this.manoeuvreInitialFormValue = {
-      manoeuvre: this.manoeuvres[0][0],
+      [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
     };
   }
 
   ngOnInit(): void {
-    //
+    /* Initialize the form */
     this.manoeuvreForm = this.formBuilder.group(this.manoeuvreInitialFormValue);
 
     this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
       startWith(this.manoeuvreInitialFormValue),
-      /* Note that the select group formControlName is 'manoeuvre' */
-      map((manoeuvreFormValue: IManoeuvreForm) => manoeuvreFormValue.manoeuvre),
+      map(
+        (manoeuvreFormValue: IManoeuvreForm) =>
+          manoeuvreFormValue[this.FORM_FIELD_NAMES.manoeuvre],
+      ),
       distinctUntilChanged(),
       shareReplay(1),
     );
@@ -86,26 +92,29 @@ export class ManoeuvreComponent implements OnInit {
       this.data.getParkMode().parkMode$,
       this.data.getRunMode().runMode$,
     ]).subscribe(([parkMode, runMode]: [EParkMode, ERunMode]) => {
-      // Handle parkMode changes
+      /* Handle parkMode changes */
       if (runMode === ERunMode.Automated) {
         if (parkMode === EParkMode.Parallel) {
           this.manoeuvres = this.objects.parallelManoeuvres;
           this.manoeuvreForm.setValue({
-            manoeuvre: this.manoeuvres[0][0],
+            [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
           });
           this.message = 'Select a manoeuvre';
           this.hint = 'The set of possible parking manoeuvres';
         } else if (parkMode === EParkMode.Bay) {
           this.manoeuvres = this.objects.bayManoeuvres;
-          this.manoeuvreForm.setValue({ manoeuvre: this.manoeuvres[0][0] });
+          this.manoeuvreForm.setValue({
+            [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
+          });
           this.message = 'Select a manoeuvre';
           this.hint = 'The set of possible parking manoeuvres';
         }
+        /* Or handle keyboard mode */
       } else if (runMode === ERunMode.Keyboard) {
         console.log('Setting distances out');
         this.manoeuvres = this.objects.distancesOut;
         this.manoeuvreForm.setValue({
-          manoeuvre: this.manoeuvres[0][0],
+          [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
         });
         this.message = 'Select a distance out from the parked car';
         this.hint = 'The set of possible distances out from the parked car';

@@ -5,7 +5,7 @@
     >
       <mat-label>{{ message }}</mat-label>
       <mat-select
-        formControlName="manoeuvre"
+        [formControlName]="FORM_FIELD_NAMES.manoeuvre"
       >
         <mat-option
           *ngFor="let manoeuvre of manoeuvres"

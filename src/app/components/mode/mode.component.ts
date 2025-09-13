@@ -42,6 +42,19 @@ import { ScreenService } from '../../services/screen.service';
   ],
 })
 export class ModeComponent implements OnInit {
+  /* Enum values for template use */
+  get runModeAutomated() {
+    return ERunMode.Automated;
+  }
+  get runModeKeyboard() {
+    return ERunMode.Keyboard;
+  }
+  get parkModeParallel() {
+    return EParkMode.Parallel;
+  }
+  get parkModeBay() {
+    return EParkMode.Bay;
+  }
   /* Form variables */
   modeForm!: FormGroup;
   #runModeInitialFormValue: IRunModeForm;
