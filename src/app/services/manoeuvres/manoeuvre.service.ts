@@ -943,7 +943,10 @@ export class ManoeuvreService {
       ([enumValue]) => enumValue,
     );
     if (distOutValues.includes(manoeuvre as EDistOut)) {
-      return this.objects[manoeuvre as EDistOut].distance / config.distScale;
+      return (
+        this.objects[manoeuvre as EDistOut].distance / config.distScale -
+        street.safetyGap
+      );
     }
 
     /* Handle automated manoeuvres */

@@ -48,7 +48,8 @@ export class StreetComponent implements OnInit, OnDestroy {
   streets: Array<[EStreet, string]>;
   streetForm!: FormGroup;
   /* Note that the select group formControlName is 'street' */
-  private streetInitialFormValue!: IStreetForm;
+  private parallelStreetInitialValue!: IStreetForm;
+  private bayStreetInitialValue!: IStreetForm;
   private street$!: Observable<EStreet>;
   private street!: IStreet;
   public message = '';
@@ -62,23 +63,29 @@ export class StreetComponent implements OnInit, OnDestroy {
   ) {
     this.streets = this.objects.parallelStreets;
     /* Note that the select group formControlName is 'street' */
-    this.streetInitialFormValue = {
-      street: this.streets[0][0],
+    this.parallelStreetInitialValue = {
+      street: EStreet.Width_1904mm,
+    };
+    this.bayStreetInitialValue = {
+      street: EStreet.Bay_2400mm,
     };
   }
 
   private setStreetIfDifferent(newStreet: EStreet) {
     const current = (this.streetForm.value as IStreetForm).street;
     if (current !== newStreet) {
-      this.streetForm.setValue({ street: newStreet }, { emitEvent: true });
+      this.streetForm.setValue(
+        { [this.FORM_FIELD_NAMES.street]: newStreet },
+        { emitEvent: true },
+      );
     }
   }
 
   ngOnInit(): void {
-    this.streetForm = this.formBuilder.group(this.streetInitialFormValue);
+    this.streetForm = this.formBuilder.group(this.parallelStreetInitialValue);
 
     this.street$ = this.streetForm.valueChanges.pipe(
-      startWith(this.streetInitialFormValue),
+      startWith(this.parallelStreetInitialValue),
       map((streetFormValue: IStreetForm) => streetFormValue.street),
       distinctUntilChanged(),
       shareReplay(1),
@@ -101,27 +108,29 @@ export class StreetComponent implements OnInit, OnDestroy {
         if (runMode === ERunMode.Automated) {
           if (parkMode === EParkMode.Parallel) {
             this.streets = this.objects.parallelStreets;
-            this.streetForm.setValue({
-              [this.FORM_FIELD_NAMES.street]: this.streets[0][0],
-            });
+            this.setStreetIfDifferent(this.parallelStreetInitialValue.street);
             this.message = 'Select a front car width';
             this.hint = 'The set of possible front car widths';
           } else if (parkMode === EParkMode.Bay) {
             this.streets = this.objects.bayStreets;
-            this.streetForm.setValue({
-              [this.FORM_FIELD_NAMES.street]: this.streets[0][0],
-            });
+            this.setStreetIfDifferent(this.bayStreetInitialValue.street);
             this.message = 'Select a bay width';
             this.hint = 'The set of possible bay widths';
           }
           /* Or handle keyboard mode */
         } else if (runMode === ERunMode.Keyboard) {
-          this.streets = this.objects.bayStreets;
-          this.streetForm.setValue({
-            [this.FORM_FIELD_NAMES.street]: this.streets[0][0],
-          });
-          this.message = 'Select a distance out from the parked car';
-          this.hint = 'The set of possible distances out from the parked car';
+          if (parkMode === EParkMode.Parallel) {
+            this.streets = this.objects.parallelSpaces;
+            this.setStreetIfDifferent(this.parallelStreetInitialValue.street);
+            this.message = 'Select a front car width and parking space length';
+            this.hint =
+              'The set of possible front car widths / parking space lengths';
+          } else if (parkMode === EParkMode.Bay) {
+            this.streets = this.objects.bayStreets;
+            this.setStreetIfDifferent(this.bayStreetInitialValue.street);
+            this.message = 'Select a bay width';
+            this.hint = 'The set of possible bay widths';
+          }
         }
       });
   }

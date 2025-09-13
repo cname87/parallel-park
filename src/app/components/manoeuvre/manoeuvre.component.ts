@@ -51,7 +51,9 @@ export class ManoeuvreComponent implements OnInit, OnDestroy {
 
   manoeuvres: Array<[EManoeuvre | EDistOut, string]>;
   manoeuvreForm!: FormGroup;
-  private manoeuvreInitialFormValue: IManoeuvreForm;
+  private parallelManoeuvreInitialValue: IManoeuvreForm;
+  private bayManoeuvreInitialValue: IManoeuvreForm;
+  private keyManoeuvreInitialValue: IManoeuvreForm;
   private manoeuvre$!: Observable<EManoeuvre | EDistOut>;
   private manoeuvre!: IManoeuvre;
   public message = '';
@@ -65,17 +67,26 @@ export class ManoeuvreComponent implements OnInit, OnDestroy {
   ) {
     /* Initial values */
     this.manoeuvres = this.objects.parallelManoeuvres;
-    this.manoeuvreInitialFormValue = {
-      [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
+    this.parallelManoeuvreInitialValue = {
+      [this.FORM_FIELD_NAMES.manoeuvre]:
+        EManoeuvre.Park2Rotate1StraightMinAngle,
+    };
+    this.bayManoeuvreInitialValue = {
+      [this.FORM_FIELD_NAMES.manoeuvre]: EDistOut.Out_500mm,
+    };
+    this.keyManoeuvreInitialValue = {
+      [this.FORM_FIELD_NAMES.manoeuvre]: EDistOut.Out_500mm,
     };
   }
 
   ngOnInit(): void {
     /* Initialize the form */
-    this.manoeuvreForm = this.formBuilder.group(this.manoeuvreInitialFormValue);
+    this.manoeuvreForm = this.formBuilder.group(
+      this.parallelManoeuvreInitialValue,
+    );
 
     this.manoeuvre$ = this.manoeuvreForm.valueChanges.pipe(
-      startWith(this.manoeuvreInitialFormValue),
+      startWith(this.parallelManoeuvreInitialValue),
       map(
         (manoeuvreFormValue: IManoeuvreForm) =>
           manoeuvreFormValue[this.FORM_FIELD_NAMES.manoeuvre],
@@ -101,14 +112,16 @@ export class ManoeuvreComponent implements OnInit, OnDestroy {
           if (parkMode === EParkMode.Parallel) {
             this.manoeuvres = this.objects.parallelManoeuvres;
             this.manoeuvreForm.setValue({
-              [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
+              [this.FORM_FIELD_NAMES.manoeuvre]:
+                this.parallelManoeuvreInitialValue.manoeuvre,
             });
             this.message = 'Select a manoeuvre';
             this.hint = 'The set of possible parking manoeuvres';
           } else if (parkMode === EParkMode.Bay) {
             this.manoeuvres = this.objects.bayManoeuvres;
             this.manoeuvreForm.setValue({
-              [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
+              [this.FORM_FIELD_NAMES.manoeuvre]:
+                this.bayManoeuvreInitialValue.manoeuvre,
             });
             this.message = 'Select a manoeuvre';
             this.hint = 'The set of possible parking manoeuvres';
@@ -118,7 +131,8 @@ export class ManoeuvreComponent implements OnInit, OnDestroy {
           console.log('Setting distances out');
           this.manoeuvres = this.objects.distancesOut;
           this.manoeuvreForm.setValue({
-            [this.FORM_FIELD_NAMES.manoeuvre]: this.manoeuvres[0][0],
+            [this.FORM_FIELD_NAMES.manoeuvre]:
+              this.keyManoeuvreInitialValue.manoeuvre,
           });
           this.message = 'Select a distance out from the parked car';
           this.hint = 'The set of possible distances out from the parked car';

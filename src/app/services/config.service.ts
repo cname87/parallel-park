@@ -52,9 +52,9 @@ export class ConfigService {
   defaultFrontCarLength = 5290 / this.distScale;
   defaultFrontCarWidth = 1904 / this.distScale;
   defaultCarFromKerb = 150 / this.distScale;
-  /* My reversing beeper goes solid at ~250mm */
+  /* My reversing beeper goes solid at ~250mm but need to go to 150mm for bay parking */
   /* Note: Do not exceed this.maxSafetyGap */
-  defaultSafetyGap = 250 / this.distScale;
+  defaultSafetyGap = 150 / this.distScale;
 
   /* The parking space gap */
   defaultExtraParkingSpace = 1000 / this.distScale;
@@ -122,7 +122,7 @@ export class ConfigService {
   }
 
   /**
-   * * Custom car and street defaults
+   * Custom car and street defaults and min/max for validators
    */
   minWheelbaseForm = 2300;
   maxWheelbaseForm = 3500;

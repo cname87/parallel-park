@@ -28,92 +28,150 @@ export class ObjectsService {
   public Width_2073mm: TStreetSetup;
   public Width_2426mm: TStreetSetup;
   public Custom_Street: TStreetSetup;
+  public Bay_2200mm: TStreetSetup;
+  public Bay_2400mm: TStreetSetup;
 
   constructor(
     public config: ConfigService,
     public data: DataService,
   ) {
     //
-    this.Width_1904mm = {
-      /* Same as 2005 VW T5 van */
-      name: EStreet.Width_1904mm,
-      type: 'parallel',
-      rearCarFromLeft: 0,
-      rearCarLength: 1000,
-      rearCarWidth: 1904,
-      frontCarLength: 5000,
-      frontCarWidth: 1904,
-      parkingSpaceLength: 0,
-      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    };
-
-    this.Width_1852mm = {
-      /* Same as 2020 Mercedes E Class Estate */
-      name: EStreet.Width_1852mm,
-      type: 'parallel',
-      rearCarFromLeft: 0,
-      rearCarLength: 1000,
-      rearCarWidth: 1852,
-      frontCarLength: 5000,
-      frontCarWidth: 1852,
-      parkingSpaceLength: 0,
-      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    };
-
-    this.Width_1795mm = {
-      /* Same as 2020 Hyundai i30 */
-      name: EStreet.Width_1795mm,
-      type: 'parallel',
-      rearCarFromLeft: 0,
-      rearCarLength: 1000,
-      rearCarWidth: 1795,
-      frontCarLength: 5000,
-      frontCarWidth: 1795,
-      parkingSpaceLength: 0,
-      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    };
 
     this.Width_1595mm = {
       /* Same as 2020 Kia Picanto - narrowest car */
       name: EStreet.Width_1595mm,
       type: 'parallel',
       rearCarFromLeft: 0,
+      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
       rearCarLength: 1000,
       rearCarWidth: 1595,
+      frontCarFromLeft: () => {
+        return (
+          this.Width_1595mm.rearCarFromLeft +
+          this.Width_1595mm.parkingSpaceLength
+        );
+      },
+      frontCarFromTop: () => {
+        return this.Width_1595mm.rearCarFromTop;
+      },
       frontCarLength: 5000,
       frontCarWidth: 1595,
-      parkingSpaceLength: 0,
+      parkingSpaceLength: 6500,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
-
+    this.Width_1795mm = {
+      /* Same as 2020 Hyundai i30 */
+      name: EStreet.Width_1795mm,
+      type: 'parallel',
+      rearCarFromLeft: 0,
+      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
+      rearCarLength: 1000,
+      rearCarWidth: 1795,
+      frontCarFromLeft: () => {
+        return (
+          this.Width_1795mm.rearCarFromLeft +
+          this.Width_1795mm.parkingSpaceLength
+        );
+      },
+      frontCarFromTop: () => {
+        return this.Width_1795mm.rearCarFromTop;
+      },
+      frontCarLength: 5000,
+      frontCarWidth: 1795,
+      parkingSpaceLength: 6700,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+    };
+    this.Width_1852mm = {
+      /* Same as 2020 Mercedes E Class Estate */
+      name: EStreet.Width_1852mm,
+      type: 'parallel',
+      rearCarFromLeft: 0,
+      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
+      rearCarLength: 1000,
+      rearCarWidth: 1852,
+      frontCarFromLeft: () => {
+        return (
+          this.Width_1852mm.rearCarFromLeft +
+          this.Width_1852mm.parkingSpaceLength
+        );
+      },
+      frontCarFromTop: () => {
+        return this.Width_1852mm.rearCarFromTop;
+      },
+      frontCarLength: 5000,
+      frontCarWidth: 1852,
+      parkingSpaceLength: 6800,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+    };
+    this.Width_1904mm = {
+      /* Same as 2005 VW T5 van */
+      name: EStreet.Width_1904mm,
+      type: 'parallel',
+      rearCarFromLeft: 0,
+      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
+      rearCarLength: 1000,
+      rearCarWidth: 1904,
+      frontCarFromLeft: () => {
+        return (
+          this.Width_1904mm.rearCarFromLeft +
+          this.Width_1904mm.parkingSpaceLength
+        );
+      },
+      frontCarFromTop: () => {
+        return this.Width_1904mm.rearCarFromTop;
+      },
+      frontCarLength: 5000,
+      frontCarWidth: 1904,
+      parkingSpaceLength: 6900,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+    };
     this.Width_2073mm = {
       /* Same as 2020 Landrover Discovery Sport */
       name: EStreet.Width_2073mm,
       type: 'parallel',
       rearCarFromLeft: 0,
+      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
       rearCarLength: 1000,
       rearCarWidth: 2073,
+      frontCarFromLeft: () => {
+        return (
+          this.Width_2073mm.rearCarFromLeft +
+          this.Width_2073mm.parkingSpaceLength
+        );
+      },
+      frontCarFromTop: () => {
+        return this.Width_2073mm.rearCarFromTop;
+      },
       frontCarLength: 5000,
       frontCarWidth: 2073,
-      parkingSpaceLength: 0,
+      parkingSpaceLength: 7200,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
-
     this.Width_2426mm = {
       /* Same as 2020 VW Crafter - widest van */
       name: EStreet.Width_2426mm,
       type: 'parallel',
       rearCarFromLeft: 0,
+      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
       rearCarLength: 1000,
       rearCarWidth: 2426,
+      frontCarFromLeft: () => {
+        return (
+          this.Width_2426mm.rearCarFromLeft +
+          this.Width_2426mm.parkingSpaceLength
+        );
+      },
+      frontCarFromTop: () => {
+        return this.Width_2426mm.rearCarFromTop;
+      },
       frontCarLength: 5000,
       frontCarWidth: 2426,
-      parkingSpaceLength: 0,
+      parkingSpaceLength: 7400,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -123,11 +181,64 @@ export class ObjectsService {
       name: EStreet.Custom_Street,
       type: 'parallel',
       rearCarFromLeft: 0,
+      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
       rearCarLength: 1000,
       rearCarWidth: 2426,
-      frontCarLength: 5000,
+      frontCarFromLeft: () => {
+        return (
+          this.Custom_Street.rearCarFromLeft +
+          this.Custom_Street.parkingSpaceLength
+        );
+      },
+      frontCarFromTop: () => {
+        return this.Custom_Street.rearCarFromTop;
+      },
+      frontCarLength: 7000,
       frontCarWidth: 2426,
       parkingSpaceLength: 0,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+    };
+    this.Bay_2200mm = {
+      name: EStreet.Bay_2200mm,
+      type: 'bay',
+      rearCarFromLeft: this.config.defaultCarFromKerb * this.config.distScale,
+      rearCarFromTop: 1000,
+      rearCarLength: 5000,
+      rearCarWidth: 2000,
+      frontCarFromLeft: () => {
+        return this.Bay_2200mm.rearCarFromTop;
+      },
+      frontCarFromTop: () => {
+        return (
+          this.Bay_2200mm.rearCarFromTop + this.Bay_2200mm.parkingSpaceLength
+        );
+      },
+      frontCarLength: 5000,
+      frontCarWidth: 2000,
+      parkingSpaceLength: 2200,
+      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
+      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+    };
+
+    this.Bay_2400mm = {
+      name: EStreet.Bay_2400mm,
+      type: 'bay',
+      rearCarFromLeft: this.config.defaultCarFromKerb * this.config.distScale,
+      rearCarFromTop: 1000,
+      rearCarLength: 5000,
+      rearCarWidth: 2000,
+      frontCarFromLeft: () => {
+        return this.Bay_2400mm.rearCarFromTop;
+      },
+      frontCarFromTop: () => {
+        return (
+          this.Bay_2400mm.rearCarFromTop + this.Bay_2400mm.parkingSpaceLength
+        );
+      },
+      frontCarLength: 5000,
+      frontCarWidth: 2000,
+      parkingSpaceLength: 2400,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
@@ -267,32 +378,6 @@ export class ObjectsService {
     wheelLength: 686,
   };
 
-  Bay_2200mm: TStreetSetup = {
-    name: EStreet.Bay_2200mm,
-    type: 'bay',
-    rearCarFromLeft: 3000,
-    rearCarLength: 2000,
-    rearCarWidth: 1000,
-    frontCarLength: 2000,
-    frontCarWidth: 1000,
-    parkingSpaceLength: 2200,
-    carFromKerb: 0,
-    safetyGap: 100,
-  };
-
-  Bay_2400mm: TStreetSetup = {
-    name: EStreet.Bay_2400mm,
-    type: 'bay',
-    rearCarFromLeft: 3000,
-    rearCarLength: 2000,
-    rearCarWidth: 1000,
-    frontCarLength: 2000,
-    frontCarWidth: 1000,
-    parkingSpaceLength: 2400,
-    carFromKerb: 0,
-    safetyGap: 100,
-  };
-
   Out_100mm: TDistOut = {
     name: EDistOut.Out_100mm,
     distance: 100,
@@ -404,33 +489,31 @@ export class ObjectsService {
 
   readonly cars: Array<[ECar, string]> = [
     [ECar.Fiat_Ducato_MWB_Van_2025, 'Fiat Ducato MWB Van 2025'],
-    [ECar.VW_T5_LWB_Van_2005, 'VW T5 LWB Van 2005'],
-    [ECar.Mercedes_E_Estate_2020, 'Mercedes E-Class Estate 2020'],
-    [ECar.Mercedes_C_Saloon_2020, 'Mercedes C-Class Saloon 2020'],
     [ECar.Hyundai_i30_2020, 'Hyundai i30 2020'],
     [ECar.Hyundai_i10_2018, 'Hyundai i10 2018'],
-    [ECar.Seat_Ibiza_2018, 'Seat Ibiza 2018'],
     [ECar.Kia_Picanto_2020, 'Kia Picanto 2020'],
-    [ECar.Custom_Car, 'Custom Car'],
+    [ECar.Mercedes_E_Estate_2020, 'Mercedes E-Class Estate 2020'],
+    [ECar.Mercedes_C_Saloon_2020, 'Mercedes C-Class Saloon 2020'],
+    [ECar.Seat_Ibiza_2018, 'Seat Ibiza 2018'],
+    [ECar.VW_T5_LWB_Van_2005, 'VW T5 LWB Van 2005'],
   ];
 
   readonly parallelStreets: Array<[EStreet, string]> = [
-    [EStreet.Width_1904mm, 'Front Car Width: 1904mm'],
+    [EStreet.Width_1595mm, 'Front Car Width: 1595mm'],
     [EStreet.Width_1852mm, 'Front Car Width: 1852mm'],
     [EStreet.Width_1795mm, 'Front Car Width: 1795mm'],
-    [EStreet.Width_1595mm, 'Front Car Width: 1595mm'],
+    [EStreet.Width_1904mm, 'Front Car Width: 1904mm'],
     [EStreet.Width_2073mm, 'Front Car Width: 2073mm'],
     [EStreet.Width_2426mm, 'Front Car Width: 2426mm'],
-    [EStreet.Custom_Street, 'Custom Front Car Width'],
   ];
 
   readonly parallelSpaces: Array<[EStreet, string]> = [
-    [EStreet.Width_1904mm, 'Front Car Width: 1904mm / Parking Space: 5400mm'],
-    [EStreet.Width_1852mm, 'Front Car Width: 1852mm / Parking Space: 5400mm'],
-    [EStreet.Width_1795mm, 'Front Car Width: 1795mm / Parking Space: 5400mm'],
-    [EStreet.Width_1595mm, 'Front Car Width: 1595mm / Parking Space: 5400mm'],
-    [EStreet.Width_2073mm, 'Front Car Width: 2073mm / Parking Space: 5400mm'],
-    [EStreet.Width_2426mm, 'Front Car Width: 2426mm / Parking Space: 5400mm'],
+    [EStreet.Width_1595mm, 'Front Car Width: 1595mm / Parking Space: 6500mm'],
+    [EStreet.Width_1852mm, 'Front Car Width: 1852mm / Parking Space: 6600mm'],
+    [EStreet.Width_1795mm, 'Front Car Width: 1795mm / Parking Space: 6700mm'],
+    [EStreet.Width_1904mm, 'Front Car Width: 1904mm / Parking Space: 6900mm'],
+    [EStreet.Width_2073mm, 'Front Car Width: 2073mm / Parking Space: 7200mm'],
+    [EStreet.Width_2426mm, 'Front Car Width: 2426mm / Parking Space: 7400mm'],
   ];
 
   readonly bayStreets: Array<[EStreet, string]> = [

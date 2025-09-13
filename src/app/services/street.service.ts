@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as createjs from 'createjs-module';
-import { TPoint, TStreetSetup } from '../shared/types';
+import { LoggingLevel, TPoint, TStreetSetup } from '../shared/types';
+import { LoggerService } from './logger.service';
 import { ConfigService } from './config.service';
 
 /**
@@ -12,13 +13,17 @@ import { ConfigService } from './config.service';
 })
 export class StreetService {
   //
-  /* Street definition variables, (including parking space length) */
+  /* Street definition variables */
   public type: 'parallel' | 'bay';
+  public rearCarFromLeft: number;
+  public rearCarFromTop: number;
   public rearCarLength: number;
   public rearCarWidth: number;
-  public rearCarFromLeft: number;
+  public frontCarFromLeft: number;
+  public frontCarFromTop: number;
   public frontCarLength: number;
   public frontCarWidth: number;
+  public parkingSpaceLength: number;
   public carFromKerb: number;
   public safetyGap: number;
   public wheelLength: number;
@@ -30,16 +35,7 @@ export class StreetService {
   public safetyGapColor = 'Pink';
   public borderColor = 'Black';
 
-  /* Set and get the parking space length */
-  public parkingSpaceLength: number;
-
-  /* Calculated */
-  public parkingSpaceLengthFromLeft = 0;
-  public frontCarFromLeft = 0;
-  public rearCarFromTop = 0;
-  public frontCarFromTop = 0;
-
-  /* Get outer corners for collision detection */
+  /* Get outer corners on the parking space side for collision detection */
   public get rearCarCorner(): TPoint {
     return {
       x: this.rearCarFromLeft + this.rearCarLength,
@@ -49,16 +45,24 @@ export class StreetService {
   public get frontCarCorner(): TPoint {
     return {
       x: this.frontCarFromLeft,
-      y: this.frontCarFromTop + this.frontCarWidth,
+      y: this.frontCarFromTop,
     };
   }
 
-  constructor(private config: ConfigService) {
+  constructor(
+    private config: ConfigService,
+    private logger: LoggerService,
+  ) {
+    this.logger.log('StreetService initialized', LoggingLevel.TRACE);
+
     this.type = this.config.defaultStreetType;
-    /* Default values in unscaled units */
+    /* Note: Default values are in unscaled units */
+    this.rearCarFromTop = 10; // this.config.defaultRearCarFromTop;
     this.rearCarLength = this.config.defaultRearCarLength;
     this.rearCarWidth = this.config.defaultRearCarWidth;
     this.rearCarFromLeft = this.config.defaultRearCarFromLeft;
+    this.frontCarFromLeft = 10; // this.config.defaultFrontCarFromLeft;
+    this.frontCarFromTop = 10; // this.config.defaultFrontCarFromTop;
     this.frontCarLength = this.config.defaultFrontCarLength;
     this.frontCarWidth = this.config.defaultFrontCarWidth;
     this.carFromKerb = this.config.defaultCarFromKerb;
@@ -66,12 +70,6 @@ export class StreetService {
     this.parkingSpaceLength = this.config.defaultParkingSpaceLength;
     this.wheelLength = this.config.defaultWheelLength;
     this.wheelWidth = this.config.defaultWheelWidth;
-    /* Calculated */
-    this.parkingSpaceLengthFromLeft = this.rearCarFromLeft + this.rearCarLength;
-    this.frontCarFromLeft =
-      this.parkingSpaceLengthFromLeft + this.parkingSpaceLength;
-    this.rearCarFromTop = this.carFromKerb;
-    this.frontCarFromTop = this.carFromKerb;
   }
 
   /*  Export car shapes for collision detection */
@@ -81,9 +79,12 @@ export class StreetService {
   public updateStreet({
     type,
     rearCarFromLeft,
+    rearCarFromTop,
     rearCarLength,
     rearCarWidth,
     parkingSpaceLength,
+    frontCarFromLeft,
+    frontCarFromTop,
     frontCarLength,
     frontCarWidth,
     carFromKerb,
@@ -92,14 +93,108 @@ export class StreetService {
     this.type = type;
     /* External updates are unscaled */
     this.rearCarFromLeft = rearCarFromLeft / this.config.distScale;
+    this.rearCarFromTop = rearCarFromTop / this.config.distScale;
     this.rearCarLength = rearCarLength / this.config.distScale;
     this.rearCarWidth = rearCarWidth / this.config.distScale;
-    /* This may be overwritten. */
     this.parkingSpaceLength = parkingSpaceLength / this.config.distScale;
+    this.frontCarFromLeft = frontCarFromLeft() / this.config.distScale;
+    this.frontCarFromTop = frontCarFromTop() / this.config.distScale;
     this.frontCarLength = frontCarLength / this.config.distScale;
     this.frontCarWidth = frontCarWidth / this.config.distScale;
     this.carFromKerb = carFromKerb / this.config.distScale;
     this.safetyGap = safetyGap / this.config.distScale;
+  }
+
+  /**
+   * Private helper method to draw car internal details (axles, wheels, V-pattern)
+   * @param carShape - The CreateJS Shape to draw on
+   * @param carLeft - X position of car
+   * @param carTop - Y position of car
+   * @param carLength - Length of car
+   * @param carWidth - Width of car
+   * @param carType - Type of car ('rear' or 'front') to determine drawing pattern
+   */
+  private drawCarInternals(
+    carShape: createjs.Shape,
+    carLeft: number,
+    carTop: number,
+    carLength: number,
+    carWidth: number,
+  ): void {
+    /* Draw the front V pattern */
+    carShape.graphics
+      .beginStroke(this.internalCarColor)
+      .setStrokeStyle(0.5)
+      .moveTo(carLeft + carLength / 2, carTop)
+      .lineTo(carLeft + carLength, carTop + carWidth / 2);
+    carShape.graphics
+      .beginStroke(this.internalCarColor)
+      .setStrokeStyle(0.5)
+      .moveTo(carLeft + carLength / 2, carTop + carWidth)
+      .lineTo(carLeft + carLength, carTop + carWidth / 2);
+    carShape.graphics
+      .beginStroke(this.internalCarColor)
+      .setStrokeStyle(0.5)
+      .moveTo(carLeft, carTop + carWidth / 2)
+      .lineTo(carLeft + carLength, carTop + carWidth / 2);
+
+    /* Draw the rear axle */
+    carShape.graphics
+      .beginStroke(this.internalCarColor)
+      .setStrokeStyle(0.5)
+      .moveTo(carLeft + (1.5 * carLength) / 8, carTop)
+      .lineTo(carLeft + (1.5 * carLength) / 8, carTop + carWidth);
+
+    /* Draw the front axle */
+    carShape.graphics
+      .beginStroke(this.internalCarColor)
+      .setStrokeStyle(0.5)
+      .moveTo(carLeft + (6 * carLength) / 8, carTop)
+      .lineTo(carLeft + (6 * carLength) / 8, carTop + carWidth);
+
+    /* Draw the front port wheel */
+    carShape.graphics
+      .beginFill(this.internalCarColor)
+      .setStrokeStyle(0)
+      .rect(
+        carLeft + (6 * carLength) / 8 + this.wheelLength / 2,
+        carTop + 1.5,
+        -this.wheelLength,
+        this.wheelWidth,
+      );
+
+    /* Draw the front starboard wheel */
+    carShape.graphics
+      .beginFill(this.internalCarColor)
+      .setStrokeStyle(0)
+      .rect(
+        carLeft + (6 * carLength) / 8 + this.wheelLength / 2,
+        carTop + carWidth - this.wheelWidth - 1.5,
+        -this.wheelLength,
+        this.wheelWidth,
+      );
+
+    /* Draw the rear port wheel */
+    carShape.graphics
+      .beginFill(this.internalCarColor)
+      .setStrokeStyle(0)
+      .rect(
+        carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
+        carTop + 1.5,
+        -this.wheelLength,
+        this.wheelWidth,
+      );
+
+    /* Draw the rear starboard wheel */
+    carShape.graphics
+      .beginFill(this.internalCarColor)
+      .setStrokeStyle(0)
+      .rect(
+        carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
+        carTop + carWidth - this.wheelWidth - 1.5,
+        -this.wheelLength,
+        this.wheelWidth,
+      );
   }
 
   /* Draw the street based on a provided parking space length */
@@ -111,46 +206,56 @@ export class StreetService {
     parkingSpaceLength: number;
   }): void {
     /* Update parking space length with calculated length */
+    this.type = type;
     this.parkingSpaceLength = parkingSpaceLength;
-    /* Repeat all calculated properties */
-    this.parkingSpaceLengthFromLeft = this.rearCarFromLeft + this.rearCarLength;
-    this.frontCarFromLeft =
-      this.parkingSpaceLengthFromLeft + this.parkingSpaceLength;
-    this.rearCarFromTop = this.carFromKerb;
-    this.frontCarFromTop = this.carFromKerb;
-    /* Set internal car colors based on type */
-    if (type === 'parallel') {
-      this.internalCarColor = this.borderColor;
-    } else if (type === 'bay') {
-      /* Hide the internal lines by making them the same color as the car */
-      this.internalCarColor = this.carColor;
-    }
-    /* Create the rear car the safetey gap shape */
+
+    /* Create the rear car safety gap shape */
     this.rearCarGap.set({ regX: 0, regY: 0 });
     this.rearCarGap.set({ x: 0, y: 0 });
     this.rearCarGap.alpha = 0.5;
-    this.rearCarGap.graphics
-      .beginFill(this.safetyGapColor)
-      .endStroke()
-      .drawRoundRect(
+
+    if (type === 'parallel') {
+      this.rearCarGap.graphics
+        .beginFill(this.safetyGapColor)
+        .endStroke()
+        .drawRoundRect(
+          this.rearCarFromLeft - this.safetyGap,
+          this.rearCarFromTop - this.safetyGap,
+          this.rearCarLength + 2 * this.safetyGap,
+          this.rearCarWidth + 2 * this.safetyGap,
+          this.safetyGap,
+        );
+      this.rearCarGap.cache(
         this.rearCarFromLeft - this.safetyGap,
         this.rearCarFromTop - this.safetyGap,
         this.rearCarLength + 2 * this.safetyGap,
         this.rearCarWidth + 2 * this.safetyGap,
-        this.safetyGap,
       );
-    this.rearCarGap.cache(
-      this.rearCarFromLeft - this.safetyGap,
-      this.rearCarFromTop - this.safetyGap,
-      this.rearCarLength + 2 * this.safetyGap,
-      this.rearCarWidth + 2 * this.safetyGap,
-    );
+    } else if (type === 'bay') {
+      this.rearCarGap.graphics
+        .beginFill(this.safetyGapColor)
+        .endStroke()
+        .drawRoundRect(
+          this.rearCarFromLeft - this.safetyGap,
+          this.rearCarFromTop - this.safetyGap,
+          this.rearCarLength + 2 * this.safetyGap,
+          this.rearCarWidth + 2 * this.safetyGap,
+          this.safetyGap,
+        );
+      this.rearCarGap.cache(
+        this.rearCarFromLeft - this.safetyGap,
+        this.rearCarFromTop - this.safetyGap,
+        this.rearCarLength + 2 * this.safetyGap,
+        this.rearCarWidth + 2 * this.safetyGap,
+      );
+    }
     this.config.stage.addChild(this.rearCarGap);
 
     /* Create the rear car shape */
     const rearCar = new createjs.Shape();
     rearCar.set({ regX: 0, regY: 0 });
     rearCar.set({ x: 0, y: 0 });
+
     rearCar.graphics.beginFill(this.carColor).endStroke().rect(
       /**
        * Sets the co-ordinates of the top left hand corner of the Graphic based on the Shape position as determined above.
@@ -160,30 +265,15 @@ export class StreetService {
       this.rearCarLength,
       this.rearCarWidth,
     );
-    rearCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(-20, this.rearCarFromTop)
-      .lineTo(
-        this.rearCarFromLeft + this.rearCarLength,
-        this.rearCarFromTop + this.rearCarWidth / 2,
-      );
-    rearCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(-20, this.rearCarFromTop + this.rearCarWidth)
-      .lineTo(
-        this.rearCarFromLeft + this.rearCarLength,
-        this.rearCarFromTop + this.rearCarWidth / 2,
-      );
-    rearCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(this.rearCarFromLeft, this.rearCarFromTop + this.rearCarWidth / 2)
-      .lineTo(
-        this.rearCarFromLeft + this.rearCarLength,
-        this.rearCarFromTop + this.rearCarWidth / 2,
-      );
+
+    this.drawCarInternals(
+      rearCar,
+      this.rearCarFromLeft,
+      this.rearCarFromTop,
+      this.rearCarLength,
+      this.rearCarWidth,
+    );
+
     rearCar.cache(
       this.rearCarFromLeft,
       this.rearCarFromTop,
@@ -211,150 +301,73 @@ export class StreetService {
     this.frontCarGap.set({ regX: 0, regY: 0 });
     this.frontCarGap.set({ x: 0, y: 0 });
     this.frontCarGap.alpha = 0.5;
-    this.frontCarGap.graphics
-      .beginFill(this.safetyGapColor)
-      .endStroke()
-      .drawRoundRect(
-        this.frontCarFromLeft - this.safetyGap + 0.5,
+
+    if (type === 'parallel') {
+      this.frontCarGap.graphics
+        .beginFill(this.safetyGapColor)
+        .endStroke()
+        .drawRoundRect(
+          this.frontCarFromLeft - this.safetyGap,
+          this.frontCarFromTop - this.safetyGap,
+          this.frontCarLength + 2 * this.safetyGap,
+          this.frontCarWidth + 2 * this.safetyGap,
+          this.safetyGap,
+        );
+      this.frontCarGap.cache(
+        this.frontCarFromLeft - this.safetyGap,
         this.frontCarFromTop - this.safetyGap,
         this.frontCarLength + 2 * this.safetyGap,
         this.frontCarWidth + 2 * this.safetyGap,
         this.safetyGap,
       );
-    this.frontCarGap.cache(
-      this.frontCarFromLeft - this.safetyGap,
-      this.frontCarFromTop - this.safetyGap,
-      this.frontCarLength + 2 * this.safetyGap,
-      this.frontCarWidth + 2 * this.safetyGap,
-      this.safetyGap,
-    );
+    } else if (type === 'bay') {
+      this.frontCarGap.graphics
+        .beginFill(this.safetyGapColor)
+        .endStroke()
+        .drawRoundRect(
+          this.rearCarFromLeft - this.safetyGap,
+          this.frontCarFromTop - this.safetyGap,
+          this.rearCarLength + 2 * this.safetyGap,
+          this.rearCarWidth + 2 * this.safetyGap,
+          this.safetyGap,
+        );
+      this.frontCarGap.cache(
+        this.rearCarFromLeft - this.safetyGap,
+        this.frontCarFromTop - this.safetyGap,
+        this.rearCarLength + 2 * this.safetyGap,
+        this.rearCarWidth + 2 * this.safetyGap,
+      );
+    }
     this.config.stage.addChild(this.frontCarGap);
 
     /* Create the front car shape */
     const frontCar = new createjs.Shape();
     frontCar.set({ regX: 0, regY: 0 });
     frontCar.set({ x: 0, y: 0 });
+
+    const frontCarLeft =
+      type === 'bay' ? this.rearCarFromLeft : this.frontCarFromLeft;
+    const frontCarTop =
+      type === 'bay' ? this.frontCarFromTop : this.frontCarFromTop;
+    const frontCarLength =
+      type === 'bay' ? this.rearCarLength : this.frontCarLength;
+    const frontCarWidth =
+      type === 'bay' ? this.rearCarWidth : this.frontCarWidth;
+
     frontCar.graphics
       .beginFill(this.carColor)
       .endStroke()
-      .rect(
-        this.frontCarFromLeft,
-        this.frontCarFromTop,
-        this.frontCarLength,
-        this.frontCarWidth,
-      );
-    /* Draw the front V */
-    frontCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(
-        this.frontCarFromLeft + this.frontCarLength / 2,
-        this.frontCarFromTop,
-      )
-      .lineTo(
-        this.frontCarFromLeft + this.frontCarLength,
-        this.frontCarFromTop + this.frontCarWidth / 2,
-      );
-    frontCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(
-        this.frontCarFromLeft + this.frontCarLength / 2,
-        this.frontCarFromTop + this.frontCarWidth,
-      )
-      .lineTo(
-        this.frontCarFromLeft + this.frontCarLength,
-        this.frontCarFromTop + this.frontCarWidth / 2,
-      );
-    frontCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(
-        this.frontCarFromLeft,
-        this.frontCarFromTop + this.frontCarWidth / 2,
-      )
-      .lineTo(
-        this.frontCarFromLeft + this.frontCarLength,
-        this.frontCarFromTop + this.frontCarWidth / 2,
-      );
-    /* Draw the rear axle */
-    frontCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(
-        this.frontCarFromLeft + (1.5 * this.frontCarLength) / 8,
-        this.frontCarFromTop,
-      )
-      .lineTo(
-        this.frontCarFromLeft + (1.5 * this.frontCarLength) / 8,
-        this.frontCarFromTop + this.frontCarWidth,
-      );
-    /* Draw the front axle */
-    frontCar.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(
-        this.frontCarFromLeft + (6 * this.frontCarLength) / 8,
-        this.frontCarFromTop,
-      )
-      .lineTo(
-        this.frontCarFromLeft + (6 * this.frontCarLength) / 8,
-        this.frontCarFromTop + this.frontCarWidth,
-      );
-    /* Draw the front port wheel */
-    frontCar.graphics
-      .beginFill(this.internalCarColor)
-      .setStrokeStyle(0)
-      .rect(
-        this.frontCarFromLeft +
-          (6 * this.frontCarLength) / 8 +
-          this.wheelLength / 2,
-        this.frontCarFromTop + 1.5,
-        -this.wheelLength,
-        this.wheelWidth,
-      );
-    /* Draw the front starboard wheel */
-    frontCar.graphics
-      .beginFill(this.internalCarColor)
-      .setStrokeStyle(0)
-      .rect(
-        this.frontCarFromLeft +
-          (6 * this.frontCarLength) / 8 +
-          this.wheelLength / 2,
-        this.frontCarFromTop + this.frontCarWidth - this.wheelWidth - 1.5,
-        -this.wheelLength,
-        this.wheelWidth,
-      );
-    /* Dear the rear port wheel */
-    frontCar.graphics
-      .beginFill(this.internalCarColor)
-      .setStrokeStyle(0)
-      .rect(
-        this.frontCarFromLeft +
-          (1.5 * this.frontCarLength) / 8 +
-          this.wheelLength / 2,
-        this.frontCarFromTop + 1.5,
-        -this.wheelLength,
-        this.wheelWidth,
-      );
-    /* Draw the rear starboard wheel */
-    frontCar.graphics
-      .beginFill(this.internalCarColor)
-      .setStrokeStyle(0)
-      .rect(
-        this.frontCarFromLeft +
-          (1.5 * this.frontCarLength) / 8 +
-          this.wheelLength / 2,
-        this.frontCarFromTop + this.frontCarWidth - this.wheelWidth - 1.5,
-        -this.wheelLength,
-        this.wheelWidth,
-      );
-    frontCar.cache(
-      this.frontCarFromLeft,
-      this.frontCarFromTop,
-      this.frontCarLength,
-      this.frontCarWidth,
+      .rect(frontCarLeft, frontCarTop, frontCarLength, frontCarWidth);
+
+    this.drawCarInternals(
+      frontCar,
+      frontCarLeft,
+      frontCarTop,
+      frontCarLength,
+      frontCarWidth,
     );
+
+    frontCar.cache(frontCarLeft, frontCarTop, frontCarLength, frontCarWidth);
     this.config.stage.addChild(frontCar);
 
     /* Add a separate uncached border so its not smudged */
@@ -364,12 +377,7 @@ export class StreetService {
     frontCarBorder.graphics
       .endFill()
       .beginStroke(this.borderColor)
-      .rect(
-        this.frontCarFromLeft,
-        this.frontCarFromTop,
-        this.frontCarLength,
-        this.frontCarWidth,
-      );
+      .rect(frontCarLeft, frontCarTop, frontCarLength, frontCarWidth);
     this.config.stage.addChild(frontCarBorder);
   }
 }

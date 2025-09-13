@@ -98,10 +98,8 @@ export class ScreenService {
       config: this.config,
     });
 
-    /* Update the parking space length if not already set. (A custom street may have already set a value, e.g. for keyboard use). */
-    if (!this.street.parkingSpaceLength) {
-      this.street.parkingSpaceLength = manoeuvre.parkingSpaceLength;
-    }
+    /* Override the parking space length from the manoeuvre - the street parkingSpaceLength is used for Keyboard mode only. */
+    this.street.parkingSpaceLength = manoeuvre.parkingSpaceLength;
 
     /* Print the street layout setting the parking space length */
     this.street.drawStreet({

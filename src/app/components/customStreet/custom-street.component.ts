@@ -133,10 +133,13 @@ export class CustomStreetComponent implements OnInit {
         const result: TStreetSetup = {
           name: EStreet.Custom_Street,
           type: 'parallel',
+          rearCarFromTop: 0,
           rearCarFromLeft: 0,
           rearCarLength: 1000,
           frontCarLength: 5000,
           rearCarWidth: streetForm.frontCarWidth,
+          frontCarFromTop: () => 0,
+          frontCarFromLeft: () => 0,
           frontCarWidth: streetForm.frontCarWidth,
           carFromKerb: streetForm.distFromKerb,
           safetyGap: streetForm.safetyGap,
