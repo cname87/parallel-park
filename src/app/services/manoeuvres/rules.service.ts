@@ -97,8 +97,7 @@ export class RulesService {
               /* Rear axle x-axis value */
               carInUse.rearPortAxleSide.x -
                 /* How far the car will move in the x-axis direction before it intersects the kerb */
-                carInUse.rearPortAxleSide.y /
-                  Math.tan(carInUse.carRotation) -
+                carInUse.rearPortAxleSide.y / Math.tan(carInUse.carRotation) -
                 /* Rear car corner x-axis value */
                 street.rearCarCorner.x -
                 /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
@@ -166,8 +165,7 @@ export class RulesService {
               /* Rear axle x-axis value */
               carInUse.rearPortAxleSide.x -
                 /* How far the car will move in the x-axis direction before it intersects the kerb */
-                carInUse.rearPortAxleSide.y /
-                  Math.tan(carInUse.carRotation) -
+                carInUse.rearPortAxleSide.y / Math.tan(carInUse.carRotation) -
                 /* Rear car corner x-axis value */
                 street.rearCarCorner.x -
                 /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
@@ -205,8 +203,7 @@ export class RulesService {
           distFromRearCarMin <
         1;
       const touchesKerb = carInUse.rearPortCorner.y <= 0;
-      const isHorizontal =
-        Math.abs(carInUse.carRotation) < horizontalTestAngle;
+      const isHorizontal = Math.abs(carInUse.carRotation) < horizontalTestAngle;
       return tooCloseToRearCar || touchesKerb || isHorizontal;
     };
 
@@ -231,17 +228,14 @@ export class RulesService {
           carInUse.carRotation -= tick;
         }
       }
-      const isHorizontal =
-        Math.abs(carInUse.carRotation) < horizontalTestAngle;
+      const isHorizontal = Math.abs(carInUse.carRotation) < horizontalTestAngle;
       return collision || isHorizontal;
     };
 
     /* Keep turning the wheels until clockwise, stopping in the center position only if the car is horizontal */
     const moveKCondition = (carInUse: CarService) => {
-      const isHorizontal =
-        Math.abs(carInUse.carRotation) < horizontalTestAngle;
-      return isHorizontal &&
-        Math.abs(carInUse.frontPortWheelRotation) < 0.01
+      const isHorizontal = Math.abs(carInUse.carRotation) < horizontalTestAngle;
+      return isHorizontal && Math.abs(carInUse.frontPortWheelRotation) < 0.01
         ? true
         : false;
     };
@@ -270,10 +264,8 @@ export class RulesService {
 
     /* Keep turning the wheels until clockwise, stopping in the center position only if the car is horizontal */
     const moveMCondition = (carInUse: CarService) => {
-      const isHorizontal =
-        Math.abs(carInUse.carRotation) < horizontalTestAngle;
-      return isHorizontal &&
-        Math.abs(carInUse.frontPortWheelRotation) < 0.01
+      const isHorizontal = Math.abs(carInUse.carRotation) < horizontalTestAngle;
+      return isHorizontal && Math.abs(carInUse.frontPortWheelRotation) < 0.01
         ? true
         : false;
     };

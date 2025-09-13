@@ -155,7 +155,7 @@ export class ObjectsService {
    * See https://www.tyres.ie/tyres-calculator for tyre sizes.
    */
 
-  readonly modes: ERunMode[] = [ERunMode.Single, ERunMode.Keyboard];
+  readonly modes: ERunMode[] = [ERunMode.Automated, ERunMode.Keyboard];
 
   readonly Fiat_Ducato_MWB_Van_2025: TCarSetup = {
     name: ECar.Fiat_Ducato_MWB_Van_2025,

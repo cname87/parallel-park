@@ -48,7 +48,7 @@ export interface IButton {
 }
 
 export const enum ERunMode {
-  Single = 'Single',
+  Automated = 'Automated',
   Keyboard = 'Keyboard',
 }
 

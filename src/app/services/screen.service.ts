@@ -42,7 +42,7 @@ export class ScreenService {
   }
 
   /* Operation mode */
-  private mode = ERunMode.Single;
+  private mode = ERunMode.Automated;
   /* Detects main button click */
   private isMainButtonClicked = false;
   /* Stores the main button status when last clicked */
@@ -448,7 +448,7 @@ export class ScreenService {
           /* Cancel keyboard operation */
           this.keyMove.cancelKeyboard();
           break;
-        case ERunMode.Single:
+        case ERunMode.Automated:
           /* Read updated scenario */
           scenario = this.getCurrentScenario();
           await this.runPlaylist([scenario]);

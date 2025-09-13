@@ -25,7 +25,9 @@ import { DataService } from '../../services/data.service';
 import { ObjectsService } from '../../services/objects.service';
 
 /**
- * Displays the manoeuvre menu.
+ * Displays the manoeuvre menu. The manoeuvre menu can contain either a set of
+ * parking manoeuvres (for automated run mode) or a set of distances out (for
+ * keyboard run mode).
  */
 
 @Component({
@@ -85,7 +87,7 @@ export class ManoeuvreComponent implements OnInit {
       this.data.getRunMode().runMode$,
     ]).subscribe(([parkMode, runMode]: [EParkMode, ERunMode]) => {
       // Handle parkMode changes
-      if (runMode === ERunMode.Single) {
+      if (runMode === ERunMode.Automated) {
         if (parkMode === EParkMode.Parallel) {
           this.manoeuvres = this.objects.parallelManoeuvres;
           this.manoeuvreForm.setValue({

@@ -27,9 +27,11 @@
             "tsConfig": "tsconfig.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/favicon.ico"
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
+              "src/assets/fonts/roboto-local.css",
               "src/styles/styles.scss",
               "src/styles/themes.scss"
             ],

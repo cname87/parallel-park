@@ -73,7 +73,7 @@ export class MenuComponent implements AfterViewInit {
     if (modeObj && modeObj.runMode$) {
       modeObj.runMode$.subscribe((value: ERunMode) => {
         mode = value;
-        if (mode === ERunMode.Single && buttonStatus === EButtonStatus.Run) {
+        if (mode === ERunMode.Automated && buttonStatus === EButtonStatus.Run) {
           this.showScenarioForm = 'block';
         }
         if (mode === ERunMode.Keyboard && buttonStatus === EButtonStatus.Run) {
@@ -104,7 +104,7 @@ export class MenuComponent implements AfterViewInit {
         if (status === EButtonStatus.Run) {
           this.showManualMode = false;
           switch (mode) {
-            case ERunMode.Single:
+            case ERunMode.Automated:
             case ERunMode.Keyboard:
               this.showScenarioForm = 'block';
               if (car === ECar.Custom_Car) {

@@ -57,7 +57,7 @@ export class ModeComponent implements OnInit {
     private config: ConfigService,
     private screen: ScreenService,
   ) {
-    this.#runModeInitialFormValue = { runMode: ERunMode.Single };
+    this.#runModeInitialFormValue = { runMode: ERunMode.Automated };
     this.#parkModeInitialFormValue = { parkMode: EParkMode.Parallel };
   }
 

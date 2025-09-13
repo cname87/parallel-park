@@ -83,9 +83,9 @@ export class SnackbarService {
         (eventTyped.stageY * this.config.distScale) / 1000,
         1,
       )}m`;
-      /* Run pause notice only when running in single scenario mode & a pause message not already showing */
+      /* Run pause notice only when running in automated mode & a pause message not already showing */
       if (
-        this.#mode === ERunMode.Single &&
+        this.#mode === ERunMode.Automated &&
         this.#buttonLastClickStatus === EButtonStatus.Run &&
         !this.#pause
       ) {
