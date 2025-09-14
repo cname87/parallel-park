@@ -91,27 +91,27 @@ and finally moves forward to pull the car into a parallel position. (The '3' ref
  * be one of 4 types TSteer, TMoveStraight,   TMoveArc or TMoveStraightOrArc. See types.ts for definitions.
  *
  * Each second move is a steering move, i.e. it just moves the steering wheel.
- * - moveFirstSteer sets the steering wheel to the center.
- * - moveB calls getMoveDist1 to get the distance to move.
- * -- getMoveDist1 calls getStartRelativePosition and
+ * - move2ndStraightirstSteer sets the steering wheel to the center.
+ * - move2ndStraightirstStraight calls getMove1stArcist1 to get the distance to move.
+ * -- getMove1stArcist1 calls getStartRelativePosition and
  * getcarDistXFromBumperMedToPivot - see above.
- * - moveC sets the steering wheel counter-clockwise.
- * - moveD calls getMoveDAngle to get the angle to turn.
- * -- getMoveDAngle calls getFirstTurnAngle as above.
- * -moveE calls getMoveESteer to get the steering angle.  It simply returns to
+ * - move2ndSteer sets the steering wheel counter-clockwise.
+ * - move1stArc calls getMove1stArcAngle to get the angle to turn.
+ * -- getMove1stArcAngle calls getFirstTurnAngle as above.
+ * -move3rdSteer calls getMove3rdSteer to get the steering angle.  It simply returns to
  * center the wheel.
- * - moveF calls getMoveF which simply returns to reverse a certain distance.
- * - moveG turns the steering wheel clockwise.
- * - moveH calls getMoveHAngle to get the angle to be turned.
- * -- getMoveHAngle subtracts getCollisionAngle from getMoveDAngle (see above).
- * - moveI calls getMoveISteer to get the steering angle. It sets the steering
+ * - move2ndStraight calls getMove2ndStraight which simply returns to reverse a certain distance.
+ * - move4thSteer turns the steering wheel clockwise.
+ * - move2ndArc calls getMove2ndArcAngle to get the angle to be turned.
+ * -- getMove2ndArcAngle subtracts getCollisionAngle from getMove1stArcAngle (see above).
+ * - move5thSteer calls getMove5thSteer to get the steering angle. It sets the steering
  * angle to counter-clockwise.
- * moveJ calls getMoveJAngle to get the angle to turn.
- * -- getMoveJAngle which returns the collision angle by calling
+ * move3rdArc calls getMove3rdArcAngle to get the angle to turn.
+ * -- getMove3rdArcAngle which returns the collision angle by calling
  * getCollisionAngle.
- * moveK calls getMoveKSteer to get the steering angle.  It sets the steering
+ * move6thSteer calls getMove6thSteer to get the steering angle.  It sets the steering
  * angle to clockwise.
- * moveL calls getMoveL which returns a move object directing the car to
+ * move4thArc calls getMove4thArc which returns a move object directing the car to
  * reverse by an amount set by a call to getExtraParkingSpace.
  *
  Note that many moves call getMoveXCondition which can set a condition to stop the move by returning true.  For this manoeuvre they all return false
@@ -120,7 +120,7 @@ and finally moves forward to pull the car into a parallel position. (The '3' ref
 
  * * Note on adding new move types
  *
- * See moveL which calls getMoveL for the best way to add new moves. getMoveL
+ * See move4thArc which calls getMove4thArc for the best way to add new moves. getMove4thArc
  * can return any required move object.
  */
 
@@ -900,9 +900,12 @@ export class ManoeuvreService {
           street.rearCarCorner.x +
           street.safetyGap +
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).x +
-          this.getMoveF({ manoeuvre, street, car, config }).deltaPositionFn(
+          this.getMove2ndStraight({
+            manoeuvre,
+            street,
             car,
-          ) *
+            config,
+          }).deltaPositionFn(car) *
             Math.cos(
               this.getFirstTurnAngle({ manoeuvre, street, car, config }),
             );
@@ -1004,9 +1007,12 @@ export class ManoeuvreService {
         const distSideY =
           this.getParkedKerbDistance({ manoeuvre, street, car, config }) +
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y +
-          this.getMoveF({ manoeuvre, street, car, config }).deltaPositionFn(
+          this.getMove2ndStraight({
+            manoeuvre,
+            street,
             car,
-          ) *
+            config,
+          }).deltaPositionFn(car) *
             Math.sin(
               this.getFirstTurnAngle({ manoeuvre, street, car, config }),
             );
@@ -1112,13 +1118,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveBDist = ({
+  private getMove1stStraightDist = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): number => {
-    this.logger.log('getMoveBDist called', LoggingLevel.TRACE);
+    this.logger.log('getMove1stStraightDist called', LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -1151,13 +1157,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveDAngle = ({
+  private getMove1stArcAngle = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): number => {
-    this.logger.log('getMoveDAngle called', LoggingLevel.TRACE);
+    this.logger.log('getMove1stArcAngle called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1180,13 +1186,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveDCondition = ({
+  private getMove1stArcCondition = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveDCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMove1stArcCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
@@ -1199,7 +1205,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveDCondition;
+          .move1stArcCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1212,13 +1218,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveF = ({
+  private getMove2ndStraight = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TMoveStraight => {
-    this.logger.log('getMoveF called', LoggingLevel.TRACE);
+    this.logger.log('getMove2ndStraight called', LoggingLevel.TRACE);
     let deltaY = 0;
     let delta = 0;
     switch (manoeuvre) {
@@ -1277,13 +1283,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveFCondition = ({
+  private getMove2ndStraightCondition = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getmoveFCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMove2ndStraightCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1296,7 +1302,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveFCondition;
+          .move2ndStraightCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1309,20 +1315,20 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveHAngle = ({
+  private getMove2ndArcAngle = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): number => {
-    this.logger.log('getMoveHAngle called', LoggingLevel.TRACE);
+    this.logger.log('getMove2ndArcAngle called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
         return (
-          this.getMoveDAngle({ manoeuvre, street, car, config }) -
+          this.getMove1stArcAngle({ manoeuvre, street, car, config }) -
           this.getCollisionAngle({ manoeuvre, street, car, config })
         );
       case EManoeuvre.Park2Rotate1StraightSetManual:
@@ -1345,13 +1351,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveHCondition = ({
+  private getMove2ndArcCondition = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveHCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMove2ndArcCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1368,7 +1374,7 @@ export class ManoeuvreService {
           street,
           car,
           config,
-        }).moveHCondition;
+        }).move2ndArcCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1383,8 +1389,8 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveISteer = ({ manoeuvre }: IParams): number => {
-    this.logger.log('getMoveISteer called', LoggingLevel.TRACE);
+  private getMove5thSteer = ({ manoeuvre }: IParams): number => {
+    this.logger.log('getMove5thSteer called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1409,13 +1415,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveICondition = ({
+  private getMove5thSteerCondition = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveICondition called', LoggingLevel.TRACE);
+    this.logger.log('getMove5thSteerCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1428,7 +1434,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveICondition;
+          .move5thSteerCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1441,13 +1447,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveJAngle = ({
+  private getMove3rdArcAngle = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): number => {
-    this.logger.log('getMoveJAngle called', LoggingLevel.TRACE);
+    this.logger.log('getMove3rdArcAngle called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1474,13 +1480,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveJCondition = ({
+  private getMove3rdArcCondition = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveJCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMove3rdArcCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1497,7 +1503,7 @@ export class ManoeuvreService {
           street,
           car,
           config,
-        }).moveJCondition;
+        }).move3rdArcCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1509,8 +1515,8 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveKSteer = ({ manoeuvre }: IParams): ELock => {
-    this.logger.log('getMoveKSteer called', LoggingLevel.TRACE);
+  private getMove6thSteer = ({ manoeuvre }: IParams): ELock => {
+    this.logger.log('getMove6thSteer called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1537,13 +1543,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveKCondition = ({
+  private getMove6thSteerCondition = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveKCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMove6thSteerCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1556,7 +1562,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveKCondition;
+          .move6thSteerCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1574,13 +1580,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveL = ({
+  private getMove4thArc = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TMoveStraight | TMoveStraightOrArc => {
-    this.logger.log('getMoveL called', LoggingLevel.TRACE);
+    this.logger.log('getMove4thArc called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1608,7 +1614,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveL;
+          .move4thArc;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1620,8 +1626,8 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveMSteer = ({ manoeuvre }: IParams): ELock => {
-    this.logger.log('getMoveMSteer called', LoggingLevel.TRACE);
+  private getMove7thSteer = ({ manoeuvre }: IParams): ELock => {
+    this.logger.log('getMove7thSteer called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1648,13 +1654,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveMCondition = ({
+  private getMove7thSteerCondition = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveMCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMove7thSteerCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1667,7 +1673,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveMCondition;
+          .move7thSteerCondition;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1681,13 +1687,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveN = ({
+  private getMove5thArc = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TMoveStraight | TMoveStraightOrArc => {
-    this.logger.log('getMoveN called', LoggingLevel.TRACE);
+    this.logger.log('getMove5thArc called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1703,7 +1709,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveN;
+          .move5thArc;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1721,13 +1727,13 @@ export class ManoeuvreService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getMoveP = ({
+  private getMove3rdStraight = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): TMoveStraight | TMoveStraightOrArc => {
-    this.logger.log('getMoveP called', LoggingLevel.TRACE);
+    this.logger.log('getMove3rdStraight called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1749,7 +1755,7 @@ export class ManoeuvreService {
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
         return this.rulesService.getRules({ manoeuvre, street, car, config })
-          .moveP;
+          .move3rdStraight;
       default:
         throw new Error('Unexpected manoeuvre');
     }
@@ -1760,86 +1766,86 @@ export class ManoeuvreService {
    */
   private createEmptyMovie(): TMovie {
     return {
-      moveFirstSteer: {
+      move1stSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
         message: undefined,
       },
-      moveB: {
+      move1stStraight: {
         type: () => EMoveType.MoveStraight,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
         deltaAngleFn: () => 0,
         message: undefined,
       },
-      moveC: {
+      move2ndSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveD: {
+      move1stArc: {
         type: () => EMoveType.MoveArc,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
         deltaAngleFn: () => 0,
         message: undefined,
       },
-      moveE: {
+      move3rdSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveF: {
+      move2ndStraight: {
         type: () => EMoveType.MoveStraight,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
         deltaAngleFn: () => 0,
         message: undefined,
       },
-      moveG: {
+      move4thSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveH: {
+      move2ndArc: {
         type: () => EMoveType.MoveArc,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
         deltaAngleFn: () => 0,
         message: undefined,
       },
-      moveI: {
+      move5thSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveJ: {
+      move3rdArc: {
         type: () => EMoveType.MoveArc,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
         deltaAngleFn: () => 0,
         message: undefined,
       },
-      moveK: {
+      move6thSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveL: {
+      move4thArc: {
         type: () => EMoveType.MoveStraight,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
         message: undefined,
       },
-      moveM: {
+      move7thSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveN: {
+      move5thArc: {
         type: () => EMoveType.MoveStraight,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
       },
-      moveO: {
+      move8thSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveP: {
+      move3rdStraight: {
         type: () => EMoveType.MoveStraight,
         fwdOrReverseFn: () => EDirection.NoMove,
         deltaPositionFn: () => 0,
@@ -1884,209 +1890,237 @@ export class ManoeuvreService {
     }
 
     const movie: TMovie = {
-      moveFirstSteer: {
+      move1stSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
-        message: this.info.getMoveFirstSteerMessage({
+        message: this.info.getMove1stSteerMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
       },
-      moveB: {
+      move1stStraight: {
         type: () => EMoveType.MoveStraight,
         fwdOrReverseFn: () => EDirection.Reverse,
         deltaPositionFn: () =>
-          this.getMoveBDist({ manoeuvre, street, car, config }),
+          this.getMove1stStraightDist({
+            manoeuvre,
+            street,
+            car,
+            config,
+          }),
         deltaAngleFn: () => 0,
-        message: this.info.getMoveBMessage({
+        message: this.info.getMove1stStraightMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
       },
-      moveC: {
+      move2ndSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Counterclockwise,
       },
-      moveD: {
+      move1stArc: {
         type: () => EMoveType.MoveArc,
         fwdOrReverseFn: () => EDirection.Reverse,
         deltaPositionFn: () => 0,
         deltaAngleFn: () =>
-          this.getMoveDAngle({ manoeuvre, street, car, config }),
+          this.getMove1stArcAngle({ manoeuvre, street, car, config }),
         condition: () =>
-          this.getMoveDCondition({
+          this.getMove1stArcCondition({
             manoeuvre,
             street,
             car,
             config,
           }),
-        message: this.info.getMoveDMessage({
+        message: this.info.getMove1stArcMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
       },
-      moveE: {
+      move3rdSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveF: {
-        type: this.getMoveF({ manoeuvre, street, car, config }).type,
-        fwdOrReverseFn: this.getMoveF({ manoeuvre, street, car, config })
-          .fwdOrReverseFn,
+      move2ndStraight: {
+        type: this.getMove2ndStraight({ manoeuvre, street, car, config }).type,
+        fwdOrReverseFn: this.getMove2ndStraight({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }).fwdOrReverseFn,
         deltaAngleFn: () => 0,
-        deltaPositionFn: this.getMoveF({ manoeuvre, street, car, config })
-          .deltaPositionFn,
+        deltaPositionFn: this.getMove2ndStraight({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }).deltaPositionFn,
         condition: () =>
-          this.getMoveFCondition({
+          this.getMove2ndStraightCondition({
             manoeuvre,
             street,
             car,
             config,
           }),
-        message: this.info.getMoveFMessage({
+        message: this.info.getMove2ndStraightMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
       },
-      moveG: {
+      move4thSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Clockwise,
       },
-      moveH: {
+      move2ndArc: {
         type: () => EMoveType.MoveArc,
         fwdOrReverseFn: () => EDirection.Reverse,
         deltaPositionFn: () => 0,
         deltaAngleFn: () =>
-          this.getMoveHAngle({ manoeuvre, street, car, config }),
+          this.getMove2ndArcAngle({ manoeuvre, street, car, config }),
         condition: () =>
-          this.getMoveHCondition({
+          this.getMove2ndArcCondition({
             manoeuvre,
             street,
             car,
             config,
           }),
-        message: this.info.getMoveHMessage({
+        message: this.info.getMove2ndArcMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
       },
-      moveI: {
+      move5thSteer: {
         type: () => EMoveType.Steer,
-        steeringWheelAngle: this.getMoveISteer({
+        steeringWheelAngle: this.getMove5thSteer({
           manoeuvre,
           street,
           car,
           config,
         }),
         condition: () =>
-          this.getMoveICondition({
+          this.getMove5thSteerCondition({
             manoeuvre,
             street,
             car,
             config,
           }),
       },
-      moveJ: {
+      move3rdArc: {
         type: () => EMoveType.MoveArc,
         fwdOrReverseFn: () => EDirection.Forward,
         deltaPositionFn: () => 0,
         deltaAngleFn: () =>
-          this.getMoveJAngle({ manoeuvre, street, car, config }),
+          this.getMove3rdArcAngle({ manoeuvre, street, car, config }),
         condition: () =>
-          this.getMoveJCondition({
+          this.getMove3rdArcCondition({
             manoeuvre,
             street,
             car,
             config,
           }),
-        message: this.info.getMoveIMessage({
+        message: this.info.getMove3rdArcMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
       },
-      moveK: {
+      move6thSteer: {
         type: () => EMoveType.Steer,
-        steeringWheelAngle: this.getMoveKSteer({
+        steeringWheelAngle: this.getMove6thSteer({
           manoeuvre,
           street,
           car,
           config,
         }),
         condition: () =>
-          this.getMoveKCondition({
+          this.getMove6thSteerCondition({
             manoeuvre,
             street,
             car,
             config,
           }),
       } as TSteer,
-      moveL: {
-        type: this.getMoveL({ manoeuvre, street, car, config }).type,
-        fwdOrReverseFn: this.getMoveL({ manoeuvre, street, car, config })
+      move4thArc: {
+        type: this.getMove4thArc({ manoeuvre, street, car, config }).type,
+        fwdOrReverseFn: this.getMove4thArc({ manoeuvre, street, car, config })
           .fwdOrReverseFn,
-        deltaAngleFn: this.getMoveL({ manoeuvre, street, car, config })
+        deltaAngleFn: this.getMove4thArc({ manoeuvre, street, car, config })
           .deltaAngleFn,
-        deltaPositionFn: this.getMoveL({ manoeuvre, street, car, config })
+        deltaPositionFn: this.getMove4thArc({ manoeuvre, street, car, config })
           .deltaPositionFn,
-        condition: this.getMoveL({ manoeuvre, street, car, config }).condition,
-        message: this.info.getMoveLMessage({
+        condition: this.getMove4thArc({ manoeuvre, street, car, config })
+          .condition,
+        message: this.info.getMove4thArcMessage({
           manoeuvre,
           street,
           car,
           config,
         }),
       } as TMoveStraight | TMoveArc,
-      moveM: {
+      move7thSteer: {
         type: () => EMoveType.Steer,
-        steeringWheelAngle: this.getMoveMSteer({
+        steeringWheelAngle: this.getMove7thSteer({
           manoeuvre,
           street,
           car,
           config,
         }),
         condition: () =>
-          this.getMoveMCondition({
+          this.getMove7thSteerCondition({
             manoeuvre,
             street,
             car,
             config,
           }),
       } as TSteer,
-      moveN: {
-        type: this.getMoveN({ manoeuvre, street, car, config }).type,
-        fwdOrReverseFn: this.getMoveN({ manoeuvre, street, car, config })
+      move5thArc: {
+        type: this.getMove5thArc({ manoeuvre, street, car, config }).type,
+        fwdOrReverseFn: this.getMove5thArc({ manoeuvre, street, car, config })
           .fwdOrReverseFn,
-        deltaAngleFn: this.getMoveN({ manoeuvre, street, car, config })
+        deltaAngleFn: this.getMove5thArc({ manoeuvre, street, car, config })
           .deltaAngleFn,
-        deltaPositionFn: this.getMoveN({ manoeuvre, street, car, config })
+        deltaPositionFn: this.getMove5thArc({ manoeuvre, street, car, config })
           .deltaPositionFn,
-        condition: this.getMoveN({ manoeuvre, street, car, config }).condition,
+        condition: this.getMove5thArc({ manoeuvre, street, car, config })
+          .condition,
       } as TMoveStraight,
-      moveO: {
+      move8thSteer: {
         type: () => EMoveType.Steer,
         steeringWheelAngle: ELock.Center,
       },
-      moveP: {
-        type: this.getMoveP({ manoeuvre, street, car, config }).type,
-        fwdOrReverseFn: this.getMoveP({ manoeuvre, street, car, config })
-          .fwdOrReverseFn,
-        deltaAngleFn: this.getMoveP({ manoeuvre, street, car, config })
-          .deltaAngleFn,
-        deltaPositionFn: this.getMoveP({ manoeuvre, street, car, config })
-          .deltaPositionFn,
-        condition: this.getMoveP({ manoeuvre, street, car, config }).condition,
+      move3rdStraight: {
+        type: this.getMove3rdStraight({ manoeuvre, street, car, config }).type,
+        fwdOrReverseFn: this.getMove3rdStraight({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }).fwdOrReverseFn,
+        deltaAngleFn: this.getMove3rdStraight({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }).deltaAngleFn,
+        deltaPositionFn: this.getMove3rdStraight({
+          manoeuvre,
+          street,
+          car,
+          config,
+        }).deltaPositionFn,
+        condition: this.getMove3rdStraight({ manoeuvre, street, car, config })
+          .condition,
       } as TMoveStraight,
     };
 

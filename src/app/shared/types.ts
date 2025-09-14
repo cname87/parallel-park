@@ -338,19 +338,22 @@ export type TSteer = {
 export type TMove = TSteer | TMoveStraight | TMoveArc | TMoveStraightOrArc;
 
 export type TMovie = {
-  moveFirstSteer: TSteer;
-  moveB: TMoveStraight;
-  moveC: TSteer;
-  moveD: TMoveArc;
-  moveE: TSteer;
-  moveF: TMoveStraight | TMoveArc;
-  moveG: TSteer;
-  moveH: TMoveArc;
-  moveI: TSteer;
-  moveJ: TMoveArc;
-  moveK: TSteer;
-  moveL: TMoveStraight | TMoveArc;
-  moveM: TSteer;
+  move1stSteer: TSteer;
+  move1stStraight: TMoveStraight;
+  move2ndSteer: TSteer;
+  move1stArc: TMoveArc;
+  move3rdSteer: TSteer;
+  move2ndStraight: TMoveStraight;
+  move4thSteer: TSteer;
+  move2ndArc: TMoveArc;
+  move5thSteer: TSteer;
+  move3rdArc: TMoveArc;
+  move6thSteer: TSteer;
+  move4thArc: TMoveStraight | TMoveArc;
+  move7thSteer: TSteer;
+  move5thArc: TMoveStraight | TMoveArc;
+  move8thSteer: TSteer;
+  move3rdStraight: TMoveStraight;
   [key: string]: TSteer | TMoveStraight | TMoveArc;
 };
 

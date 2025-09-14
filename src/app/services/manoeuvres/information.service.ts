@@ -35,8 +35,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveFirstSteerMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveFirstSteerMessage called`, LoggingLevel.TRACE);
+  getMove1stSteerMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMove1stSteerMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -127,8 +127,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveBMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveBMessage called`, LoggingLevel.TRACE);
+  getMove1stStraightMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMove1stStraightMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -168,8 +168,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveDMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveDMessage called`, LoggingLevel.TRACE);
+  getMove1stArcMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMove1stArcMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -185,7 +185,7 @@ export class InformationService {
         return {
           message:
             'Rule 2: Rotate until the inner side of the car is inline with a point ' +
-            this.rules.r1_moveDProjectedDistFromRearCar *
+            this.rules.r1_Move1stArcProjectedDistFromRearCar *
               this.config.distScale +
             'mm forward of the parked rear car',
           snackConfig: {
@@ -219,8 +219,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveFMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveFMessage called`, LoggingLevel.TRACE);
+  getMove2ndStraightMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMove2ndStraightMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -262,8 +262,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveHMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveHMessage called`, LoggingLevel.TRACE);
+  getMove2ndArcMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMove2ndArcMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -301,8 +301,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveIMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveIMessage called`, LoggingLevel.TRACE);
+  getMove3rdArcMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`get3rdArcMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:
@@ -340,8 +340,8 @@ export class InformationService {
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  getMoveLMessage = ({ manoeuvre }: IParams): ISnackOpen => {
-    this.logger.log(`getMoveLMessage called`, LoggingLevel.TRACE);
+  getMove4thArcMessage = ({ manoeuvre }: IParams): ISnackOpen => {
+    this.logger.log(`getMove4thArcMessage called`, LoggingLevel.TRACE);
 
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate0Straight:

@@ -153,6 +153,8 @@ export class StreetService {
   ): void {
     this.logger.log('drawCarInternals', LoggingLevel.TRACE);
 
+    const minCarLengthForTwoAxles = 50;
+
     /* Draw the front V pattern */
     carShape.graphics
       .beginStroke(this.internalCarColor)
@@ -169,13 +171,6 @@ export class StreetService {
       .setStrokeStyle(0.5)
       .moveTo(carLeft, carTop + carWidth / 2)
       .lineTo(carLeft + carLength, carTop + carWidth / 2);
-
-    /* Draw the rear axle */
-    carShape.graphics
-      .beginStroke(this.internalCarColor)
-      .setStrokeStyle(0.5)
-      .moveTo(carLeft + (1.5 * carLength) / 8, carTop)
-      .lineTo(carLeft + (1.5 * carLength) / 8, carTop + carWidth);
 
     /* Draw the front axle */
     carShape.graphics
@@ -206,27 +201,36 @@ export class StreetService {
         this.wheelWidth,
       );
 
-    /* Draw the rear port wheel */
-    carShape.graphics
-      .beginFill(this.internalCarColor)
-      .setStrokeStyle(0)
-      .rect(
-        carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
-        carTop + 1.5,
-        -this.wheelLength,
-        this.wheelWidth,
-      );
+    if (carLength > minCarLengthForTwoAxles) {
+      /* Draw the rear axle */
+      carShape.graphics
+        .beginStroke(this.internalCarColor)
+        .setStrokeStyle(0.5)
+        .moveTo(carLeft + (1.5 * carLength) / 8, carTop)
+        .lineTo(carLeft + (1.5 * carLength) / 8, carTop + carWidth);
 
-    /* Draw the rear starboard wheel */
-    carShape.graphics
-      .beginFill(this.internalCarColor)
-      .setStrokeStyle(0)
-      .rect(
-        carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
-        carTop + carWidth - this.wheelWidth - 1.5,
-        -this.wheelLength,
-        this.wheelWidth,
-      );
+      /* Draw the rear port wheel */
+      carShape.graphics
+        .beginFill(this.internalCarColor)
+        .setStrokeStyle(0)
+        .rect(
+          carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
+          carTop + 1.5,
+          -this.wheelLength,
+          this.wheelWidth,
+        );
+
+      /* Draw the rear starboard wheel */
+      carShape.graphics
+        .beginFill(this.internalCarColor)
+        .setStrokeStyle(0)
+        .rect(
+          carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
+          carTop + carWidth - this.wheelWidth - 1.5,
+          -this.wheelLength,
+          this.wheelWidth,
+        );
+    }
   }
 
   /**
