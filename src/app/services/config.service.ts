@@ -24,8 +24,9 @@ export class ConfigService {
    * * Dimensions
    *
    * Canvas Dimensions are set in index.html:
-   * - Set width to 800 pixels and height to 400 pixels.
+   * - Set width to 800 pixels and height to 500 pixels.
    * The canvas width represents 16m actual distance so therefore each pixel represents 16000 / 800 = 20mm.
+   * The canvas height represents 10m actual distance so therefore each pixel represents 10000 / 500 = 20mm.
    * Because distances are input in mm, and each pixel equals 20mm, the factor to scale input distances in mm to pixels is 20.
    * Also print a grid with a grid scale of 5, i.e. each small grid box represents 5 pixels x 5 pixels, or 0.1m x 0,1.m, and each large grid box, which is 10 x 10 small boxes, represents 1m x 1m.
    * Run all animations at 100 frames per minute.

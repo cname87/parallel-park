@@ -12,21 +12,23 @@
   <!-- Material Icons fallback for online use -->
   <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet"> -->
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: auto;
+    }
     canvas {
-      left: 0px;
-      top: 0px;
-      width: 100%;
-      height: 100%;
-      margin: 0px;
+      width: 100vw;
+      height: 62.5vw; /* 500/800 = 0.625, maintains 16:10 aspect ratio */
+      display: block;
+      margin: 0;
       border: 0;
-      overflow: hidden; /*  Disable scrollbars */
-      display: block;  /* No floating content on sides */
     }
   </style>
 </head>
 <body>
   <app-root></app-root>
-  <canvas width="800" height="400" id="canvas">
+  <canvas width="800" height="500" id="canvas">
   Sorry! Your browser does not support the canvas drawing element.
   </canvas>
 </body>
