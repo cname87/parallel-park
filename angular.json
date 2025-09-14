@@ -36,6 +36,7 @@
               "src/styles/themes.scss"
             ],
             "scripts": [],
+            "sourceMap": true,
             "allowedCommonJsDependencies": [
               "createjs-module"
             ]
@@ -50,7 +51,7 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,

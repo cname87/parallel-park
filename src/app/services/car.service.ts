@@ -647,10 +647,10 @@ export class CarService {
   }
 
   /**
-   * Updates the car dimensions.
-   * @param car An object holding the car dimensions.  All input distances are real-world distances in mm and are reduced by a factor to convert mm to pixels before being stored.
+   * Updates the car dimensions from a scenario car configuration.
+   * @param car An object holding the scenario car dimensions.  All scenario distances are real-world distances in mm and are scaled by a factor to convert mm to pixels before being stored.
    */
-  public update(car: TCarSetup): void {
+  public setCarFromScenario(car: TCarSetup): void {
     this.minTurningRadius = car.minTurningRadius / this.config.distScale;
     this.rearOverhang = car.rearOverhang / this.config.distScale;
     this.wheelbase = car.wheelbase / this.config.distScale;

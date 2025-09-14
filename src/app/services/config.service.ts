@@ -46,25 +46,24 @@ export class ConfigService {
 
   /* All street defaults */
   defaultStreetType: 'parallel' | 'bay' = 'parallel';
+  defaultRearCarFromTop = 150 / this.distScale;
   defaultRearCarLength = 1000 / this.distScale;
   defaultRearCarWidth = 1904 / this.distScale;
   defaultRearCarFromLeft = 0 / this.distScale;
+  defaultFrontCarFromLeft = 8000 / this.distScale;
+  defaultFrontCarFromTop = 150 / this.distScale;
   defaultFrontCarLength = 5290 / this.distScale;
   defaultFrontCarWidth = 1904 / this.distScale;
   defaultCarFromKerb = 150 / this.distScale;
-  /* My reversing beeper goes solid at ~250mm but need to go to 150mm for bay parking */
   /* Note: Do not exceed this.maxSafetyGap */
   defaultSafetyGap = 150 / this.distScale;
 
   /* The parking space gap */
-  defaultExtraParkingSpace = 1000 / this.distScale;
+  defaultExtraParkingSpace = 1500 / this.distScale;
   defaultParkingSpaceLength =
     this.defaultSafetyGap * 2 +
     this.defaultExtraParkingSpace +
     this.defaultFrontCarLength;
-
-  /* All bay size defaults */
-  defaultBayWidth = 2400 / this.distScale;
 
   /* All car size defaults */
   defaultRearOverhang = 996 / this.distScale;

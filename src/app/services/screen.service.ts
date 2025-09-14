@@ -80,17 +80,17 @@ export class ScreenService {
     this.config.stage.removeAllChildren();
     this.config.stage.update();
 
-    /* Modify the car instance to contain the properties of a chosen car */
-    this.car.update(this.objects[scenario.carSetup]);
-
-    /* Modify the street instance to contain the properties of the basic street.
-    Note: The parking space length may be zero and therefore set later. */
-    this.street.updateStreet(this.objects[scenario.streetSetup]);
-
     /* Print the grid */
     this.grid.createGrid();
 
-    /* Run the parking calculations getting a manoeuvre containing set of moves. The returned object contains the parking space length, the start position and the set of moves. */
+    /* Modify the car instance to contain the properties of the scenario car */
+    this.car.setCarFromScenario(this.objects[scenario.carSetup]);
+
+    /* Modify the street instance to contain the properties of the scenario street.
+    Note: The parking space length may be zero and therefore set later. */
+    this.street.setStreetFromScenario(this.objects[scenario.streetSetup]);
+
+    /* Run the parking calculations getting a manoeuvre containing set of moves. The returned object contains a calculated parking space length, the start position and the set of moves. */
     const manoeuvre = this.manoeuvre.getManoeuvre({
       manoeuvre: scenario.manoeuvre,
       street: this.street,
@@ -99,13 +99,10 @@ export class ScreenService {
     });
 
     /* Override the parking space length from the manoeuvre - the street parkingSpaceLength is used for Keyboard mode only. */
-    this.street.parkingSpaceLength = manoeuvre.parkingSpaceLength;
+    this.street.updateStreetParkingSpace(manoeuvre.parkingSpaceLength);
 
-    /* Print the street layout setting the parking space length */
-    this.street.drawStreet({
-      type: this.street.type,
-      parkingSpaceLength: this.street.parkingSpaceLength,
-    });
+    /* Draw the street layout setting the parking space length */
+    this.street.drawStreet();
 
     /* Print the axis values (on top of the street) */
     this.grid.addAxesValues();

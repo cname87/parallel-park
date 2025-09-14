@@ -232,7 +232,7 @@ export class RulesService {
       return collision || isHorizontal;
     };
 
-    /* Keep turning the wheels until clockwise, stopping in the center position only if the car is horizontal */
+    /* Keep turning the wheels until clockwise, staying in the center position only if the car is horizontal */
     const moveKCondition = (carInUse: CarService) => {
       const isHorizontal = Math.abs(carInUse.carRotation) < horizontalTestAngle;
       return isHorizontal && Math.abs(carInUse.frontPortWheelRotation) < 0.01

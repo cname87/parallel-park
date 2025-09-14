@@ -30,11 +30,12 @@
       "label": "Serve Application",
       "type": "shell",
       "command": "npm",
+      /* Serves without opening Chrome as VSCode debugger opens Chrome */
       "args": [
         "run",
         "--prefix",
         "${workspaceFolder}/",
-        "serve:dev"
+        "serve:dev-debug"
       ],
       "group": {
         "kind": "build",
@@ -56,7 +57,7 @@
             "regexp": "(.*?)"
           },
           "endsPattern": {
-            "regexp": "Application bundle generation complete.|Application bundle generation failed."
+            "regexp": "(Angular Live Development Server is listening on localhost:\\d+)|(✖ Failed to compile)|(Error: .*)"
           }
         }
       }
@@ -67,11 +68,10 @@
       "label": "Taskkill node.exe",
       "type": "shell",
       "windows": {
-        "command": "TASKKILL",
+        "command": "cmd",
         "args": [
-          "/IM",
-          "node.exe",
-          "/F"
+          "/c",
+          "TASKKILL /IM node.exe /F || echo No node.exe processes found"
         ]
       },
       "linux": {

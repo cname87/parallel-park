@@ -43,12 +43,19 @@ export class StreetService {
     };
   }
   public get frontCarCorner(): TPoint {
-    return {
-      x: this.frontCarFromLeft,
-      y: this.frontCarFromTop,
-    };
+    if (this.type === 'parallel') {
+      return {
+        x: this.frontCarFromLeft,
+        y: this.frontCarFromTop + this.frontCarWidth,
+      };
+    } else if (this.type === 'bay') {
+      return {
+        x: this.frontCarFromLeft + this.frontCarLength,
+        y: this.frontCarFromTop,
+      };
+    }
+    throw new Error('Invalid street type');
   }
-
   constructor(
     private config: ConfigService,
     private logger: LoggerService,
@@ -57,12 +64,12 @@ export class StreetService {
 
     this.type = this.config.defaultStreetType;
     /* Note: Default values are in unscaled units */
-    this.rearCarFromTop = 10; // this.config.defaultRearCarFromTop;
+    this.rearCarFromTop = this.config.defaultRearCarFromTop;
     this.rearCarLength = this.config.defaultRearCarLength;
     this.rearCarWidth = this.config.defaultRearCarWidth;
     this.rearCarFromLeft = this.config.defaultRearCarFromLeft;
-    this.frontCarFromLeft = 10; // this.config.defaultFrontCarFromLeft;
-    this.frontCarFromTop = 10; // this.config.defaultFrontCarFromTop;
+    this.frontCarFromLeft = this.config.defaultFrontCarFromLeft;
+    this.frontCarFromTop = this.config.defaultFrontCarFromTop;
     this.frontCarLength = this.config.defaultFrontCarLength;
     this.frontCarWidth = this.config.defaultFrontCarWidth;
     this.carFromKerb = this.config.defaultCarFromKerb;
@@ -76,7 +83,11 @@ export class StreetService {
   public rearCarGap = new createjs.Shape();
   public frontCarGap = new createjs.Shape();
 
-  public updateStreet({
+  /**
+   * Sets the street configuration from a scenario street setup. All scenario distances are real-world distances in mm and are scaled by a factor to convert mm to pixels before being stored.
+   * @param param0 - A scenario street configuration
+   */
+  public setStreetFromScenario({
     type,
     rearCarFromLeft,
     rearCarFromTop,
@@ -90,6 +101,8 @@ export class StreetService {
     carFromKerb,
     safetyGap,
   }: Omit<TStreetSetup, 'name'>): void {
+    this.logger.log('setStreetFromScenario called', LoggingLevel.TRACE);
+
     this.type = type;
     /* External updates are unscaled */
     this.rearCarFromLeft = rearCarFromLeft / this.config.distScale;
@@ -103,6 +116,23 @@ export class StreetService {
     this.frontCarWidth = frontCarWidth / this.config.distScale;
     this.carFromKerb = carFromKerb / this.config.distScale;
     this.safetyGap = safetyGap / this.config.distScale;
+  }
+
+  /**
+   * Updates the street configuration .
+   * @param param0 - A scenario street configuration
+   */
+  public updateStreetParkingSpace(parkingSpaceLength: number): void {
+    this.logger.log('updateStreetParkingSpace called', LoggingLevel.TRACE);
+
+    this.parkingSpaceLength = parkingSpaceLength;
+    if (this.type === 'parallel') {
+      this.frontCarFromLeft =
+        this.rearCarFromLeft + this.rearCarLength + this.parkingSpaceLength;
+    } else if (this.type === 'bay') {
+      this.frontCarFromTop =
+        this.rearCarFromTop + this.rearCarWidth + this.parkingSpaceLength;
+    }
   }
 
   /**
@@ -121,6 +151,8 @@ export class StreetService {
     carLength: number,
     carWidth: number,
   ): void {
+    this.logger.log('drawCarInternals', LoggingLevel.TRACE);
+
     /* Draw the front V pattern */
     carShape.graphics
       .beginStroke(this.internalCarColor)
@@ -197,187 +229,72 @@ export class StreetService {
       );
   }
 
-  /* Draw the street based on a provided parking space length */
-  public drawStreet({
-    type,
-    parkingSpaceLength,
-  }: {
-    type: 'parallel' | 'bay';
-    parkingSpaceLength: number;
-  }): void {
-    /* Update parking space length with calculated length */
-    this.type = type;
-    this.parkingSpaceLength = parkingSpaceLength;
+  /**
+   * Private helper method to draw a car with its internals and border
+   * @param carLeft - X position of car
+   * @param carTop - Y position of car
+   * @param carLength - Length of car
+   * @param carWidth - Width of car
+   */
+  private drawCar(
+    carLeft: number,
+    carTop: number,
+    carLength: number,
+    carWidth: number,
+  ): void {
+    this.logger.log('drawCar', LoggingLevel.TRACE);
 
-    /* Create the rear car safety gap shape */
-    this.rearCarGap.set({ regX: 0, regY: 0 });
-    this.rearCarGap.set({ x: 0, y: 0 });
-    this.rearCarGap.alpha = 0.5;
+    /* Create the car shape */
+    const car = new createjs.Shape();
+    car.set({ regX: 0, regY: 0 });
+    car.set({ x: 0, y: 0 });
 
-    if (type === 'parallel') {
-      this.rearCarGap.graphics
-        .beginFill(this.safetyGapColor)
-        .endStroke()
-        .drawRoundRect(
-          this.rearCarFromLeft - this.safetyGap,
-          this.rearCarFromTop - this.safetyGap,
-          this.rearCarLength + 2 * this.safetyGap,
-          this.rearCarWidth + 2 * this.safetyGap,
-          this.safetyGap,
-        );
-      this.rearCarGap.cache(
-        this.rearCarFromLeft - this.safetyGap,
-        this.rearCarFromTop - this.safetyGap,
-        this.rearCarLength + 2 * this.safetyGap,
-        this.rearCarWidth + 2 * this.safetyGap,
-      );
-    } else if (type === 'bay') {
-      this.rearCarGap.graphics
-        .beginFill(this.safetyGapColor)
-        .endStroke()
-        .drawRoundRect(
-          this.rearCarFromLeft - this.safetyGap,
-          this.rearCarFromTop - this.safetyGap,
-          this.rearCarLength + 2 * this.safetyGap,
-          this.rearCarWidth + 2 * this.safetyGap,
-          this.safetyGap,
-        );
-      this.rearCarGap.cache(
-        this.rearCarFromLeft - this.safetyGap,
-        this.rearCarFromTop - this.safetyGap,
-        this.rearCarLength + 2 * this.safetyGap,
-        this.rearCarWidth + 2 * this.safetyGap,
-      );
-    }
-    this.config.stage.addChild(this.rearCarGap);
-
-    /* Create the rear car shape */
-    const rearCar = new createjs.Shape();
-    rearCar.set({ regX: 0, regY: 0 });
-    rearCar.set({ x: 0, y: 0 });
-
-    rearCar.graphics.beginFill(this.carColor).endStroke().rect(
-      /**
-       * Sets the co-ordinates of the top left hand corner of the Graphic based on the Shape position as determined above.
-       */
-      this.rearCarFromLeft,
-      this.rearCarFromTop,
-      this.rearCarLength,
-      this.rearCarWidth,
+    car.graphics.beginFill(this.carColor).endStroke().rect(
+      /* Sets the co-ordinates of the top left hand corner of the Graphic based on the Shape position as determined above. */
+      carLeft,
+      carTop,
+      carLength,
+      carWidth,
     );
 
-    this.drawCarInternals(
-      rearCar,
-      this.rearCarFromLeft,
-      this.rearCarFromTop,
-      this.rearCarLength,
-      this.rearCarWidth,
-    );
+    this.drawCarInternals(car, carLeft, carTop, carLength, carWidth);
 
-    rearCar.cache(
-      this.rearCarFromLeft,
-      this.rearCarFromTop,
-      this.rearCarLength,
-      this.rearCarWidth,
-    );
-    this.config.stage.addChild(rearCar);
+    car.cache(carLeft, carTop, carLength, carWidth);
+    this.config.stage.addChild(car);
 
     /* Add a separate uncached border so its not smudged */
-    const rearCarBorder = new createjs.Shape();
-    rearCarBorder.set({ regX: 0, regY: 0 });
-    rearCarBorder.set({ x: 0, y: 0 });
-    rearCarBorder.graphics
+    const carBorder = new createjs.Shape();
+    carBorder.set({ regX: 0, regY: 0 });
+    carBorder.set({ x: 0, y: 0 });
+    carBorder.graphics
       .endFill()
       .beginStroke(this.borderColor)
-      .rect(
-        this.rearCarFromLeft,
-        this.rearCarFromTop,
-        this.rearCarLength,
-        this.rearCarWidth,
-      );
-    this.config.stage.addChild(rearCarBorder);
+      .rect(carLeft, carTop, carLength, carWidth);
+    this.config.stage.addChild(carBorder);
+  }
 
-    /* Create the front car safetey gap shape */
-    this.frontCarGap.set({ regX: 0, regY: 0 });
-    this.frontCarGap.set({ x: 0, y: 0 });
-    this.frontCarGap.alpha = 0.5;
+  /**
+   * Draw the street based on a provided parking space length
+   * @param type - Type of parking ('parallel' or 'bay')
+   * @param parkingSpaceLength - Length of the parking space
+   */
+  public drawStreet(): void {
+    this.logger.log('drawStreet', LoggingLevel.TRACE);
 
-    if (type === 'parallel') {
-      this.frontCarGap.graphics
-        .beginFill(this.safetyGapColor)
-        .endStroke()
-        .drawRoundRect(
-          this.frontCarFromLeft - this.safetyGap,
-          this.frontCarFromTop - this.safetyGap,
-          this.frontCarLength + 2 * this.safetyGap,
-          this.frontCarWidth + 2 * this.safetyGap,
-          this.safetyGap,
-        );
-      this.frontCarGap.cache(
-        this.frontCarFromLeft - this.safetyGap,
-        this.frontCarFromTop - this.safetyGap,
-        this.frontCarLength + 2 * this.safetyGap,
-        this.frontCarWidth + 2 * this.safetyGap,
-        this.safetyGap,
-      );
-    } else if (type === 'bay') {
-      this.frontCarGap.graphics
-        .beginFill(this.safetyGapColor)
-        .endStroke()
-        .drawRoundRect(
-          this.rearCarFromLeft - this.safetyGap,
-          this.frontCarFromTop - this.safetyGap,
-          this.rearCarLength + 2 * this.safetyGap,
-          this.rearCarWidth + 2 * this.safetyGap,
-          this.safetyGap,
-        );
-      this.frontCarGap.cache(
-        this.rearCarFromLeft - this.safetyGap,
-        this.frontCarFromTop - this.safetyGap,
-        this.rearCarLength + 2 * this.safetyGap,
-        this.rearCarWidth + 2 * this.safetyGap,
-      );
-    }
-    this.config.stage.addChild(this.frontCarGap);
-
-    /* Create the front car shape */
-    const frontCar = new createjs.Shape();
-    frontCar.set({ regX: 0, regY: 0 });
-    frontCar.set({ x: 0, y: 0 });
-
-    const frontCarLeft =
-      type === 'bay' ? this.rearCarFromLeft : this.frontCarFromLeft;
-    const frontCarTop =
-      type === 'bay' ? this.frontCarFromTop : this.frontCarFromTop;
-    const frontCarLength =
-      type === 'bay' ? this.rearCarLength : this.frontCarLength;
-    const frontCarWidth =
-      type === 'bay' ? this.rearCarWidth : this.frontCarWidth;
-
-    frontCar.graphics
-      .beginFill(this.carColor)
-      .endStroke()
-      .rect(frontCarLeft, frontCarTop, frontCarLength, frontCarWidth);
-
-    this.drawCarInternals(
-      frontCar,
-      frontCarLeft,
-      frontCarTop,
-      frontCarLength,
-      frontCarWidth,
+    /* Draw the rear car */
+    this.drawCar(
+      this.rearCarFromLeft,
+      this.rearCarFromTop,
+      this.rearCarLength,
+      this.rearCarWidth,
     );
 
-    frontCar.cache(frontCarLeft, frontCarTop, frontCarLength, frontCarWidth);
-    this.config.stage.addChild(frontCar);
-
-    /* Add a separate uncached border so its not smudged */
-    const frontCarBorder = new createjs.Shape();
-    frontCarBorder.set({ regX: 0, regY: 0 });
-    frontCarBorder.set({ x: 0, y: 0 });
-    frontCarBorder.graphics
-      .endFill()
-      .beginStroke(this.borderColor)
-      .rect(frontCarLeft, frontCarTop, frontCarLength, frontCarWidth);
-    this.config.stage.addChild(frontCarBorder);
+    /* Draw the front car */
+    this.drawCar(
+      this.frontCarFromLeft,
+      this.frontCarFromTop,
+      this.frontCarLength,
+      this.frontCarWidth,
+    );
   }
 }

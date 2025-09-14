@@ -72,7 +72,7 @@ export class ManoeuvreComponent implements OnInit, OnDestroy {
         EManoeuvre.Park2Rotate1StraightMinAngle,
     };
     this.bayManoeuvreInitialValue = {
-      [this.FORM_FIELD_NAMES.manoeuvre]: EDistOut.Out_500mm,
+      [this.FORM_FIELD_NAMES.manoeuvre]: EManoeuvre.BayPark1,
     };
     this.keyManoeuvreInitialValue = {
       [this.FORM_FIELD_NAMES.manoeuvre]: EDistOut.Out_500mm,
@@ -128,7 +128,6 @@ export class ManoeuvreComponent implements OnInit, OnDestroy {
           }
           /* Or handle keyboard mode */
         } else if (runMode === ERunMode.Keyboard) {
-          console.log('Setting distances out');
           this.manoeuvres = this.objects.distancesOut;
           this.manoeuvreForm.setValue({
             [this.FORM_FIELD_NAMES.manoeuvre]:

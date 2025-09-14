@@ -9,6 +9,7 @@
     "ngBuild:prod": "ng run parallel-park:build:production",
     "build:dev": "npm-run-all prettier:all eslint:all ngBuild:dev",
     "build:prod": "npm-run-all prettier:all eslint:all ngBuild:prod",
+    "serve:dev-debug": "ng run parallel-park:serve",
     "serve:dev": "ng run parallel-park:serve --open",
     "serve:prod": "ng run parallel-park:serve:production --open",
     "deploy": "./deploy.sh"

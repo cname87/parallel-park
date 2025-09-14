@@ -20,24 +20,28 @@
         "runtimeExecutable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       },
       "runtimeArgs": [
-        "--incognito",
+        // "--incognito",
         "--start-maximized",
-        "--new-window"
+        "--remote-debugging-port=9222",
+        "--enable-features=DevToolsWellKnown,DevToolsAutomaticFileSystems"
       ],
       "userDataDir": true,
       "url": "http://localhost:4200/",
       // tell vscode where to find scripts on the server
-      "webRoot": "${workspaceFolder}/dist",
+      "webRoot": "${workspaceFolder}",
       "pathMapping": {
-        "/": "${workspaceFolder}/dist/",
+        "/": "${workspaceFolder}/",
+        "/*": "${workspaceFolder}/*"
       },
       "sourceMapPathOverrides": {
         "webpack:///./*": "${workspaceFolder}/*",
+        "webpack:///src/*": "${workspaceFolder}/src/*"
       },
       "smartStep": false,
       "disableNetworkCache": true,
       "showAsyncStacks": true,
       "sourceMaps": true,
+      "trace": true,
     },
   ],
 }

@@ -1415,7 +1415,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveISteerCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMoveICondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1543,15 +1543,15 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveKSteerCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMoveKCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park3Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate1StraightSetManual:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-        /* These manoeuvres are not stopped by the condition function */
-        return () => false;
+        /* These manoeuvres skip this steering and stay centered */
+        return () => true;
       case EManoeuvre.Park4UsingRules1:
       case EManoeuvre.Park4UsingRules2:
       case EManoeuvre.BayPark1:
@@ -1654,7 +1654,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TCondition => {
-    this.logger.log('getMoveMSteerCondition called', LoggingLevel.TRACE);
+    this.logger.log('getMoveMCondition called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1687,7 +1687,7 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TMoveStraight | TMoveStraightOrArc => {
-    this.logger.log('getMoveL called', LoggingLevel.TRACE);
+    this.logger.log('getMoveN called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1727,17 +1727,11 @@ export class ManoeuvreService {
     car,
     config,
   }: IParams): TMoveStraight | TMoveStraightOrArc => {
-    this.logger.log('getMoveL called', LoggingLevel.TRACE);
+    this.logger.log('getMoveP called', LoggingLevel.TRACE);
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
       case EManoeuvre.Park2Rotate1StraightFixedStart:
-        return {
-          type: () => EMoveType.MoveStraight,
-          fwdOrReverseFn: () => EDirection.Forward,
-          deltaPositionFn: () =>
-            this.getExtraParkingSpace({ manoeuvre, street, car, config }) / 2,
-        };
       case EManoeuvre.Park2Rotate1StraightSetManual:
         return {
           type: () => EMoveType.MoveStraight,
