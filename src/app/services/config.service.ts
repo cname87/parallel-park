@@ -175,6 +175,16 @@ export class ConfigService {
   /* All button texts in a cloned Map */
   allButtonTexts = new Map(this.manualModeRunTexts).set('main', 'RUN');
 
+  /* Default distance from manoeuvre start position for keyboard mode */
+  defaultKeyboardModeStartDistFromRearToPivot = 1000;
+
+  /* Distances in mm for the setManual manoeuvre */
+  setManualExtraParkingSpace = 2000;
+  setManualMinKerbDistance = this.defaultCarFromKerb;
+  setManualFirstTurnAngle = 25.0; // degrees
+  setManualStartDistFromRearToPivot = 600;
+  setManualStartDistSideToPivot = 250;
+
   constructor(@Inject(DOCUMENT) private document: Document) {
     /* Read canvas from index.html */
     this.canvas = this.document.getElementById('canvas') as HTMLCanvasElement;

@@ -3,11 +3,13 @@ import * as createjs from 'createjs-module';
 import {
   ELock,
   ERotateDirection,
+  LoggingLevel,
   TCarSetup,
   TPoint,
   TSteeringAngle,
 } from '../shared/types';
 import { ConfigService } from './config.service';
+import { LoggerService } from './logger.service';
 
 /**
  * Defines the car as displayed on the grid.
@@ -60,7 +62,10 @@ export class CarService {
   private circleOfRotationShape = new createjs.Shape();
   private shadowCarShape = new createjs.Shape();
 
-  constructor(private config: ConfigService) {
+  constructor(
+    private config: ConfigService,
+    private logger: LoggerService,
+  ) {
     this.minTurningRadius = config.defaultMinTurningRadius;
     this.rearOverhang = config.defaultRearOverhang;
     this.wheelbase = config.defaultWheelbase;
@@ -673,7 +678,7 @@ export class CarService {
   /**
    * Draws a car on the canvas.  This includes the car createjs container with all the constituent createjs shapes.
    * @param startPosition The x & y coordinates (world) for the front starboard corner (pivot).
-   * @param initialAngleRads Optional initial world angle for the car container (default 0).
+   * @param initialAngleRads Optional initial angle (clockwise positive) for the car container (default 0).
    */
   public draw(startPosition: TPoint, initialAngleRads: number = 0): void {
     //
@@ -706,6 +711,14 @@ export class CarService {
     });
 
     // Compute the local position (in container space) of the desired world front-starboard corner
+    this.logger.log(
+      'CarService.draw: front starboard corner at (' +
+        startPosition.x +
+        ', ' +
+        startPosition.y +
+        ')',
+      LoggingLevel.DEBUG,
+    );
     const frontStarboardStartLocal = this.carContainer.globalToLocal(
       startPosition.x,
       startPosition.y,

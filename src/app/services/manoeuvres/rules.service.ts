@@ -87,7 +87,7 @@ export class RulesService {
     /* The switch statement sets different rules for each manoeuvre */
     switch (manoeuvre) {
       case EManoeuvre.Park4UsingRules1:
-        /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
+        /* The starting rear bumper x-axis position to the PP is the safety gap + a constant */
         startDistXToPivot =
           this.r1_startDistXToRearCarBumper + street.safetyGap;
         /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. This is the most critical move in the manoeuvre. */
