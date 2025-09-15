@@ -713,9 +713,9 @@ export class CarService {
     // Compute the local position (in container space) of the desired world front-starboard corner
     this.logger.log(
       'CarService.draw: front starboard corner at (' +
-        startPosition.x +
+        startPosition.x * this.config.distScale +
         ', ' +
-        startPosition.y +
+        startPosition.y * this.config.distScale +
         ')',
       LoggingLevel.DEBUG,
     );

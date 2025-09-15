@@ -219,7 +219,7 @@ export class ManoeuvreService {
         const numerator = Math.pow(rb, 2) - Math.pow(rc, 2) - Math.pow(m, 2);
         const denominator = 2 * rc * Math.sqrt(Math.pow(m, 2) + Math.pow(n, 2));
         const angle = Math.asin(numerator / denominator) + Math.atan(m / n);
-        this.logger.log(`Collision angle: ${angle}`, LoggingLevel.TRACE);
+        this.logger.log(`Collision angle: ${angle}`, LoggingLevel.DEBUG);
         return angle;
       case EManoeuvre.Park4UsingRules1:
       case EManoeuvre.Park4UsingRules2:
@@ -396,7 +396,10 @@ export class ManoeuvreService {
           });
           const parkingSpace =
             2 * street.safetyGap + car.length + extraParkingSpace;
-          this.logger.log(`Parking space: ${parkingSpace}`, LoggingLevel.TRACE);
+          this.logger.log(
+            `Parking space: (${parkingSpace}`,
+            LoggingLevel.TRACE,
+          );
           return parkingSpace;
         case EManoeuvre.BayPark1:
           /* Return the bay width set by the chosen street*/
@@ -812,7 +815,8 @@ export class ManoeuvreService {
         this.config.defaultKeyboardModeStartDistFromRearToPivot /
         config.distScale;
       this.logger.log(
-        `Keyboard mode - start distance from rear to pivot: ${value}`,
+        `Dist from rear to pivot when 1st arc move starts: ` +
+          `${value * config.distScale} (default for keyboard mode)`,
         LoggingLevel.DEBUG,
       );
       return value;
@@ -908,8 +912,9 @@ export class ManoeuvreService {
         throw new Error('Unexpected manoeuvre');
     }
     this.logger.log(
-      `Start dist from rear to pivot: ${value}`,
-      LoggingLevel.TRACE,
+      'Dist from rear to pivot when 1st arc move starts: ' +
+        `${value * config.distScale}`,
+      LoggingLevel.DEBUG,
     );
     return value;
   };
@@ -936,7 +941,8 @@ export class ManoeuvreService {
       const value =
         this.objects[manoeuvre as EDistOut].distance / config.distScale;
       this.logger.log(
-        `Keyboard mode - start distance from side to pivot: ${value}`,
+        `Dist from side to pivot when 1st arc move starts: ` +
+          `${value * config.distScale}`,
         LoggingLevel.DEBUG,
       );
       return value;
@@ -1027,8 +1033,9 @@ export class ManoeuvreService {
         throw new Error('Unexpected manoeuvre');
     }
     this.logger.log(
-      `Start dist from side to pivot: ${value}`,
-      LoggingLevel.TRACE,
+      'Dist from side to pivot when 1st arc move starts: ' +
+        `${value * config.distScale}`,
+      LoggingLevel.DEBUG,
     );
     return value;
   };
@@ -1053,6 +1060,12 @@ export class ManoeuvreService {
     this.logger.log('getPivot called', LoggingLevel.TRACE);
 
     let value = {} as TPoint;
+    const parkingSpace = this.getParkingSpace({
+      manoeuvre,
+      street,
+      car,
+      config,
+    });
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1061,12 +1074,6 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park4UsingRules1:
       case EManoeuvre.Park4UsingRules2:
-        const parkingSpace = this.getParkingSpace({
-          manoeuvre,
-          street,
-          car,
-          config,
-        });
         const fromKerb = this.getPivotPointFromKerb({
           manoeuvre,
           street,
@@ -1085,21 +1092,28 @@ export class ManoeuvreService {
         break;
       case EManoeuvre.BayPark1:
         value = {
-          /* The PP is offset from the x-axis by the rear car distance from and the parking space less a safety gap. */
-          x:
+          /* The PP is offset from the x-axis (kerb) by the rear car distance from the x-axis + the front car length + the safety gap. */
+          x: street.frontCarFromLeft + street.frontCarLength + street.safetyGap,
+          /* The PP is offset from the y-axis by the front car's distance
+          from the kerb, its width, the parking space and the safety gap. */
+          y:
             street.rearCarFromTop +
             street.rearCarWidth +
-            this.getParkingSpace({ manoeuvre, street, car, config }) -
+            parkingSpace -
             street.safetyGap,
-          /* The PP is offset from the kerb (y-axis) by the front car's distance
-          from the kerb, its width, and the safety gap. */
-          y: street.frontCarFromLeft + street.frontCarWidth,
         };
         break;
       default:
         throw new Error('Unexpected manoeuvre');
     }
-    this.logger.log(`Pivot Point: ${value}`, LoggingLevel.DEBUG);
+    this.logger.log(
+      'Pivot Point: (' +
+        value.x * config.distScale +
+        ',' +
+        value.y * config.distScale +
+        ')',
+      LoggingLevel.DEBUG,
+    );
     return value;
   };
 
@@ -1131,14 +1145,19 @@ export class ManoeuvreService {
 
     /* The gap between a calculated manoeuvre start position and where the car is placed for the start of the parking attempt */
     const startGap = config.defaultCarOuterCornerStartFromPP;
-    this.logger.log(`Start gap from pivot: ${startGap}`, LoggingLevel.DEBUG);
+    this.logger.log(
+      `Added gap from start position to pivot: ${startGap * config.distScale}`,
+      LoggingLevel.DEBUG,
+    );
 
     const value = {
       x: car.length + startDistx + startGap,
       y: car.width + startDisty,
     };
     this.logger.log(
-      `Start position relative to pivot: ${value}`,
+      `Start position relative to pivot: (${
+        value.x * config.distScale
+      },${value.y * config.distScale})`,
       LoggingLevel.DEBUG,
     );
     return value;
@@ -1164,16 +1183,19 @@ export class ManoeuvreService {
       car,
       config,
     });
-    this.logger.log(
-      `Starting position relative to pivot: ${startRelativePosition}`,
-      LoggingLevel.DEBUG,
-    );
 
     const value = {
       x: pivotPoint.x + startRelativePosition.x,
       y: pivotPoint.y + startRelativePosition.y,
     };
-    this.logger.log(`Starting position: ${value}`, LoggingLevel.DEBUG);
+    this.logger.log(
+      'Starting position: (' +
+        value.x * config.distScale +
+        ',' +
+        value.y * config.distScale +
+        ')',
+      LoggingLevel.DEBUG,
+    );
     return value;
   };
 

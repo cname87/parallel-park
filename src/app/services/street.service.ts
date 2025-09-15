@@ -234,21 +234,87 @@ export class StreetService {
   }
 
   /**
+   * Private helper method to draw car internal details (axles, wheels, V-pattern)
+   * @param shape - The CreateJS Shape to draw on
+   * @param carLeft - X position of car
+   * @param carTop - Y position of car
+   * @param carLength - Length of car
+   * @param carWidth - Width of car
+   * @param carType - Type of car ('rear' or 'front') to determine drawing pattern
+   */
+  private drawSafetyGaps(
+    shape: createjs.Shape,
+    carLeft: number,
+    carTop: number,
+    carLength: number,
+    carWidth: number,
+  ): createjs.Shape {
+    this.logger.log('drawSafetyGaps', LoggingLevel.TRACE);
+
+    /* Create the front car safetey gap shape */
+    shape.set({ regX: 0, regY: 0 });
+    shape.set({ x: 0, y: 0 });
+    shape.alpha = 0.5;
+
+    shape.graphics
+      .beginFill(this.safetyGapColor)
+      .endStroke()
+      .drawRoundRect(
+        carLeft - this.safetyGap,
+        carTop - this.safetyGap,
+        carLength + 2 * this.safetyGap,
+        carWidth + 2 * this.safetyGap,
+        this.safetyGap,
+      );
+    shape.cache(
+      carLeft - this.safetyGap,
+      carTop - this.safetyGap,
+      carLength + 2 * this.safetyGap,
+      carWidth + 2 * this.safetyGap,
+      this.safetyGap,
+    );
+    return shape;
+  }
+
+  /**
    * Private helper method to draw a car with its internals and border
    * @param carLeft - X position of car
    * @param carTop - Y position of car
    * @param carLength - Length of car
    * @param carWidth - Width of car
+   * @param carType - Type of car ('rear' or 'front') to create appropriate safety gap
    */
   private drawCar(
     carLeft: number,
     carTop: number,
     carLength: number,
     carWidth: number,
+    carType: 'rear' | 'front',
   ): void {
     this.logger.log('drawCar', LoggingLevel.TRACE);
 
-    /* Create the car shape */
+    /* Draw safety gap first (behind the car) so only outer edges show */
+    if (carType === 'front') {
+      this.frontCarGap = this.drawSafetyGaps(
+        this.frontCarGap,
+        carLeft,
+        carTop,
+        carLength,
+        carWidth,
+      );
+      this.config.stage.addChild(this.frontCarGap);
+    } else if (carType === 'rear') {
+      this.rearCarGap = this.drawSafetyGaps(
+        this.rearCarGap,
+        carLeft,
+        carTop,
+        carLength,
+        carWidth,
+      );
+      this.config.stage.addChild(this.rearCarGap);
+    }
+
+    /* Create the car shape on top of the safety gap */
     const car = new createjs.Shape();
     car.set({ regX: 0, regY: 0 });
     car.set({ x: 0, y: 0 });
@@ -262,7 +328,6 @@ export class StreetService {
     );
 
     this.drawCarInternals(car, carLeft, carTop, carLength, carWidth);
-
     car.cache(carLeft, carTop, carLength, carWidth);
     this.config.stage.addChild(car);
 
@@ -291,6 +356,7 @@ export class StreetService {
       this.rearCarFromTop,
       this.rearCarLength,
       this.rearCarWidth,
+      'rear',
     );
 
     /* Draw the front car */
@@ -299,6 +365,7 @@ export class StreetService {
       this.frontCarFromTop,
       this.frontCarLength,
       this.frontCarWidth,
+      'front',
     );
   }
 }
