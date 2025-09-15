@@ -107,6 +107,7 @@ export interface IManoeuvreForm {
 export interface IPark {
   readonly parkingSpaceLength: number;
   readonly startPosition: TPoint;
+  readonly startAngleRads: number;
   readonly movie: TMovie;
 }
 

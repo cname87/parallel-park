@@ -74,8 +74,7 @@ export class RulesService {
 
     /* Starting distance car side is out from the front car */
     /* The starting side y-axis position to the PP is a fixed default minus the safety gap which meaans the car side is the fixed default distance out from the front car */
-    const startDistYToPivot =
-      this.r1_startDistYToRearCarSide - street.safetyGap;
+    let startDistYToPivot = this.r1_startDistYToRearCarSide - street.safetyGap;
 
     const midPoint =
       street.rearCarFromLeft +
@@ -157,7 +156,9 @@ export class RulesService {
       case EManoeuvre.BayPark1:
         /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
         startDistXToPivot =
-          this.r1_startDistXToRearCarBumper + street.safetyGap;
+          this.r1_startDistXToRearCarBumper + street.safetyGap - car.length;
+        startDistYToPivot = 1000 / config.distScale;
+
         /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. This is the most critical move in the manoeuvre. */
         move1stArcCondition = (carInUse: CarService, _tick: any) => {
           return (

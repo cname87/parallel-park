@@ -343,9 +343,7 @@ export class StreetService {
   }
 
   /**
-   * Draw the street based on a provided parking space length
-   * @param type - Type of parking ('parallel' or 'bay')
-   * @param parkingSpaceLength - Length of the parking space
+   * Draw the parked cars on the canvas
    */
   public drawStreet(): void {
     this.logger.log('drawStreet', LoggingLevel.TRACE);

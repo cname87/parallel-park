@@ -108,7 +108,7 @@ export class ScreenService {
     this.grid.addAxesValues();
 
     /* Add the car to the street in its start position, with an initial angle */
-    this.car.draw({ ...manoeuvre.startPosition }, 0);
+    this.car.draw({ ...manoeuvre.startPosition }, manoeuvre.startAngleRads);
 
     return manoeuvre;
   }

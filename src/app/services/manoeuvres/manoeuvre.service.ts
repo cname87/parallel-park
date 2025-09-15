@@ -16,7 +16,6 @@ import {
   TMovie,
   EDistOut,
 } from '../../shared/types';
-import { CarService } from '../car.service';
 import { ConfigService } from '../config.service';
 import { LoggerService } from '../logger.service';
 import { ObjectsService } from '../objects.service';
@@ -164,7 +163,6 @@ export class ManoeuvreService {
     private logger: LoggerService,
     private info: InformationService,
     private config: ConfigService,
-    private car: CarService,
     private rulesService: RulesService,
     private objects: ObjectsService,
   ) {}
@@ -816,7 +814,7 @@ export class ManoeuvreService {
         config.distScale;
       this.logger.log(
         `Dist from rear to pivot when 1st arc move starts: ` +
-          `${value * config.distScale} (default for keyboard mode)`,
+          `${value * config.distScale}`,
         LoggingLevel.DEBUG,
       );
       return value;
@@ -1199,6 +1197,27 @@ export class ManoeuvreService {
     return value;
   };
 
+  /**
+   * @returns The angle in radians, positive to the clockwise direction, that the car is at when drawn
+   */
+  private getStartAngle = ({ manoeuvre }: IParams): number => {
+    this.logger.log('getStartAngle called', LoggingLevel.TRACE);
+
+    switch (manoeuvre) {
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park4UsingRules1:
+      case EManoeuvre.Park4UsingRules2:
+        return 0;
+      case EManoeuvre.BayPark1:
+        return Math.PI / 2;
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+  };
   /**
    * @returns The distance in scaled units that the car first moves in a straight reverse.
    *
@@ -1953,6 +1972,7 @@ export class ManoeuvreService {
 
     let parkingSpaceLength = 0;
     let startPosition: TPoint = { x: 0, y: 0 };
+    let startAngleRads = 0;
     parkingSpaceLength = this.getParkingSpace({
       manoeuvre,
       street,
@@ -1965,6 +1985,7 @@ export class ManoeuvreService {
       car,
       config,
     });
+    startAngleRads = this.getStartAngle({ manoeuvre, street, car, config });
 
     /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
     const distOutValues = this.objects.distancesOut.map(
@@ -1974,6 +1995,7 @@ export class ManoeuvreService {
       return {
         parkingSpaceLength,
         startPosition,
+        startAngleRads,
         movie: this.createEmptyMovie(),
       };
     }
@@ -2216,6 +2238,7 @@ export class ManoeuvreService {
     return {
       parkingSpaceLength,
       startPosition,
+      startAngleRads,
       movie,
     };
   }
