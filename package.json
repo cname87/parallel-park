@@ -5,12 +5,12 @@
   "scripts": {
     "prettier:all": "prettier --write \"./**/*.ts\" \"./**/*.js\"",
     "eslint:all": "eslint --ext .js,.ts .",
-    "ngBuild:dev": "ng run parallel-park:build",
+    "ngBuild:dev": "ng run parallel-park:build:development",
     "ngBuild:prod": "ng run parallel-park:build:production",
     "build:dev": "npm-run-all prettier:all eslint:all ngBuild:dev",
     "build:prod": "npm-run-all prettier:all eslint:all ngBuild:prod",
-    "serve:dev-debug": "ng run parallel-park:serve",
-    "serve:dev": "ng run parallel-park:serve --open",
+    "serve:dev-debug": "ng run parallel-park:serve:development",
+    "serve:dev": "ng run parallel-park:serve:development --open",
     "serve:prod": "ng run parallel-park:serve:production --open",
     "deploy": "./deploy.sh"
   },

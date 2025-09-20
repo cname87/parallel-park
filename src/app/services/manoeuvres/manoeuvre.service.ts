@@ -70,9 +70,9 @@ and finally moves forward to pull the car into a parallel position. (The '3' ref
  * relative to the PP.
  * - getStartRelativePosition calls getcarDistXFromBumperMedToPivot to get
  * the distance from the car's bumper to the PP.
- * - getStartRelativePosition calls getStartDistSideToPivot to get the distance
+ * - getStartRelativePosition calSide to get the distance
  * from the car's side to the PP.
- * getcarDistXFromBumperMedToPivot and getStartDistSideToPivot both call
+ * getcarDistXFromBumperMedToPivot aSide both call
  * getFirstTurnAngle to get the first turn angle for the manoeuvre. The car's
  * starting position is dependent on the first turn angle.
  * - For this manoeuvre, getFirstTurnAngle calls getFirstTurnAngle3R1SMin to
@@ -794,9 +794,11 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The x-axis distance, in unscaled mm, from a y-axis line along the rear bumper of the car to a y-axis line through the PP just before the car rotates in.
+   * @returns
+   * X-axis setups: The x-axis distance from a y-axis line along the rear bumper of the car to a y-axis line through the PP at the point when the car starts the first turn.
+   * Y-axis setups: The x-axis distance from the Pivot Point to the Outer Corner of the car at the point when the car starts the first turn.
    */
-  private getStartDistFromRearToPivot = ({
+  private getStartXDistToPivot = ({
     manoeuvre,
     street,
     car,
@@ -859,12 +861,12 @@ export class ManoeuvreService {
         });
         /* The turned angle is added to the end angle as the starting angle is
         further clockwise than the end angle */
-        const startAngleRads = endAngleRads + turnedAngleRads;
+        const startingAngleRads = endAngleRads + turnedAngleRads;
         /* Formula to find the Y direction move for a chord (where the angles
         are with respect to the x-axis). */
         const distMovedXDuringTurn =
           car.frontInnerCornerTurningRadius(ELock.Counterclockwise) *
-          (Math.cos(endAngleRads) - Math.cos(startAngleRads));
+          (Math.cos(endAngleRads) - Math.cos(startingAngleRads));
         /* This is the distance the car rear bumper is behind the OC */
         const distOCToRearBumper = car.length;
         value = cornerFwdXFromPivot - distMovedXDuringTurn - distOCToRearBumper;
@@ -918,18 +920,20 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The y-axis distance from the inner side of the parking car to the x-axis line drawn through the PP of the front parked car, before the parking car moves off.
+   * @returns
+   * X-axis setups: The y-axis distancefrom the inner side of the parking car to the x-axis line drawn through the PP of the front parked car at the point when the car starts the first turn.
+   * Y-axis setups: The x-axis distance from the Pivot Point to the Outer Corner of the car at the point when the car starts the first turn.
    *
    * @throws Error
    * Thrown if an invalid manoeuvre is passed in.
    */
-  private getStartDistSideToPivot = ({
+  private getStartYDistToPivot = ({
     manoeuvre,
     street,
     car,
     config,
   }: IParams): number => {
-    this.logger.log('getStartDistSideToPivot called', LoggingLevel.TRACE);
+    this.logger.log('getStartDistYToPivot called', LoggingLevel.TRACE);
 
     /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
     const distOutValues = this.objects.distancesOut.map(
@@ -987,12 +991,12 @@ export class ManoeuvreService {
         });
         /* The turned angle is added to the end angle as the starting angle is
           further clockwise than the end angle */
-        const startAngleRads = endAngleRads + turnedAngleRads;
+        const startingAngleRads = endAngleRads + turnedAngleRads;
         /* Formula to find the Y direction move for a chord (where the angles
           are with respect to the a-axis). */
         const distMovedYDuringTurn =
           car.frontInnerCornerTurningRadius(ELock.Counterclockwise) *
-          (Math.sin(endAngleRads) - Math.sin(startAngleRads));
+          (Math.sin(endAngleRads) - Math.sin(startingAngleRads));
         /* This is the distance the PP is out from the front car */
         const distPivotYToCar = street.safetyGap;
         value = cornerOutYFromFrontCar - distMovedYDuringTurn - distPivotYToCar;
@@ -1056,6 +1060,15 @@ export class ManoeuvreService {
    */
   private getPivot = ({ manoeuvre, street, car, config }: IParams): TPoint => {
     this.logger.log('getPivot called', LoggingLevel.TRACE);
+
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
+    /* * TBD * */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      manoeuvre = EManoeuvre.BayPark1;
+    }
 
     let value = {} as TPoint;
     const parkingSpace = this.getParkingSpace({
@@ -1127,14 +1140,15 @@ export class ManoeuvreService {
   }: IParams): TPoint => {
     this.logger.log('getStartRelativePosition called', LoggingLevel.TRACE);
 
-    /* The distance from the pivot where the calculated manoeuvre starts */
-    const startDistx = this.getStartDistFromRearToPivot({
+    /* X-Axis setups: The distance from the pivot to the rear of the car when in the start position
+    Y-Axis setups: The distance from the pivot to the OC of the car when in the start position */
+    const startDistx = this.getStartXDistToPivot({
       manoeuvre,
       street,
       car,
       config,
     });
-    const startDisty = this.getStartDistSideToPivot({
+    const startDisty = this.getStartYDistToPivot({
       manoeuvre,
       street,
       car,
@@ -1148,10 +1162,32 @@ export class ManoeuvreService {
       LoggingLevel.DEBUG,
     );
 
-    const value = {
-      x: car.length + startDistx + startGap,
-      y: car.width + startDisty,
-    };
+    let value = {} as TPoint;
+    switch (manoeuvre) {
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park4UsingRules1:
+      case EManoeuvre.Park4UsingRules2:
+        /* X-Axis: The OC is offset from the PP in the x-axis by the distance from the rear of the car + the distance to move to where the 1st arc starts + and anadded gap, and in the y-axis by the width of the car and the distance from the side of the car to the pivot. */
+        value = {
+          x: car.length + startDistx + startGap,
+          y: car.width + startDisty,
+        };
+        break;
+      case EManoeuvre.BayPark1:
+        /* Y-Axis: The OC is offset from the PP by the distance from the side of the car + the distance to move to where the 1st arc starts + and added gap. */
+        value = {
+          x: startDistx,
+          y: startDisty + startGap,
+        };
+        break;
+      default:
+        throw new Error('Unexpected manoeuvre');
+    }
+
     this.logger.log(
       `Start position relative to pivot: (${
         value.x * config.distScale
@@ -1172,6 +1208,15 @@ export class ManoeuvreService {
     config,
   }: IParams): TPoint => {
     this.logger.log('getStartPosition called', LoggingLevel.TRACE);
+
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
+    /* * TBD * */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      manoeuvre = EManoeuvre.BayPark1;
+    }
 
     const pivotPoint = this.getPivot({ manoeuvre, street, car, config });
 
@@ -1198,7 +1243,7 @@ export class ManoeuvreService {
   };
 
   /**
-   * @returns The angle in radians, positive to the clockwise direction, that the car is at when drawn
+   * @returns The angle in radians, made by a line through the side of the car to the negative x-axis with positive in the clockwise direction, that the car is at when drawn
    */
   private getStartAngle = ({ manoeuvre }: IParams): number => {
     this.logger.log('getStartAngle called', LoggingLevel.TRACE);
@@ -1251,7 +1296,7 @@ export class ManoeuvreService {
         }).x;
         const endRelPositionX =
           car.length +
-          this.getStartDistFromRearToPivot({ manoeuvre, street, car, config });
+          this.getStartXDistToPivot({ manoeuvre, street, car, config });
         return Math.abs(startRelPositionX - endRelPositionX);
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1350,7 +1395,7 @@ export class ManoeuvreService {
           street.carFromKerb +
           street.frontCarWidth +
           street.safetyGap +
-          this.getStartDistSideToPivot({ manoeuvre, street, car, config }) -
+          this.getStartYDistToPivot({ manoeuvre, street, car, config }) -
           this.getParkedKerbDistance({ manoeuvre, street, car, config }) -
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).y;
         delta =
@@ -1970,6 +2015,13 @@ export class ManoeuvreService {
   public getManoeuvre({ manoeuvre, street, car, config }: IParams): IPark {
     this.logger.log('getManoeuvre called', LoggingLevel.TRACE);
 
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      manoeuvre = EManoeuvre.BayPark1;
+    }
+
     let parkingSpaceLength = 0;
     let startPosition: TPoint = { x: 0, y: 0 };
     let startAngleRads = 0;
@@ -1987,18 +2039,18 @@ export class ManoeuvreService {
     });
     startAngleRads = this.getStartAngle({ manoeuvre, street, car, config });
 
-    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
-    const distOutValues = this.objects.distancesOut.map(
-      ([enumValue]) => enumValue,
-    );
-    if (distOutValues.includes(manoeuvre as EDistOut)) {
-      return {
-        parkingSpaceLength,
-        startPosition,
-        startAngleRads,
-        movie: this.createEmptyMovie(),
-      };
-    }
+    // /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
+    // const distOutValues = this.objects.distancesOut.map(
+    //   ([enumValue]) => enumValue,
+    // );
+    // if (distOutValues.includes(manoeuvre as EDistOut)) {
+    //   return {
+    //     parkingSpaceLength,
+    //     startPosition,
+    //     startAngleRads,
+    //     movie: this.createEmptyMovie(),
+    //   };
+    // }
 
     const movie: TMovie = {
       move1stSteer: {

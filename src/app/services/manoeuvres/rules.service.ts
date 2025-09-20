@@ -31,8 +31,8 @@ export class RulesService {
     private config: ConfigService,
   ) {
     this.r1_grossExtraParkingSpace = 1200 / this.config.distScale;
-    this.r1_startDistXToRearCarBumper = -300 / this.config.distScale;
-    this.r1_startDistYToRearCarSide = 500 / this.config.distScale;
+    this.r1_startDistXToRearCarBumper = 1500 / this.config.distScale;
+    this.r1_startDistYToRearCarSide = 6000 / this.config.distScale;
     this.r1_Move1stArcProjectedDistFromRearCar = 1250 / this.config.distScale;
     this.r1_distFromKerb = 200 / config.distScale;
     this.r1_beyondRearBumperDist = -this.config.defaultSafetyGap;
@@ -155,9 +155,8 @@ export class RulesService {
 
       case EManoeuvre.BayPark1:
         /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
-        startDistXToPivot =
-          this.r1_startDistXToRearCarBumper + street.safetyGap - car.length;
-        startDistYToPivot = 1000 / config.distScale;
+        startDistXToPivot = this.r1_startDistXToRearCarBumper;
+        startDistYToPivot = this.r1_startDistYToRearCarSide;
 
         /* Rotate until a line through the port side of the car intersects the kerb at a point that is a fixed distance forward from the rear car front bumper. This is the most critical move in the manoeuvre. */
         move1stArcCondition = (carInUse: CarService, _tick: any) => {

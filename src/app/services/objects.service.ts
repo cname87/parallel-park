@@ -203,7 +203,7 @@ export class ObjectsService {
       name: EStreet.Bay_2200mm,
       type: 'bay',
       rearCarFromLeft: this.config.defaultCarFromKerb * this.config.distScale,
-      rearCarFromTop: 2000,
+      rearCarFromTop: 0,
       rearCarLength: 5000,
       rearCarWidth: 2000,
       frontCarFromLeft: () => {
@@ -225,7 +225,7 @@ export class ObjectsService {
       name: EStreet.Bay_2400mm,
       type: 'bay',
       rearCarFromLeft: this.config.defaultCarFromKerb * this.config.distScale,
-      rearCarFromTop: 2000,
+      rearCarFromTop: 0,
       rearCarLength: 5000,
       rearCarWidth: 2000,
       frontCarFromLeft: () => {
