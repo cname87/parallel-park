@@ -26,80 +26,79 @@ export class CalculationService {
    */
 
   /**
-   * @param car Checks the car has not collided with the rear or front car corners, (that face in towards the parking space), or with the canvas edge, and it checks that none of the car corners collide with either the rear or front cars or the canvas edge
-   * @param includeSafety: True to include the street safety gap as part of the rear and front cars when considering a collision.  False to ignore the street safety gap.
+   * @param car Checks the car has not collided with the rear or front car outer corners, (that face in towards the parking space), or with the canvas edge, and it checks that none of the car corners collide with either the rear or front cars or the canvas edge
    * @returns True is a collision was detected. False if not.
    */
-  public checkCollision = (car: CarService, includeSafety = false): boolean => {
+  public checkCollision = (car: CarService): boolean => {
     //
     let collision = false;
 
-    /* Minimum buffer to prevent spurious collisions when safety gap < 30cm */
-    let buffer = this.street.safetyGap >= 1.5 ? 0 : 1.5;
-    /* Modify the safety gap so the collisions after gap is directly out from the corner.  This is to correct the fact that a collision seems to be detected further out from the corner than you might expect */
-    const modSafetyGap = -Math.sqrt(Math.pow(this.street.safetyGap, 2) / 2);
-    /* Include safety gap if the input parameter demands it */
-    buffer = includeSafety ? modSafetyGap : buffer;
-
-    /* Test for a collision between the front and rear car corners that face into the parking space and the car */
-    const rearCarCorner = car.carShape.globalToLocal(
-      this.street.rearCarCorner.x - buffer - 3,
-      this.street.rearCarCorner.y - buffer - 1.5,
+    /* Test for a collision between the parking car shape and the rear and front outer corners (that face into the parking space) of the parked cars using create.js functionality */
+    const rearCarOuterCornerLocal = car.carShape.globalToLocal(
+      this.street.rearCarOuterCorner.x,
+      this.street.rearCarOuterCorner.y,
     );
-    const frontCarCorner = car.carShape.globalToLocal(
-      this.street.frontCarCorner.x + buffer + 1.5,
-      this.street.frontCarCorner.y - buffer - 1.5,
+    const frontCarOuterCornerLocal = car.carShape.globalToLocal(
+      this.street.frontCarOuterCorner.x,
+      this.street.frontCarOuterCorner.y,
     );
-    if (car.carShape.hitTest(rearCarCorner.x, rearCarCorner.y)) {
-      this.logger.log(`Collision: Rear car corner collision`);
+    if (
+      car.carShape.hitTest(rearCarOuterCornerLocal.x, rearCarOuterCornerLocal.y)
+    ) {
+      this.logger.log(`Collision: Rear parked car outer corner collision`);
       collision = true;
     }
-    if (car.carShape.hitTest(frontCarCorner.x, frontCarCorner.y)) {
-      this.logger.log(`Collision: Front car corner collision`);
+    if (
+      car.carShape.hitTest(
+        frontCarOuterCornerLocal.x,
+        frontCarOuterCornerLocal.y,
+      )
+    ) {
+      this.logger.log(`Collision: Front parked car outer corner collision`);
       collision = true;
     }
 
-    /* Test for a collision between each car corner and the rear and front cars, and the canvas edges */
-    const corners: TPoint[] = [
+    /* Test for collision between parking car inner corners and parked car shapes */
+    const parkingCarCorners: TPoint[] = [
       car.frontStarboardCorner,
       car.frontPortCorner,
       car.rearStarboardCorner,
       car.rearPortCorner,
     ];
-    const testForCollision = (corner: TPoint) => {
-      if (
-        /* Check car corner against rear car */
-        (corner.x <=
-          this.street.rearCarFromLeft + this.street.rearCarLength - buffer &&
-          corner.y <=
-            this.street.rearCarFromTop + this.street.rearCarWidth - buffer) ||
-        /* Check car corner against front car */
-        (corner.x >= this.street.frontCarFromLeft + buffer &&
-          corner.x <=
-            this.street.frontCarFromLeft + this.street.frontCarLength &&
-          corner.y <=
-            this.street.frontCarFromTop + this.street.frontCarWidth - buffer) ||
-        /* Check car corner against canvas edges */
-        corner.x <= 0 ||
-        corner.x >= this.config.canvasW ||
-        corner.y <= 0 ||
-        corner.y >= this.config.canvasH
-      ) {
-        this.logger.log('Car corner collision');
-        this.logger.log(
-          `Collision.x: ${this.config.round(
-            (corner.x * this.config.distScale) / 1000,
-          )}m`,
+
+    /* Test for a collision between the parked car shapes and the rear and front outer corners (that face into the parking space) of the parking ar using create.js functionality */
+    parkingCarCorners.forEach((corner) => {
+      if (this.street.rearCarShape) {
+        const rearCarCornerLocal = this.street.rearCarShape.globalToLocal(
+          corner.x,
+          corner.y,
         );
-        this.logger.log(
-          `Collision.y: ${this.config.round(
-            (corner.y * this.config.distScale) / 1000,
-          )}m`,
-        );
-        collision = true;
+        if (
+          this.street.rearCarShape.hitTest(
+            rearCarCornerLocal.x,
+            rearCarCornerLocal.y,
+          )
+        ) {
+          this.logger.log(`Collision: Parking car corner with rear parked car`);
+          collision = true;
+        }
       }
-    };
-    corners.forEach(testForCollision);
+      if (this.street.frontCarShape) {
+        const frontCarCornerLocal = this.street.frontCarShape.globalToLocal(
+          corner.x,
+          corner.y,
+        );
+        if (
+          this.street.frontCarShape.hitTest(
+            frontCarCornerLocal.x,
+            frontCarCornerLocal.y,
+          )
+        ) {
+          this.logger.log(`Collision: Parking car corner with front car`);
+          collision = true;
+        }
+      }
+    });
 
     return collision;
   };

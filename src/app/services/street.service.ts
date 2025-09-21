@@ -36,13 +36,13 @@ export class StreetService {
   public borderColor = 'Black';
 
   /* Get outer corners on the parking space side for collision detection */
-  public get rearCarCorner(): TPoint {
+  public get rearCarOuterCorner(): TPoint {
     return {
       x: this.rearCarFromLeft + this.rearCarLength,
       y: this.rearCarFromTop + this.rearCarWidth,
     };
   }
-  public get frontCarCorner(): TPoint {
+  public get frontCarOuterCorner(): TPoint {
     if (this.type === 'parallel') {
       return {
         x: this.frontCarFromLeft,
@@ -82,6 +82,8 @@ export class StreetService {
   /*  Export car shapes for collision detection */
   public rearCarGap = new createjs.Shape();
   public frontCarGap = new createjs.Shape();
+  public rearCarShape = new createjs.Shape();
+  public frontCarShape = new createjs.Shape();
 
   /**
    * Sets the street configuration from a scenario street setup. All scenario distances are real-world distances in mm and are scaled by a factor to convert mm to pixels before being stored.
@@ -318,6 +320,13 @@ export class StreetService {
     const car = new createjs.Shape();
     car.set({ regX: 0, regY: 0 });
     car.set({ x: 0, y: 0 });
+
+    /* Store reference to the car shape for collision detection */
+    if (carType === 'front') {
+      this.frontCarShape = car;
+    } else if (carType === 'rear') {
+      this.rearCarShape = car;
+    }
 
     car.graphics.beginFill(this.carColor).endStroke().rect(
       /* Sets the co-ordinates of the top left hand corner of the Graphic based on the Shape position as determined above. */

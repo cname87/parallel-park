@@ -322,7 +322,7 @@ export class MoveService {
           /* Check if the stop condition is met */
           const stop = condition(this.car)(this.car, tickMove);
           /* Check for a collision including safety gap */
-          const collision = this.calc.checkCollision(this.car, true);
+          const collision = this.calc.checkCollision(this.car);
           /* Check if move is complete */
           /* Note: Caution comparing floating point numbers */
           const bigNum = 100000;
@@ -521,7 +521,7 @@ export class MoveService {
           /* Check if the condition is met */
           const stop = condition(this.car)(this.car, tickAngle);
           /* Check for a collision, including safety gap */
-          const collision = this.calc.checkCollision(this.car, true);
+          const collision = this.calc.checkCollision(this.car);
           /* Check if move is complete */
           /* Note: Caution comparing floating point numbers */
           const bigNum = 100000;
@@ -532,7 +532,7 @@ export class MoveService {
             /* Clear collision */
             do {
               this.car.carRotation -= tickAngle;
-            } while (this.calc.checkCollision(this.car, true));
+            } while (this.calc.checkCollision(this.car));
             {
               this.car.carRotation -= tickAngle;
             }

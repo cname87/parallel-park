@@ -875,7 +875,7 @@ export class ManoeuvreService {
         /* This is the x-axis position of the rear bumper after moving from the
         parked position to the point where it begins rotating in */
         const distRearBumperX =
-          street.rearCarCorner.x +
+          street.rearCarOuterCorner.x +
           street.safetyGap +
           this.getDistFrom2Arcs({ manoeuvre, street, car, config }).x +
           this.getMove2ndStraight({

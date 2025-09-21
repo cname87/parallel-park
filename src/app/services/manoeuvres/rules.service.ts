@@ -98,7 +98,7 @@ export class RulesService {
                 /* How far the car will move in the x-axis direction before it intersects the kerb */
                 carInUse.rearPortAxleSide.y / Math.tan(carInUse.carRotation) -
                 /* Rear car corner x-axis value */
-                street.rearCarCorner.x -
+                street.rearCarOuterCorner.x -
                 /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
                 this.r1_Move1stArcProjectedDistFromRearCar,
             ) < 1
@@ -108,12 +108,12 @@ export class RulesService {
         move2ndStraightCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
             carInUse.rearStarboardCorner.x -
-              street.rearCarCorner.x -
+              street.rearCarOuterCorner.x -
               street.safetyGap -
               distFromRearCarMin <
             1;
           const rearBumperRelativePosition =
-            carInUse.frontPortCorner.x - street.frontCarCorner.x;
+            carInUse.frontPortCorner.x - street.frontCarOuterCorner.x;
           const beyondRearBumper =
             rearBumperRelativePosition - this.r1_beyondRearBumperDist < 0.1;
           const withinKerbDistance =
@@ -142,7 +142,7 @@ export class RulesService {
         move2ndStraightCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
             carInUse.rearStarboardCorner.x -
-              street.rearCarCorner.x -
+              street.rearCarOuterCorner.x -
               street.safetyGap -
               distFromRearCarMin <
             1;
@@ -167,7 +167,7 @@ export class RulesService {
                 /* How far the car will move in the x-axis direction before it intersects the kerb */
                 carInUse.rearPortAxleSide.y / Math.tan(carInUse.carRotation) -
                 /* Rear car corner x-axis value */
-                street.rearCarCorner.x -
+                street.rearCarOuterCorner.x -
                 /* Distance in front of the rear car of the intersection point of a line through the port side to the kerb */
                 this.r1_Move1stArcProjectedDistFromRearCar,
             ) < 1
@@ -177,12 +177,12 @@ export class RulesService {
         move2ndStraightCondition = (carInUse: CarService, _tick: any) => {
           const tooCloseToRearCar =
             carInUse.rearStarboardCorner.x -
-              street.rearCarCorner.x -
+              street.rearCarOuterCorner.x -
               street.safetyGap -
               distFromRearCarMin <
             1;
           const rearBumperRelativePosition =
-            carInUse.frontPortCorner.x - street.frontCarCorner.x;
+            carInUse.frontPortCorner.x - street.frontCarOuterCorner.x;
           const beyondRearBumper =
             rearBumperRelativePosition - this.r1_beyondRearBumperDist < 0.1;
           const withinKerbDistance =
@@ -198,7 +198,7 @@ export class RulesService {
     const move2ndArcCondition = (carInUse: CarService, _tick: unknown) => {
       const tooCloseToRearCar =
         carInUse.rearStarboardCorner.x -
-          street.rearCarCorner.x -
+          street.rearCarOuterCorner.x -
           street.safetyGap -
           distFromRearCarMin <
         1;
@@ -218,12 +218,12 @@ export class RulesService {
     /* Rotate in until the car touches the safety gap of the front car or is
     horizontal */
     const move3rdArcCondition = (carInUse: CarService, tick: unknown) => {
-      const collision = this.calc.checkCollision(carInUse, true);
+      const collision = this.calc.checkCollision(carInUse);
       if (collision && typeof tick === 'number') {
         /* Clear collision */
         do {
           carInUse.carRotation -= tick;
-        } while (this.calc.checkCollision(carInUse, true));
+        } while (this.calc.checkCollision(carInUse));
         {
           carInUse.carRotation -= tick;
         }
