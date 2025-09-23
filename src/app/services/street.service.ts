@@ -390,6 +390,33 @@ export class StreetService {
   }
 
   /**
+   * Private helper method to draw the limit of the bay parking aisle
+   */
+  private drawBayAisleLimit(): createjs.Shape {
+    this.logger.log('drawBayAisleLimit', LoggingLevel.TRACE);
+
+    const line = new createjs.Shape();
+    line.set({ regX: 0, regY: 0 });
+    line.set({ x: 0, y: 0 });
+
+    // Calculate position 6m out from the rear of the rear parked car
+    const sixMetersInScaledUnits = 6000 / this.config.distScale;
+    const lineX =
+      this.rearCarFromLeft + this.rearCarLength + sixMetersInScaledUnits;
+    const lineY = this.rearCarFromTop;
+    const lineHeight = this.config.canvasH;
+    const lineWidth = 2; // Thin vertical line
+
+    line.graphics
+      .beginFill(this.borderColor)
+      .endStroke()
+      .rect(lineX, lineY, lineWidth, lineHeight);
+
+    line.cache(lineX, lineY, lineWidth, lineHeight);
+    return line;
+  }
+
+  /**
    * Draw the parked cars on the canvas
    */
   public drawStreet(): void {
@@ -422,6 +449,8 @@ export class StreetService {
         this.thirdCarWidth,
         'third',
       );
+      const aisleLimit = this.drawBayAisleLimit();
+      this.config.stage.addChild(aisleLimit);
     }
   }
 }

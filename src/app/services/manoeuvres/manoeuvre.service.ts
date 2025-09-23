@@ -1181,6 +1181,24 @@ export class ManoeuvreService {
       LoggingLevel.DEBUG,
     );
 
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so set to the bay or parallel parking value depending on the street type */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      if (this.street.type === 'bay') {
+        return {
+          x: startDistx,
+          y: startDisty + startGap,
+        };
+      } else if (this.street.type === 'parallel') {
+        return {
+          x: car.length + startDistx + startGap,
+          y: car.width + startDisty,
+        };
+      }
+    }
+
     let value = {} as TPoint;
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
@@ -1202,29 +1220,6 @@ export class ManoeuvreService {
           x: startDistx,
           y: startDisty + startGap,
         };
-        break;
-      case EDistOut.Out_100mm:
-      case EDistOut.Out_200mm:
-      case EDistOut.Out_300mm:
-      case EDistOut.Out_400mm:
-      case EDistOut.Out_500mm:
-      case EDistOut.Out_600mm:
-      case EDistOut.Out_700mm:
-      case EDistOut.Out_800mm:
-      case EDistOut.Out_900mm:
-      case EDistOut.Out_1000mm:
-        /*EDistOut manoeuvres are used for the Keyboard mode so set to the bay or parallel parking value depending on the street type */
-        if (this.street.type === 'bay') {
-          value = {
-            x: startDistx,
-            y: startDisty + startGap,
-          };
-        } else if (this.street.type === 'parallel') {
-          value = {
-            x: car.length + startDistx + startGap,
-            y: car.width + startDisty,
-          };
-        }
         break;
       default:
         throw new Error('Unexpected manoeuvre');
@@ -1281,6 +1276,18 @@ export class ManoeuvreService {
   private getStartAngle = ({ manoeuvre }: IParams): number => {
     this.logger.log('getStartAngle called', LoggingLevel.TRACE);
 
+    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so set to the bay or parallel parking value depending on the street type */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      if (this.street.type === 'bay') {
+        return Math.PI / 2;
+      } else {
+        return 0;
+      }
+    }
+
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1292,22 +1299,6 @@ export class ManoeuvreService {
         return 0;
       case EManoeuvre.BayPark1:
         return Math.PI / 2;
-      case EDistOut.Out_100mm:
-      case EDistOut.Out_200mm:
-      case EDistOut.Out_300mm:
-      case EDistOut.Out_400mm:
-      case EDistOut.Out_500mm:
-      case EDistOut.Out_600mm:
-      case EDistOut.Out_700mm:
-      case EDistOut.Out_800mm:
-      case EDistOut.Out_900mm:
-      case EDistOut.Out_1000mm:
-        /*EDistOut manoeuvres are used for the Keyboard mode so set to the bay or parallel parking value depending on the street type */
-        if (this.street.type === 'bay') {
-          return Math.PI / 2;
-        } else {
-          return 0;
-        }
       default:
         throw new Error('Unexpected manoeuvre');
     }
