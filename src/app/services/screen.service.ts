@@ -62,6 +62,8 @@ export class ScreenService {
 
   /* Utility to construct the current scenario object. */
   public getCurrentScenario(): TScenario {
+    this.logger.log('getCurrentScenario called', LoggingLevel.TRACE);
+    /* Read current scenario from the selected manoeuvre, car and street */
     return {
       manoeuvre: this.selectedManoeuvre,
       carSetup: this.carSetup,

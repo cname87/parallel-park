@@ -23,6 +23,10 @@ export class StreetService {
   public frontCarFromTop: number;
   public frontCarLength: number;
   public frontCarWidth: number;
+  public thirdCarFromLeft: number;
+  public thirdCarFromTop: number;
+  public thirdCarLength: number;
+  public thirdCarWidth: number;
   public parkingSpaceLength: number;
   public carFromKerb: number;
   public safetyGap: number;
@@ -56,6 +60,7 @@ export class StreetService {
     }
     throw new Error('Invalid street type');
   }
+
   constructor(
     private config: ConfigService,
     private logger: LoggerService,
@@ -72,6 +77,13 @@ export class StreetService {
     this.frontCarFromTop = this.config.defaultFrontCarFromTop;
     this.frontCarLength = this.config.defaultFrontCarLength;
     this.frontCarWidth = this.config.defaultFrontCarWidth;
+    this.thirdCarFromLeft = this.config.defaultFrontCarFromLeft;
+    this.thirdCarFromTop =
+      this.config.defaultFrontCarFromTop +
+      this.config.defaultFrontCarWidth +
+      this.config.defaultParkingSpaceLength;
+    this.thirdCarLength = this.config.defaultFrontCarLength;
+    this.thirdCarWidth = this.config.defaultFrontCarWidth;
     this.carFromKerb = this.config.defaultCarFromKerb;
     this.safetyGap = this.config.defaultSafetyGap;
     this.parkingSpaceLength = this.config.defaultParkingSpaceLength;
@@ -84,10 +96,12 @@ export class StreetService {
   public frontCarGap = new createjs.Shape();
   public rearCarShape = new createjs.Shape();
   public frontCarShape = new createjs.Shape();
+  public thirdCarGap = new createjs.Shape();
+  public thirdCarShape = new createjs.Shape();
 
   /**
    * Sets the street configuration from a scenario street setup. All scenario distances are real-world distances in mm and are scaled by a factor to convert mm to pixels before being stored.
-   * @param param0 - A scenario street configuration
+   * @params - A scenario street configuration
    */
   public setStreetFromScenario({
     type,
@@ -116,17 +130,23 @@ export class StreetService {
     this.frontCarFromTop = frontCarFromTop() / this.config.distScale;
     this.frontCarLength = frontCarLength / this.config.distScale;
     this.frontCarWidth = frontCarWidth / this.config.distScale;
+    this.thirdCarFromLeft = this.frontCarFromLeft;
+    this.thirdCarFromTop =
+      this.frontCarFromTop + this.frontCarWidth + this.parkingSpaceLength;
+    this.thirdCarLength = this.frontCarLength;
+    this.thirdCarWidth = this.frontCarWidth;
     this.carFromKerb = carFromKerb / this.config.distScale;
     this.safetyGap = safetyGap / this.config.distScale;
   }
 
   /**
    * Updates the street configuration .
-   * @param param0 - A scenario street configuration
+   * @param parkingSpaceLength - The new parking space length in scaled units
    */
   public updateStreetParkingSpace(parkingSpaceLength: number): void {
     this.logger.log('updateStreetParkingSpace called', LoggingLevel.TRACE);
 
+    /* Upate the parking space length and recalculate the front car position */
     this.parkingSpaceLength = parkingSpaceLength;
     if (this.type === 'parallel') {
       this.frontCarFromLeft =
@@ -134,6 +154,8 @@ export class StreetService {
     } else if (this.type === 'bay') {
       this.frontCarFromTop =
         this.rearCarFromTop + this.rearCarWidth + this.parkingSpaceLength;
+      this.thirdCarFromTop =
+        this.frontCarFromTop + this.frontCarWidth + this.parkingSpaceLength;
     }
   }
 
@@ -155,7 +177,8 @@ export class StreetService {
   ): void {
     this.logger.log('drawCarInternals', LoggingLevel.TRACE);
 
-    const minCarLengthForTwoAxles = 50;
+    const minCarLengthForTwoAxles = this.config.minCarLengthForTwoAxles;
+    const minCarWidthForTwoWheels = this.config.minCarWidthForTwoWheels;
 
     /* Draw the front V pattern */
     carShape.graphics
@@ -182,15 +205,17 @@ export class StreetService {
       .lineTo(carLeft + (6 * carLength) / 8, carTop + carWidth);
 
     /* Draw the front port wheel */
-    carShape.graphics
-      .beginFill(this.internalCarColor)
-      .setStrokeStyle(0)
-      .rect(
-        carLeft + (6 * carLength) / 8 + this.wheelLength / 2,
-        carTop + 1.5,
-        -this.wheelLength,
-        this.wheelWidth,
-      );
+    if (carWidth > minCarWidthForTwoWheels) {
+      carShape.graphics
+        .beginFill(this.internalCarColor)
+        .setStrokeStyle(0)
+        .rect(
+          carLeft + (6 * carLength) / 8 + this.wheelLength / 2,
+          carTop + 1.5,
+          -this.wheelLength,
+          this.wheelWidth,
+        );
+    }
 
     /* Draw the front starboard wheel */
     carShape.graphics
@@ -211,16 +236,18 @@ export class StreetService {
         .moveTo(carLeft + (1.5 * carLength) / 8, carTop)
         .lineTo(carLeft + (1.5 * carLength) / 8, carTop + carWidth);
 
-      /* Draw the rear port wheel */
-      carShape.graphics
-        .beginFill(this.internalCarColor)
-        .setStrokeStyle(0)
-        .rect(
-          carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
-          carTop + 1.5,
-          -this.wheelLength,
-          this.wheelWidth,
-        );
+      if (carWidth > minCarWidthForTwoWheels) {
+        /* Draw the rear port wheel */
+        carShape.graphics
+          .beginFill(this.internalCarColor)
+          .setStrokeStyle(0)
+          .rect(
+            carLeft + (1.5 * carLength) / 8 + this.wheelLength / 2,
+            carTop + 1.5,
+            -this.wheelLength,
+            this.wheelWidth,
+          );
+      }
 
       /* Draw the rear starboard wheel */
       carShape.graphics
@@ -291,7 +318,7 @@ export class StreetService {
     carTop: number,
     carLength: number,
     carWidth: number,
-    carType: 'rear' | 'front',
+    carType: 'rear' | 'front' | 'third',
   ): void {
     this.logger.log('drawCar', LoggingLevel.TRACE);
 
@@ -314,6 +341,15 @@ export class StreetService {
         carWidth,
       );
       this.config.stage.addChild(this.rearCarGap);
+    } else if (carType === 'third') {
+      this.thirdCarGap = this.drawSafetyGaps(
+        this.thirdCarGap,
+        carLeft,
+        carTop,
+        carLength,
+        carWidth,
+      );
+      this.config.stage.addChild(this.thirdCarGap);
     }
 
     /* Create the car shape on top of the safety gap */
@@ -326,6 +362,8 @@ export class StreetService {
       this.frontCarShape = car;
     } else if (carType === 'rear') {
       this.rearCarShape = car;
+    } else if (carType === 'third') {
+      this.thirdCarShape = car;
     }
 
     car.graphics.beginFill(this.carColor).endStroke().rect(
@@ -374,5 +412,16 @@ export class StreetService {
       this.frontCarWidth,
       'front',
     );
+
+    /* Draw the third car (only in bay parking mode) */
+    if (this.type === 'bay') {
+      this.drawCar(
+        this.thirdCarFromLeft,
+        this.thirdCarFromTop,
+        this.thirdCarLength,
+        this.thirdCarWidth,
+        'third',
+      );
+    }
   }
 }

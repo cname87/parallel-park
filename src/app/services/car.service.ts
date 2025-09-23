@@ -60,6 +60,7 @@ export class CarService {
   public readonly frontPortWheelShape = new createjs.Shape();
   public readonly carShape = new createjs.Shape();
   private circleOfRotationShape = new createjs.Shape();
+  private circleOfRotationShape2 = new createjs.Shape();
   private shadowCarShape = new createjs.Shape();
 
   constructor(
@@ -155,6 +156,17 @@ export class CarService {
   public nearRearAxleSideTurningRadius(steeringAngle: TSteeringAngle): number {
     const distance =
       this.farRearAxleSideTurningRadius(steeringAngle) - this.width;
+    return Math.abs(distance);
+  }
+
+  /**
+   * @returns The distance from the center of rotation to the rear port corner
+   */
+  private rearPortCornerTurningRadius(steeringAngle: TSteeringAngle): number {
+    const distance = Math.sqrt(
+      Math.pow(this.nearRearAxleSideTurningRadius(steeringAngle), 2) +
+        Math.pow(this.rearOverhang, 2),
+    );
     return Math.abs(distance);
   }
 
@@ -578,6 +590,13 @@ export class CarService {
       .endFill()
       .beginStroke('Blue')
       .drawCircle(0, 0, newTurningRadius);
+
+    // Update the rear port corner circle radius
+    this.circleOfRotationShape2.graphics
+      .clear()
+      .endFill()
+      .beginStroke('Blue')
+      .drawCircle(0, 0, this.rearPortCornerTurningRadius(steeringAngle));
   }
 
   /**
@@ -649,6 +668,13 @@ export class CarService {
       .endFill()
       .beginStroke('Blue')
       .drawCircle(0, 0, this.turningRadius(steeringAngle));
+
+    // Update the rear port corner circle radius
+    this.circleOfRotationShape2.graphics
+      .clear()
+      .endFill()
+      .beginStroke('Blue')
+      .drawCircle(0, 0, this.rearPortCornerTurningRadius(steeringAngle));
   }
 
   /**
@@ -910,9 +936,32 @@ export class CarService {
     this.circleOfRotationShape.graphics
       .endFill()
       .beginStroke('Blue')
+      /* The turning radius is the distance from the center of rotation to the outer front wheel */
       .drawCircle(0, 0, this.turningRadius(ERotateDirection.Counterclockwise));
     if (!this.carContainer.children?.includes?.(this.circleOfRotationShape)) {
       this.carContainer.addChild(this.circleOfRotationShape);
+    }
+
+    this.config.stage.addChild(this.carContainer);
+    this.config.stage.update();
+
+    /* Create a circle at center of rotation showing the turning radius to rear port corner for parallel parking */
+    this.circleOfRotationShape2.set({
+      regX: 0,
+      regY: 0,
+      x: 0,
+      y: 0,
+    });
+    this.circleOfRotationShape2.graphics
+      .endFill()
+      .beginStroke('Blue')
+      .drawCircle(
+        0,
+        0,
+        this.rearPortCornerTurningRadius(ERotateDirection.Counterclockwise),
+      );
+    if (!this.carContainer.children?.includes?.(this.circleOfRotationShape2)) {
+      this.carContainer.addChild(this.circleOfRotationShape2);
     }
 
     this.config.stage.addChild(this.carContainer);

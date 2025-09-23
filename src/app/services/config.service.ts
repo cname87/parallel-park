@@ -96,6 +96,9 @@ export class ConfigService {
     this.defaultSideOverhang +
     this.defaultCarOutFromSafetyOfFrontCar;
 
+  minCarLengthForTwoAxles = 1500 / this.distScale;
+  minCarWidthForTwoWheels = 1000 / this.distScale;
+
   /* Limits */
   collisionBuffer = 1 / this.distScale;
   defaultMinFromKerb = 150 / this.distScale;
@@ -176,7 +179,8 @@ export class ConfigService {
   allButtonTexts = new Map(this.manualModeRunTexts).set('main', 'RUN');
 
   /* Default distance from manoeuvre start position for keyboard mode */
-  defaultKeyboardModeStartDistFromRearToPivot = 1000;
+  parallelKeyboardModeStartDistFromRearToPivot = 1000;
+  bayKeyboardModeStartDistFromRearToPivot = 6000;
 
   /* Distances in mm for the setManual manoeuvre */
   setManualExtraParkingSpace = 2000;

@@ -12,8 +12,12 @@ import {
   TPoint,
   TSteer,
   EDirection,
+  IParams,
+  EManoeuvre,
+  EDistOut,
 } from '../shared/types';
 import { CarService } from './car.service';
+import { ManoeuvreService } from './manoeuvres/manoeuvre.service';
 import { ConfigService } from './config.service';
 import { MoveService } from './move.service';
 import { StreetService } from './street.service';
@@ -77,6 +81,7 @@ export class ManualMoveService {
     private mover: MoveService,
     private street: StreetService,
     private car: CarService,
+    private manoeuvre: ManoeuvreService,
     private config: ConfigService,
     private logger: LoggerService,
     private data: DataService,
@@ -150,14 +155,17 @@ export class ManualMoveService {
             this.#running = true;
             this.#resetToStreetRunning = true;
             this.logger.log(`${event.key} pressed`, LoggingLevel.TRACE);
+            /* Default for parallel parking is to start horizontal */
+            let startAngle = 0;
             const startPosition: TPoint = {
-              x:
-                this.street.rearCarFromLeft +
-                this.street.rearCarLength +
-                175 / this.config.distScale,
-              y: this.car.length,
+              x: this.calculateStartPosition().x,
+              y: this.calculateStartPosition().y,
             };
-            this.car.draw(startPosition, Math.PI / 2);
+
+            if (this.street.type === 'bay') {
+              startAngle = Math.PI / 2;
+            }
+            this.car.draw(startPosition, startAngle);
             /* Trigger key up and reset all buttons (as no stop move is called) */
             await this.#keyup({ key: EButtonLabels.Start });
             Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
@@ -172,14 +180,24 @@ export class ManualMoveService {
             this.#running = true;
             this.#resetToParkedRunning = true;
             this.logger.log(`${event.key} pressed`, LoggingLevel.TRACE);
-            const parkPosition: TPoint = {
-              x:
-                this.street.rearCarFromLeft +
-                this.street.rearCarLength +
-                this.street.safetyGap +
-                this.car.length,
-              y: this.street.carFromKerb + this.car.width,
-            };
+            let parkPosition: TPoint;
+            if (this.street.type === 'bay') {
+              parkPosition = {
+                x: this.street.carFromKerb + this.car.length,
+                y:
+                  this.street.frontCarFromTop -
+                  (this.street.parkingSpaceLength - this.car.width) / 2,
+              };
+            } else {
+              parkPosition = {
+                x:
+                  this.street.rearCarFromLeft +
+                  this.street.rearCarLength +
+                  this.car.length +
+                  (this.street.parkingSpaceLength - this.car.length) / 2,
+                y: this.street.carFromKerb + this.car.width,
+              };
+            }
             this.car.draw(parkPosition, 0);
             await this.#keyup({ key: EButtonLabels.Start });
             Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
@@ -254,6 +272,8 @@ export class ManualMoveService {
   }
 
   #subscriptions: Subscription[] = [];
+  private manoeuvreName: EManoeuvre | EDistOut =
+    EManoeuvre.Park2Rotate1StraightMinAngle;
 
   /* Tracks the stop move called observable to reset after a stop move */
   #enableStop = (keyToPress: string): Subscription => {
@@ -291,11 +311,32 @@ export class ManualMoveService {
       });
   };
 
+  /**
+   * Calculate start position coordinates
+   */
+  private calculateStartPosition(): TPoint {
+    const parameters: IParams = {
+      manoeuvre: this.manoeuvreName,
+      street: this.street,
+      car: this.car,
+      config: this.config,
+    };
+    return this.manoeuvre.getStartPosition(parameters);
+  }
+
   /* Called externally to start listening for keyboard events */
   runKeyboard(): void {
     this.logger.log(`Running keyboard operation`, LoggingLevel.TRACE);
     window.addEventListener('keydown', this.#keydown, true);
     window.addEventListener('keyup', this.#keyup, true);
+
+    /* Subscribe to manoeuvre changes to keep local variable updated */
+    this.#subscriptions.push(
+      this.data.getManoeuvre().manoeuvre$.subscribe((manoeuvre) => {
+        this.manoeuvreName = manoeuvre;
+      }),
+    );
+
     /* Track each button */
     for (const [key, value] of this.config.manualModeRunTexts) {
       const keyToPress = value.slice(-2)[0];
