@@ -6,8 +6,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { ConfigService } from '../../services/config.service';
-import { TButtonNames } from '../../shared/types';
 import { ButtonComponent } from '../button/button.component';
 
 /**
@@ -30,9 +28,6 @@ import { ButtonComponent } from '../button/button.component';
 })
 export class ManualModeComponent {
   //
-  buttonTexts: Map<TButtonNames, string>;
 
-  constructor(private config: ConfigService) {
-    this.buttonTexts = this.config.manualModeRunTexts;
-  }
+  constructor() {}
 }

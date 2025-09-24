@@ -175,6 +175,7 @@ export class ConfigService {
     ['center', 'Center (c)'],
     ['right', 'Right (r)'],
     ['start', 'Start (s)'],
+    ['park', 'Park (p)'],
   ]);
   /* All button texts in a cloned Map */
   allButtonTexts = new Map(this.manualModeRunTexts).set('main', 'RUN');
