@@ -270,14 +270,15 @@ export class ObjectsService {
 
   readonly Fiat_Ducato_MWB_Van_2025: TCarSetup = {
     name: ECar.Fiat_Ducato_MWB_Van_2025,
-    minTurningRadius: 6250, // 12.5m turning circle
+    minTurningRadius: 6250, // L2: 12.5m turning circle
     rearOverhang: 1015,
     wheelbase: 3450,
     frontOverhang: 948,
     wheelToWheelWidth: 1800, // Front 1810, rear 1790
-    sideOverhang: 125, // Width 2050 => (2050 - 1800) / 2
+    /* Width = 2050mm; Front track width = 1810mm; Rear track width = 1790mm => Use 1800mm as average wheel to wheel width => side overhang is (2050 - 1800) / 2 */
+    sideOverhang: 125,
     wheelWidth: 225, // 225/75 R16 CP
-    wheelLength: 744,
+    wheelLength: 744, // Diameter = 744mm
   };
 
   readonly VW_T5_LWB_Van_2005: TCarSetup = {
