@@ -400,7 +400,8 @@ export class StreetService {
     line.set({ x: 0, y: 0 });
 
     // Calculate position 6m out from the rear of the rear parked car
-    const sixMetersInScaledUnits = 6000 / this.config.distScale;
+    const sixMetersInScaledUnits =
+      this.config.bayParkingAisleLimit / this.config.distScale;
     const lineX =
       this.rearCarFromLeft + this.rearCarLength + sixMetersInScaledUnits;
     const lineY = this.rearCarFromTop;

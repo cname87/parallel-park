@@ -150,7 +150,8 @@ export class ConfigService {
   maxWheelAngleAllowed = 45;
   /* Minimum allowed turning radius in mm calculated with wheelbase = 2300mm and front overhang = 300mm. */
   minTurningRadiusAllowed = 3677;
-
+  /* The width of the aisle space in bay parking */
+  bayParkingAisleLimit = 6000;
   /**
    * * Error constants
    */

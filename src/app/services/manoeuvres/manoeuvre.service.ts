@@ -371,41 +371,37 @@ export class ManoeuvreService {
 
     let extraParkingSpace = 0;
 
-    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use the street parking space value directly */
+    /* Handle EDistOut manoeuvres. EDistOut manoeuvres are used for the Keyboard mode. Return the street parking space value */
     const distOutValues = this.objects.distancesOut.map(
       ([enumValue]) => enumValue,
     );
     if (distOutValues.includes(manoeuvre as EDistOut)) {
       return street.parkingSpaceLength;
-      /* Handle automated manoeuvres */
-    } else {
-      switch (manoeuvre as EManoeuvre) {
-        case EManoeuvre.Park2Rotate0Straight:
-        case EManoeuvre.Park2Rotate1StraightFixedStart:
-        case EManoeuvre.Park2Rotate1StraightMinAngle:
-        case EManoeuvre.Park2Rotate1StraightSetManual:
-        case EManoeuvre.Park3Rotate1StraightMinAngle:
-        case EManoeuvre.Park4UsingRules1:
-        case EManoeuvre.Park4UsingRules2:
-          extraParkingSpace = this.getExtraParkingSpace({
-            manoeuvre,
-            street,
-            car,
-            config,
-          });
-          const parkingSpace =
-            2 * street.safetyGap + car.length + extraParkingSpace;
-          this.logger.log(
-            `Parking space: (${parkingSpace}`,
-            LoggingLevel.TRACE,
-          );
-          return parkingSpace;
-        case EManoeuvre.BayPark1:
-          /* Return the bay width set by the chosen street*/
-          return street.parkingSpaceLength;
-        default:
-          throw new Error('Unexpected manoeuvre');
-      }
+    }
+    /* Handle automated manoeuvres */
+    switch (manoeuvre as EManoeuvre) {
+      case EManoeuvre.Park2Rotate0Straight:
+      case EManoeuvre.Park2Rotate1StraightFixedStart:
+      case EManoeuvre.Park2Rotate1StraightMinAngle:
+      case EManoeuvre.Park2Rotate1StraightSetManual:
+      case EManoeuvre.Park3Rotate1StraightMinAngle:
+      case EManoeuvre.Park4UsingRules1:
+      case EManoeuvre.Park4UsingRules2:
+        extraParkingSpace = this.getExtraParkingSpace({
+          manoeuvre,
+          street,
+          car,
+          config,
+        });
+        const parkingSpace =
+          2 * street.safetyGap + car.length + extraParkingSpace;
+        this.logger.log(`Parking space: (${parkingSpace}`, LoggingLevel.TRACE);
+        return parkingSpace;
+      case EManoeuvre.BayPark1:
+        /* Return the bay width set by the chosen street*/
+        return street.parkingSpaceLength;
+      default:
+        throw new Error('Unexpected manoeuvre');
     }
   };
 
@@ -807,7 +803,7 @@ export class ManoeuvreService {
   }: IParams): number => {
     this.logger.log('getStartXDistToPivot called', LoggingLevel.TRACE);
 
-    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use a default value */
+    /* Handle EDistOut manoeuvres. EDistOut manoeuvres are used for the Keyboard mode. Use the EDistOut value for bay parking, as the x-axis represents the distance from the parked car in bay parking, and a configuration value for parallel parking. */
     const distOutValues = this.objects.distancesOut.map(
       ([enumValue]) => enumValue,
     );
@@ -820,15 +816,16 @@ export class ManoeuvreService {
           LoggingLevel.DEBUG,
         );
         return value;
+      } else if (this.street.type === 'parallel') {
+        const value =
+          this.config.parallelKeyboardModeStartDistFromRearToPivot /
+          config.distScale;
+        this.logger.log(
+          `x-distance to pivot: ${value * config.distScale}`,
+          LoggingLevel.DEBUG,
+        );
+        return value;
       }
-      const value =
-        this.config.parallelKeyboardModeStartDistFromRearToPivot /
-        config.distScale;
-      this.logger.log(
-        `x-distance to pivot: ${value * config.distScale}`,
-        LoggingLevel.DEBUG,
-      );
-      return value;
     }
 
     /* Handle automated manoeuvres */
@@ -944,7 +941,7 @@ export class ManoeuvreService {
   }: IParams): number => {
     this.logger.log('getStartDistYToPivot called', LoggingLevel.TRACE);
 
-    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so use the EDistOut value */
+    /* Handle EDistOut manoeuvres. EDistOut manoeuvres are used for the Keyboard mode. Use the EDistOut value for parallel parking, as the y-axis represents the distance from the parked car in bay parking, and a configuration value for bay parking. */
     const distOutValues = this.objects.distancesOut.map(
       ([enumValue]) => enumValue,
     );
@@ -958,14 +955,15 @@ export class ManoeuvreService {
           LoggingLevel.DEBUG,
         );
         return value;
+      } else if (this.street.type === 'parallel') {
+        const value =
+          this.objects[manoeuvre as EDistOut].distance / config.distScale;
+        this.logger.log(
+          `y-distance to pivot: ${value * config.distScale}`,
+          LoggingLevel.DEBUG,
+        );
+        return value;
       }
-      const value =
-        this.objects[manoeuvre as EDistOut].distance / config.distScale;
-      this.logger.log(
-        `y-distance to pivot: ${value * config.distScale}`,
-        LoggingLevel.DEBUG,
-      );
-      return value;
     }
 
     /* Handle automated manoeuvres */
@@ -1079,16 +1077,6 @@ export class ManoeuvreService {
   private getPivot = ({ manoeuvre, street, car, config }: IParams): TPoint => {
     this.logger.log('getPivot called', LoggingLevel.TRACE);
 
-    /* EDistOut manoeuvres are used for the Keyboard mode so set to a bay or parallel manoeuvre to return an appropriate value */
-    const distOutValues = this.objects.distancesOut.map(
-      ([enumValue]) => enumValue,
-    );
-    if (distOutValues.includes(manoeuvre as EDistOut)) {
-      if (this.street.type === 'bay') {
-        manoeuvre = EManoeuvre.BayPark1;
-      } else manoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
-    }
-
     let value = {} as TPoint;
     const parkingSpace = this.getParkingSpace({
       manoeuvre,
@@ -1096,6 +1084,27 @@ export class ManoeuvreService {
       car,
       config,
     });
+    const fromKerb = this.getPivotPointFromKerb({
+      manoeuvre,
+      street,
+      car,
+      config,
+    });
+
+    /* EDistOut manoeuvres are used for the Keyboard mode so set the manoeuvre to an bay or parallel manoeuvre to return an appropriate value */
+    /* NOTE: If the pivot point in keyboard mode ever differs from the automated manoeuvres chosen below then this must be edited */
+    const distOutValues = this.objects.distancesOut.map(
+      ([enumValue]) => enumValue,
+    );
+    if (distOutValues.includes(manoeuvre as EDistOut)) {
+      if (this.street.type === 'bay') {
+        /* The bay parking keyboard mode pivot point is the same as in the BayPark1 manoeuvre */
+        manoeuvre = EManoeuvre.BayPark1;
+      } else if (this.street.type === 'parallel') {
+        /* The parallel parking keyboard mode pivot point is the same for all parallel manoeuvre, so use one at random*/
+        manoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
+      }
+    }
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -1104,12 +1113,6 @@ export class ManoeuvreService {
       case EManoeuvre.Park2Rotate1StraightFixedStart:
       case EManoeuvre.Park4UsingRules1:
       case EManoeuvre.Park4UsingRules2:
-        const fromKerb = this.getPivotPointFromKerb({
-          manoeuvre,
-          street,
-          car,
-          config,
-        });
         value = {
           /* The PP is offset from the x-axis by the rear car and the parking space less a safety gap. */
           x:
@@ -1181,7 +1184,7 @@ export class ManoeuvreService {
       LoggingLevel.DEBUG,
     );
 
-    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so set to the bay or parallel parking value depending on the street type */
+    /* Handle EDistOut manoeuvres. EDistOut manoeuvres are used for the Keyboard mode. Set to an appropriate bay or parallel parking value. */
     const distOutValues = this.objects.distancesOut.map(
       ([enumValue]) => enumValue,
     );
@@ -1276,7 +1279,7 @@ export class ManoeuvreService {
   private getStartAngle = ({ manoeuvre }: IParams): number => {
     this.logger.log('getStartAngle called', LoggingLevel.TRACE);
 
-    /* Handle EDistOut manoeuvres.  EDistOut manoeuvres are used for the Keyboard mode so set to the bay or parallel parking value depending on the street type */
+    /* Handle EDistOut manoeuvres. EDistOut manoeuvres are used for the Keyboard mode. Set to the Pi/2 for bay, and zero for parallel parking value. */
     const distOutValues = this.objects.distancesOut.map(
       ([enumValue]) => enumValue,
     );
@@ -1288,6 +1291,7 @@ export class ManoeuvreService {
       }
     }
 
+    /* Handle automated manoeuvres */
     switch (manoeuvre) {
       case EManoeuvre.Park2Rotate1StraightMinAngle:
       case EManoeuvre.Park2Rotate0Straight:
@@ -2055,19 +2059,6 @@ export class ManoeuvreService {
   public getManoeuvre({ manoeuvre, street, car, config }: IParams): IPark {
     this.logger.log('getManoeuvre called', LoggingLevel.TRACE);
 
-    /* Currently, the manoeuvre values are of type `EDistOut for bay parking.  as there There is no calculated bay parking manoeuvre so if the input manoeuvre is one of these, change it to the sole bay parking manoeuvre */
-    /* * Improvement i to */
-    // const distOutValues = this.objects.distancesOut.map(
-    //   ([enumValue]) => enumValue,
-    // );
-    // if (distOutValues.includes(manoeuvre as EDistOut)) {
-    //   // Respect the actual parking type instead of always forcing bay parking
-    //   manoeuvre =
-    //     street.type === 'bay'
-    //       ? EManoeuvre.BayPark1
-    //       : EManoeuvre.Park2Rotate1StraightMinAngle;
-    // }
-
     let parkingSpaceLength = 0;
     let startPosition: TPoint = { x: 0, y: 0 };
     let startAngleRads = 0;
@@ -2085,12 +2076,14 @@ export class ManoeuvreService {
     });
     startAngleRads = this.getStartAngle({ manoeuvre, street, car, config });
 
-    /* Handle the sole bay parking manoeuvre by returning an empty movie as there is currently no calculated bay parking manoeuvre */
+    /* Exit at this stage for bay parking manoeuvre or EDistOut manoeuvres as there are no calculated manoeuvres for these */
     const distOutValues = this.objects.distancesOut.map(
       ([enumValue]) => enumValue,
     );
     if (
+      /* Handle the sole bay parking manoeuvre by returning an empty movie as there is currently no calculated bay parking manoeuvre */
       manoeuvre === EManoeuvre.BayPark1 ||
+      /* EDistOut manoeuvres are only used for Keyboard mode so return anempty movie as there is no calculated parking manoeuvre */
       distOutValues.includes(manoeuvre as EDistOut)
     ) {
       return {
