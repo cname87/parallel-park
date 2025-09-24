@@ -27,7 +27,6 @@ export class ObjectsService {
   public Width_1595mm: TStreetSetup;
   public Width_2073mm: TStreetSetup;
   public Width_2426mm: TStreetSetup;
-  public Custom_Street: TStreetSetup;
   public Bay_2200mm: TStreetSetup;
   public Bay_2400mm: TStreetSetup;
 
@@ -176,29 +175,6 @@ export class ObjectsService {
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
 
-    this.Custom_Street = {
-      /* To be set by user in a form */
-      name: EStreet.Custom_Street,
-      type: 'parallel',
-      rearCarFromLeft: 0,
-      rearCarFromTop: this.config.defaultCarFromKerb * this.config.distScale,
-      rearCarLength: 1000,
-      rearCarWidth: 2426,
-      frontCarFromLeft: () => {
-        return (
-          this.Custom_Street.rearCarFromLeft +
-          this.Custom_Street.parkingSpaceLength
-        );
-      },
-      frontCarFromTop: () => {
-        return this.Custom_Street.rearCarFromTop;
-      },
-      frontCarLength: 7000,
-      frontCarWidth: 2426,
-      parkingSpaceLength: 0,
-      carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
-      safetyGap: this.config.defaultSafetyGap * this.config.distScale,
-    };
     this.Bay_2200mm = {
       name: EStreet.Bay_2200mm,
       type: 'bay',
@@ -365,18 +341,6 @@ export class ObjectsService {
     sideOverhang: 96, // 1595mm total width
     wheelWidth: 175, // 175/65 R14
     wheelLength: 609, // 14 inch
-  };
-
-  Custom_Car: TCarSetup = {
-    name: ECar.Custom_Car,
-    minTurningRadius: 6600,
-    rearOverhang: 996,
-    wheelbase: 3400,
-    frontOverhang: 894,
-    wheelToWheelWidth: 1628,
-    sideOverhang: 138,
-    wheelWidth: 215,
-    wheelLength: 686,
   };
 
   Out_100mm: TDistOut = {

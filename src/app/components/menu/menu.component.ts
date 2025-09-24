@@ -51,8 +51,6 @@ export class MenuComponent
   }
 
   public showScenarioForm: 'none' | 'block' = 'block';
-  public showCustomCarForm: 'none' | 'block' = 'none';
-  public showCustomStreetForm: 'none' | 'block' = 'none';
   public showManualMode = false;
 
   private buttonStatus: EButtonStatus = EButtonStatus.Reset;
@@ -126,10 +124,6 @@ export class MenuComponent
         case ERunMode.Automated:
         case ERunMode.Keyboard:
           this.showScenarioForm = 'block';
-          this.showCustomCarForm =
-            this.car === ECar.Custom_Car ? 'block' : 'none';
-          this.showCustomStreetForm =
-            this.street === EStreet.Custom_Street ? 'block' : 'none';
           break;
         default:
           break;
@@ -138,8 +132,6 @@ export class MenuComponent
 
     if (this.buttonStatus === EButtonStatus.Reset) {
       this.showScenarioForm = 'none';
-      this.showCustomCarForm = 'none';
-      this.showCustomStreetForm = 'none';
       switch (this.mode) {
         case ERunMode.Keyboard:
           this.showManualMode = true;

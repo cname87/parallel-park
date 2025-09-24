@@ -3,8 +3,6 @@ import { Observable } from 'rxjs/internal/Observable';
 import {
   IButton,
   ICar,
-  ICustomCar,
-  ICustomStreet,
   IRunMode,
   IManoeuvre,
   IStreet,
@@ -26,8 +24,6 @@ export class DataService {
   #street!: IStreet;
   #runMode!: IRunMode;
   #parkMode!: IParkMode;
-  #customCar!: ICustomCar;
-  #customStreet!: ICustomStreet;
   #stopMoveCalled$!: Observable<boolean>;
 
   #buttons = new Map();
@@ -37,8 +33,6 @@ export class DataService {
   getManoeuvre = (): IManoeuvre => this.#manoeuvre;
   getCar = (): ICar => this.#car;
   getStreet = (): IStreet => this.#street;
-  getCustomCar = (): ICustomCar => this.#customCar;
-  getCustomStreet = (): ICustomStreet => this.#customStreet;
   getStopMoveCalled = (): Observable<boolean> => this.#stopMoveCalled$;
 
   setRunMode = (group: IRunMode): void => {
@@ -55,12 +49,6 @@ export class DataService {
   };
   setStreet = (street: IStreet): void => {
     this.#street = street;
-  };
-  setCustomCar = (custom: ICustomCar): void => {
-    this.#customCar = custom;
-  };
-  setCustomStreet = (custom: ICustomStreet): void => {
-    this.#customStreet = custom;
   };
   setStopMoveCalled = (stopMove$: Observable<boolean>): void => {
     this.#stopMoveCalled$ = stopMove$;

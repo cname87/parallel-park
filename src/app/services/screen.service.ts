@@ -402,29 +402,8 @@ export class ScreenService {
 
       /* Set to wait for the next button click */
       this.isMainButtonClicked = false;
-      let invalid = false;
       do {
         await this.runEventLoop();
-        /* Disable menus if custom car or street entry form is invalid */
-        if (
-          // Add ? as custom car and street are optional
-          this.data.getCustomCar()?.customCarForm?.invalid ||
-          this.data.getCustomStreet()?.customStreetForm?.invalid
-        ) {
-          invalid = true;
-          this.data.getButton('main').disable();
-          this.data.getRunMode().modeForm.disable({ emitEvent: false });
-          this.data.getManoeuvre().manoeuvreForm.disable({ emitEvent: false });
-          this.data.getCar().carForm.disable({ emitEvent: false });
-          this.data.getStreet().streetForm.disable({ emitEvent: false });
-        } else if (invalid === true) {
-          invalid = false;
-          this.data.getButton('main').enableRun();
-          this.data.getRunMode().modeForm.enable({ emitEvent: false });
-          this.data.getManoeuvre().manoeuvreForm.enable({ emitEvent: false });
-          this.data.getCar().carForm.enable({ emitEvent: false });
-          this.data.getStreet().streetForm.enable({ emitEvent: false });
-        }
       } while (this.isMainButtonClicked === false);
 
       /* Disable all form controls */

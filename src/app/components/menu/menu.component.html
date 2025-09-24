@@ -68,37 +68,7 @@
 
 </div>
 
-<div
-  class="custom"
-  fxLayout="row"
-  fxLayoutGap="1rem"
-  fxLayoutAlign="center"
-  [ngStyle]="{'display': showCustomCarForm}"
->
 
-  <app-custom-car
-    fxFlex="0 1 100%"
-    [ngStyle]="{'display': showCustomCarForm}"
-  >
-  </app-custom-car>
-
-</div>
-
-<div
-  class="custom"
-  fxLayout="row"
-  fxLayoutGap="1rem"
-  fxLayoutAlign="center"
-  [ngStyle]="{'display': showCustomStreetForm}"
->
-
-  <app-custom-street
-    fxFlex="0 1 100%"
-    [ngStyle]="{'display': showCustomStreetForm}"
-  >
-  </app-custom-street>
-
-</div>
 
 <app-manual-mode
   *ngIf="showManualMode"

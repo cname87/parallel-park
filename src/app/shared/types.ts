@@ -75,31 +75,6 @@ export interface IParkMode {
   parkMode$: Observable<EParkMode>;
 }
 
-export interface ICustomCarForm {
-  minTurningRadius: number;
-  wheelbase: number;
-  width: number;
-  frontOverhang: number;
-  rearOverhang: number;
-}
-
-export interface ICustomCar {
-  customCarForm: FormGroup | null;
-  customCar$: Observable<TCarSetup>;
-}
-
-export interface ICustomStreetForm {
-  frontCarWidth: number;
-  distFromKerb: number;
-  safetyGap: number;
-  parkingSpace: number;
-}
-
-export interface ICustomStreet {
-  customStreetForm: FormGroup | null;
-  customStreet$: Observable<TStreetSetup>;
-}
-
 export interface IManoeuvreForm {
   manoeuvre: EManoeuvre | EDistOut;
 }
@@ -212,7 +187,6 @@ export const enum ECar {
   Seat_Ibiza_2018 = 'Seat_Ibiza_2018',
   Hyundai_i10_2018 = 'Hyundai_i10_2018',
   Kia_Picanto_2020 = 'Kia_Picanto_2020',
-  Custom_Car = 'Custom_Car',
   Fiat_Ducato_MWB_Van_2025 = 'Fiat_Ducato_MWB_Van_2025',
 }
 
@@ -256,7 +230,6 @@ export const enum EStreet {
   Width_1595mm = 'Width_1595mm',
   Width_2073mm = 'Width_2073mm',
   Width_2426mm = 'Width_2426mm',
-  Custom_Street = 'Custom_Street',
   Bay_2400mm = 'Bay_2400mm',
   Bay_2200mm = 'Bay_2200mm',
 }
