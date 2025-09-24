@@ -7,6 +7,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from '../../shared/base.component';
 import {
   startWith,
   shareReplay,
@@ -47,7 +49,7 @@ import { StdErrorStateMatcher } from '../../shared/utilities';
     MatOptionModule,
   ],
 })
-export class CustomStreetComponent implements OnInit {
+export class CustomStreetComponent extends BaseComponent implements OnInit {
   customStreetForm!: FormGroup;
   #customStreetInitialFormValue: ICustomStreetForm;
   #customStreet$!: Observable<TStreetSetup>;
@@ -69,6 +71,7 @@ export class CustomStreetComponent implements OnInit {
     private fb: FormBuilder,
     private objects: ObjectsService,
   ) {
+    super();
     this.minSafetyGap = this.config.minSafetyGap;
     this.maxSafetyGap = this.config.maxSafetyGap;
     this.minFrontCarWidth = this.config.minFrontCarWidth;
@@ -157,18 +160,21 @@ export class CustomStreetComponent implements OnInit {
     this.data.setCustomStreet(this.#customStreet);
 
     /* Store the updated form value in the Custom Street object */
-    this.#customStreet$.subscribe((street) => {
+    this.#customStreet$.pipe(takeUntil(this.destroy$)).subscribe((street) => {
       this.objects.Custom_Street = street;
     });
 
-    this.data.getRunMode().runMode$.subscribe((value: ERunMode) => {
-      if (value === ERunMode.Keyboard) {
-        this.customStreetForm.controls['parkingSpace'].enable();
-      } else {
-        this.customStreetForm.controls['parkingSpace'].disable();
-        /* Clear parking space length whenever field is disabled */
-        this.customStreetForm.get('parkingSpace')?.setValue('0');
-      }
-    });
+    this.data
+      .getRunMode()
+      .runMode$.pipe(takeUntil(this.destroy$))
+      .subscribe((value: ERunMode) => {
+        if (value === ERunMode.Keyboard) {
+          this.customStreetForm.controls['parkingSpace'].enable();
+        } else {
+          this.customStreetForm.controls['parkingSpace'].disable();
+          /* Clear parking space length whenever field is disabled */
+          this.customStreetForm.get('parkingSpace')?.setValue('0');
+        }
+      });
   }
 }

@@ -6,6 +6,7 @@ import {
 } from '@angular/material/snack-bar';
 import { Subject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { SubscriptionManager } from '../shared/subscription-manager';
 import {
   EButtonStatus,
   ERunMode,
@@ -22,6 +23,8 @@ import { LoggerService } from './logger.service';
 
 @Injectable()
 export class SnackbarService {
+  private subscriptionManager = new SubscriptionManager();
+
   constructor(
     private config: ConfigService,
     private data: DataService,
@@ -45,7 +48,7 @@ export class SnackbarService {
 
   /* Subscribe to track the operation mode */
   public trackMode(): void {
-    this.data
+    const modeSub = this.data
       .getRunMode()
       .runMode$.pipe(
         this.logger.tapLog('Snackbar Service Mode click:', LoggingLevel.DEBUG),
@@ -53,12 +56,13 @@ export class SnackbarService {
       .subscribe((data: ERunMode) => {
         this.#mode = data;
       });
+    this.subscriptionManager.add(modeSub);
   }
 
   /* Track the button status */
   /* Called by the root program when the button is enabled */
   public trackButton(): void {
-    this.data
+    const buttonSub = this.data
       .getButton('main')
       .buttonLastClick$.pipe(
         this.logger.tapLog(
@@ -69,6 +73,7 @@ export class SnackbarService {
       .subscribe((data: EButtonStatus) => {
         this.#buttonLastClickStatus = data;
       });
+    this.subscriptionManager.add(buttonSub);
   }
 
   /* Add all mouse events that interact with the grid here */
@@ -149,5 +154,13 @@ export class SnackbarService {
       }
     });
     return snackRef;
+  }
+
+  /**
+   * Clean up all subscriptions.
+   * Should be called when the service is no longer needed.
+   */
+  cleanup(): void {
+    this.subscriptionManager.unsubscribeAll();
   }
 }

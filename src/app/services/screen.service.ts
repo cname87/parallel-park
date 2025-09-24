@@ -12,6 +12,7 @@ import {
   TMove,
 } from '../shared/types';
 import { ConfigService } from './config.service';
+import { SubscriptionManager } from '../shared/subscription-manager';
 import { GridService } from './grid.service';
 import { StreetService } from './street.service';
 import { CarService } from './car.service';
@@ -25,6 +26,8 @@ import { SnackbarService } from './snackbar.service';
 
 @Injectable({ providedIn: 'root' })
 export class ScreenService {
+  private subscriptionManager = new SubscriptionManager();
+
   constructor(
     private config: ConfigService,
     private grid: GridService,
@@ -296,8 +299,11 @@ export class ScreenService {
     /* Avoids view error */
     await this.runEventLoop();
 
+    /* Clean up any existing subscriptions before creating new ones */
+    this.subscriptionManager.unsubscribeAll();
+
     /* Subscribe to track the button status from the last click */
-    this.data
+    const mainButtonSub = this.data
       .getButton('main')
       .buttonLastClick$.pipe(
         this.logger.tapLog('Main button click detected', LoggingLevel.DEBUG),
@@ -307,52 +313,60 @@ export class ScreenService {
         /* Reset this flag to false to detect a main button click */
         this.isMainButtonClicked = true;
       });
+    this.subscriptionManager.add(mainButtonSub);
 
     /* Subscribe to track the selected parking manoeuvre, car and street setup */
     const manoeuvreService = this.data.getManoeuvre();
     if (manoeuvreService.manoeuvre$) {
-      manoeuvreService.manoeuvre$
+      const manoeuvreSub = manoeuvreService.manoeuvre$
         .pipe(this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG))
         .subscribe((manoeuvre: EManoeuvre) => {
           this.selectedManoeuvre = manoeuvre;
           this.setupScreen(this.getCurrentScenario());
         });
+      this.subscriptionManager.add(manoeuvreSub);
     }
 
     const carService = this.data.getCar();
     if (carService.car$) {
-      carService.car$
+      const carSub = carService.car$
         .pipe(this.logger.tapLog('Car chosen:', LoggingLevel.DEBUG))
         .subscribe((car: ECar) => {
           this.carSetup = car;
           this.setupScreen(this.getCurrentScenario());
         });
+      this.subscriptionManager.add(carSub);
     }
 
     const streetService = this.data.getStreet();
     if (streetService.street$) {
-      streetService.street$
+      const streetSub = streetService.street$
         .pipe(this.logger.tapLog('Street chosen:', LoggingLevel.DEBUG))
         .subscribe((street: EStreet) => {
           this.streetSetup = street;
           this.setupScreen(this.getCurrentScenario());
         });
+      this.subscriptionManager.add(streetSub);
     }
 
     const modeService = this.data.getRunMode();
     if (modeService.runMode$) {
-      modeService.runMode$
+      const modeSub = modeService.runMode$
         .pipe(this.logger.tapLog('Mode chosen:', LoggingLevel.DEBUG))
         .subscribe((data: ERunMode) => {
           this.mode = data;
           this.setupScreen(this.getCurrentScenario());
         });
+      this.subscriptionManager.add(modeSub);
     }
 
     /* Subscribe to get latest info messages */
-    this.snack.info$.subscribe((snackRef: MatSnackBarRef<TextOnlySnackBar>) => {
-      this.infoSnackRef = snackRef;
-    });
+    const infoSub = this.snack.info$.subscribe(
+      (snackRef: MatSnackBarRef<TextOnlySnackBar>) => {
+        this.infoSnackRef = snackRef;
+      },
+    );
+    this.subscriptionManager.add(infoSub);
 
     /* Enable required tracking in the services */
     this.mover.trackButton();
@@ -449,5 +463,13 @@ export class ScreenService {
           throw new Error('Unexpected mode in switch statement');
       }
     }
+  }
+
+  /**
+   * Clean up all subscriptions.
+   * Should be called when the service is no longer needed.
+   */
+  cleanup(): void {
+    this.subscriptionManager.unsubscribeAll();
   }
 }

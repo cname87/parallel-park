@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
+import { takeUntil } from 'rxjs/operators';
+import { BaseComponent } from '../../shared/base.component';
 
 import {
   AbstractControl,
@@ -57,7 +59,7 @@ import { StdErrorStateMatcher } from '../../shared/utilities';
     // MatHint, MatLabel, MatError are included via MatFormFieldModule in recent Angular Material versions
   ],
 })
-export class CustomCarComponent {
+export class CustomCarComponent extends BaseComponent implements OnInit {
   customCarForm!: FormGroup;
   #customCarInitialFormValue: ICustomCarForm;
   #customCar$!: Observable<TCarSetup>;
@@ -89,6 +91,7 @@ export class CustomCarComponent {
     private fb: FormBuilder,
     private objects: ObjectsService,
   ) {
+    super();
     this.minWheelBase = this.config.minWheelbaseForm;
     this.maxWheelBase = this.config.maxWheelbaseForm;
     this._minTurningRadius = this.config.minTurningRadiusForm;
@@ -236,9 +239,11 @@ export class CustomCarComponent {
       customCar$: this.#customCar$,
     };
     this.data.setCustomCar(this.#customCar);
+  }
 
+  ngOnInit(): void {
     /* Store the updated form detail in the Custom Car object. The car detail parameter values are accessed from the objects service when drawing the street or calculating the moves. */
-    this.#customCar$.subscribe((car) => {
+    this.#customCar$.pipe(takeUntil(this.destroy$)).subscribe((car) => {
       this.objects.Custom_Car = car;
     });
   }

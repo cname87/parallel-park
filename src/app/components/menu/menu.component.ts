@@ -1,4 +1,4 @@
-import { AfterViewInit } from '@angular/core';
+import { AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -7,8 +7,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { Component } from '@angular/core';
+import { takeUntil } from 'rxjs/operators';
 import { EButtonStatus, ECar, ERunMode, EStreet } from '../../shared/types';
 import { DataService } from '../../services/data.service';
+import { BaseComponent } from '../../shared/base.component';
 import { ModeComponent } from '../mode/mode.component';
 import { ButtonComponent } from '../button/button.component';
 import { ManualModeComponent } from '../manual-mode/manual-mode.component';
@@ -40,101 +42,111 @@ import { StreetComponent } from '../street/street.component';
     StreetComponent,
   ],
 })
-export class MenuComponent implements AfterViewInit {
-  constructor(private data: DataService) {}
+export class MenuComponent
+  extends BaseComponent
+  implements OnInit, AfterViewInit
+{
+  constructor(private data: DataService) {
+    super();
+  }
 
   public showScenarioForm: 'none' | 'block' = 'block';
   public showCustomCarForm: 'none' | 'block' = 'none';
   public showCustomStreetForm: 'none' | 'block' = 'none';
   public showManualMode = false;
 
+  private buttonStatus: EButtonStatus = EButtonStatus.Reset;
+  private mode: ERunMode = ERunMode.Automated;
+  private car: ECar = ECar.VW_T5_LWB_Van_2005;
+  private street: EStreet = EStreet.Width_1904mm;
+
+  /**
+   * Initialize subscriptions with proper cleanup using takeUntil pattern.
+   */
+  ngOnInit(): void {
+    // Subscribe to car changes
+    const carObj = this.data.getCar();
+    if (carObj && carObj.car$) {
+      carObj.car$.pipe(takeUntil(this.destroy$)).subscribe((value: ECar) => {
+        this.car = value;
+        this.updateDisplayState();
+      });
+    }
+
+    // Subscribe to mode changes
+    const modeObj = this.data.getRunMode();
+    if (modeObj && modeObj.runMode$) {
+      modeObj.runMode$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((value: ERunMode) => {
+          this.mode = value;
+          this.updateDisplayState();
+        });
+    }
+
+    // Subscribe to street changes
+    const streetObj = this.data.getStreet();
+    if (streetObj && streetObj.street$) {
+      streetObj.street$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((value: EStreet) => {
+          this.street = value;
+          this.updateDisplayState();
+        });
+    }
+
+    // Subscribe to button status changes
+    const buttonObj = this.data.getButton('main');
+    if (buttonObj && buttonObj.buttonStatus$) {
+      buttonObj.buttonStatus$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((status: EButtonStatus) => {
+          this.buttonStatus = status;
+          this.updateDisplayState();
+        });
+    }
+  }
+
   /**
    * Sets up the various displays.
    */
   ngAfterViewInit(): void {
-    let buttonStatus: EButtonStatus;
-    let mode: ERunMode;
-    let car: ECar;
-    let street: EStreet;
+    // Initial display state setup
+    this.updateDisplayState();
+  }
 
-    const carObj = this.data.getCar();
-    if (carObj && carObj.car$) {
-      carObj.car$.subscribe((value: ECar) => {
-        car = value;
-        if (value === ECar.Custom_Car && buttonStatus === EButtonStatus.Run) {
-          this.showCustomCarForm = 'block';
-        } else {
-          this.showCustomCarForm = 'none';
-        }
-      });
-    }
-
-    const modeObj = this.data.getRunMode();
-    if (modeObj && modeObj.runMode$) {
-      modeObj.runMode$.subscribe((value: ERunMode) => {
-        mode = value;
-        if (mode === ERunMode.Automated && buttonStatus === EButtonStatus.Run) {
+  /**
+   * Updates the display state based on current values.
+   * Centralized logic for managing form visibility.
+   */
+  private updateDisplayState(): void {
+    if (this.buttonStatus === EButtonStatus.Run) {
+      this.showManualMode = false;
+      switch (this.mode) {
+        case ERunMode.Automated:
+        case ERunMode.Keyboard:
           this.showScenarioForm = 'block';
-        }
-        if (mode === ERunMode.Keyboard && buttonStatus === EButtonStatus.Run) {
-          this.showScenarioForm = 'block';
-        }
-      });
+          this.showCustomCarForm =
+            this.car === ECar.Custom_Car ? 'block' : 'none';
+          this.showCustomStreetForm =
+            this.street === EStreet.Custom_Street ? 'block' : 'none';
+          break;
+        default:
+          break;
+      }
     }
 
-    const streetObj = this.data.getStreet();
-    if (streetObj && streetObj.street$) {
-      streetObj.street$.subscribe((value: EStreet) => {
-        street = value;
-        if (
-          value === EStreet.Custom_Street &&
-          buttonStatus === EButtonStatus.Run
-        ) {
-          this.showCustomStreetForm = 'block';
-        } else {
-          this.showCustomStreetForm = 'none';
-        }
-      });
-    }
-
-    const buttonObj = this.data.getButton('main');
-    if (buttonObj && buttonObj.buttonStatus$) {
-      buttonObj.buttonStatus$.subscribe((status: EButtonStatus) => {
-        buttonStatus = status;
-        if (status === EButtonStatus.Run) {
-          this.showManualMode = false;
-          switch (mode) {
-            case ERunMode.Automated:
-            case ERunMode.Keyboard:
-              this.showScenarioForm = 'block';
-              if (car === ECar.Custom_Car) {
-                this.showCustomCarForm = 'block';
-              } else {
-                this.showCustomCarForm = 'none';
-              }
-              if (street === EStreet.Custom_Street) {
-                this.showCustomStreetForm = 'block';
-              } else {
-                this.showCustomStreetForm = 'none';
-              }
-              break;
-            default:
-              break;
-          }
-        }
-        if (status === EButtonStatus.Reset) {
-          this.showScenarioForm = 'none';
-          this.showCustomCarForm = 'none';
-          this.showCustomStreetForm = 'none';
-          switch (mode) {
-            case ERunMode.Keyboard:
-              this.showManualMode = true;
-              break;
-            default:
-              break;
-          }
-        }
-      });
+    if (this.buttonStatus === EButtonStatus.Reset) {
+      this.showScenarioForm = 'none';
+      this.showCustomCarForm = 'none';
+      this.showCustomStreetForm = 'none';
+      switch (this.mode) {
+        case ERunMode.Keyboard:
+          this.showManualMode = true;
+          break;
+        default:
+          break;
+      }
     }
   }
 }

@@ -5,6 +5,7 @@ import {
   TextOnlySnackBar,
 } from '@angular/material/snack-bar';
 import * as createjs from 'createjs-module';
+import { SubscriptionManager } from '../shared/subscription-manager';
 import {
   EButtonStatus,
   EDirection,
@@ -42,6 +43,8 @@ export class MoveService {
   #stopMoveCalled = new BehaviorSubject<boolean>(false);
   #stopMoveCalled$ = this.#stopMoveCalled.asObservable();
 
+  private subscriptionManager = new SubscriptionManager();
+
   constructor(
     private config: ConfigService,
     private car: CarService,
@@ -51,15 +54,17 @@ export class MoveService {
     private snackBar: MatSnackBar,
     private logger: LoggerService,
   ) {
-    this.snack.pause$.subscribe(
+    const pauseSub = this.snack.pause$.subscribe(
       (snackRef: MatSnackBarRef<TextOnlySnackBar>) => {
         this.#pause = true;
         this.#pauseSnackRef = snackRef;
-        snackRef.afterDismissed().subscribe(() => {
+        const dismissSub = snackRef.afterDismissed().subscribe(() => {
           this.#pause = false;
         });
+        this.subscriptionManager.add(dismissSub);
       },
     );
+    this.subscriptionManager.add(pauseSub);
 
     this.data.setStopMoveCalled(this.#stopMoveCalled$);
   }
@@ -67,7 +72,7 @@ export class MoveService {
   /* Track the main button status */
   /* Called by the root program when the button is enabled */
   public trackButton(): void {
-    this.data
+    const buttonSub = this.data
       .getButton('main')
       .buttonLastClick$.pipe(
         this.logger.tapLog('Move Service Button click:', LoggingLevel.DEBUG),
@@ -78,6 +83,7 @@ export class MoveService {
           this.#pauseSnackRef?.dismiss();
         }
       });
+    this.subscriptionManager.add(buttonSub);
   }
 
   /**
@@ -699,5 +705,13 @@ export class MoveService {
       default:
         throw new Error('Unexpected move type');
     }
+  }
+
+  /**
+   * Clean up all subscriptions.
+   * Should be called when the service is no longer needed.
+   */
+  cleanup(): void {
+    this.subscriptionManager.unsubscribeAll();
   }
 }
