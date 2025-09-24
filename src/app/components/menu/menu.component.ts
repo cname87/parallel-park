@@ -58,6 +58,9 @@ export class MenuComponent
   #car: ECar = ECar.VW_T5_LWB_Van_2005;
   #street: EStreet = EStreet.Width_1904mm;
 
+  #modeSubscriptionSetup = false;
+  #buttonSubscriptionSetup = false;
+
   /**
    * Initialize subscriptions with proper cleanup using takeUntil pattern.
    */
@@ -72,15 +75,7 @@ export class MenuComponent
     }
 
     // Subscribe to mode changes
-    const modeObj = this.data.getRunMode();
-    if (modeObj && modeObj.runMode$) {
-      modeObj.runMode$
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((value: ERunMode) => {
-          this.#mode = value;
-          this.updateDisplayState();
-        });
-    }
+    this.setupModeSubscription();
 
     // Subscribe to street changes
     const streetObj = this.data.getStreet();
@@ -93,9 +88,61 @@ export class MenuComponent
         });
     }
 
-    // Subscribe to button status changes
+    // Try to subscribe to button status changes
+    this.setupButtonSubscription();
+  }
+
+  /**
+   * Sets up the various displays.
+   */
+  ngAfterViewInit(): void {
+    // Try to set up subscriptions again in case they weren't available in ngOnInit
+    this.setupModeSubscription();
+    this.setupButtonSubscription();
+
+    // Fallback: try again after a short delay if subscriptions still not set up
+    setTimeout(() => {
+      this.setupModeSubscription();
+      this.setupButtonSubscription();
+    }, 100);
+
+    // Initial display state setup
+    this.updateDisplayState();
+  }
+
+  /**
+   * Set up subscription to mode changes.
+   * Can be called multiple times safely.
+   */
+  private setupModeSubscription(): void {
+    if (this.#modeSubscriptionSetup) {
+      return; // Already set up
+    }
+
+    const modeObj = this.data.getRunMode();
+    if (modeObj && modeObj.runMode$) {
+      this.#modeSubscriptionSetup = true;
+      modeObj.runMode$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((value: ERunMode) => {
+          this.#mode = value;
+          this.updateDisplayState();
+        });
+    }
+  }
+
+  /**
+   * Set up subscription to main button status changes.
+   * Can be called multiple times safely.
+   */
+  private setupButtonSubscription(): void {
+    if (this.#buttonSubscriptionSetup) {
+      return; // Already set up
+    }
+
     const buttonObj = this.data.getButton('main');
     if (buttonObj && buttonObj.buttonStatus$) {
+      this.#buttonSubscriptionSetup = true;
       buttonObj.buttonStatus$
         .pipe(takeUntil(this.destroy$))
         .subscribe((status: EButtonStatus) => {
@@ -103,14 +150,6 @@ export class MenuComponent
           this.updateDisplayState();
         });
     }
-  }
-
-  /**
-   * Sets up the various displays.
-   */
-  ngAfterViewInit(): void {
-    // Initial display state setup
-    this.updateDisplayState();
   }
 
   /**
@@ -137,6 +176,7 @@ export class MenuComponent
           this.showManualMode = true;
           break;
         default:
+          this.showManualMode = false;
           break;
       }
     }

@@ -168,9 +168,10 @@ export class ManualMoveService {
             this.car.draw(startPosition, startAngle);
             /* Trigger key up and reset all buttons (as no stop move is called) */
             await this.#keyup({ key: EButtonLabels.Start });
-            Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
-              this.data.getButton(item).enableRun(),
-            );
+            Array.from(this.config.manualModeRunTexts.keys()).map((item) => {
+              const btn = this.data.getButton(item);
+              if (btn) btn.enableRun();
+            });
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
@@ -200,9 +201,10 @@ export class ManualMoveService {
             }
             this.car.draw(parkPosition, 0);
             await this.#keyup({ key: EButtonLabels.Start });
-            Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
-              this.data.getButton(item).enableRun(),
-            );
+            Array.from(this.config.manualModeRunTexts.keys()).map((item) => {
+              const btn = this.data.getButton(item);
+              if (btn) btn.enableRun();
+            });
             this.logger.log(`${event.key} move exit`, LoggingLevel.TRACE);
           }
           break;
@@ -280,33 +282,43 @@ export class ManualMoveService {
     /* Subscribe to reset after any move stop */
     return this.data.getStopMoveCalled().subscribe(() => {
       this.#keyup({ key: keyToPress });
-      Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
-        this.data.getButton(item).enableRun(),
-      );
+      Array.from(this.config.manualModeRunTexts.keys()).map((item) => {
+        const btn = this.data.getButton(item);
+        if (btn) btn.enableRun();
+      });
     });
   };
 
   /* Tracks the main button to identify when RUN or RESET is clicked */
   #enableButton = (key: TButtonNames, keyToPress: string): Subscription => {
     /* Subscribe to track the button status from the last click */
-    return this.data
-      .getButton(key)
-      .buttonLastClick$.pipe(
-        this.logger.tapLog(`${key} button click:`, LoggingLevel.TRACE),
-      )
+    const button = this.data.getButton(key);
+    if (!button) {
+      // Return empty subscription if button doesn't exist yet
+      return new Subscription();
+    }
+    return button.buttonLastClick$
+      .pipe(this.logger.tapLog(`${key} button click:`, LoggingLevel.TRACE))
       .subscribe((status: EButtonStatus) => {
         if (status === EButtonStatus.Run) {
-          this.data.getButton(key).enableReset();
+          const currentButton = this.data.getButton(key);
+          if (currentButton) {
+            currentButton.enableReset();
+          }
           this.#keydown({ key: keyToPress });
           Array.from(this.config.manualModeRunTexts.keys())
             .filter((item) => item !== key)
-            .map((item) => this.data.getButton(item).disable());
+            .map((item) => {
+              const btn = this.data.getButton(item);
+              if (btn) btn.disable();
+            });
         }
         if (status === EButtonStatus.Reset) {
           this.#keyup({ key: keyToPress });
-          Array.from(this.config.manualModeRunTexts.keys()).map((item) =>
-            this.data.getButton(item).enableRun(),
-          );
+          Array.from(this.config.manualModeRunTexts.keys()).map((item) => {
+            const btn = this.data.getButton(item);
+            if (btn) btn.enableRun();
+          });
         }
       });
   };
