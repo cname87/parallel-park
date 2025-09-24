@@ -65,7 +65,7 @@ export class RulesService {
     let move1stArcCondition: TCondition = () => false;
     /* Condition that stops the straight reverse */
     let move2ndStraightCondition: TCondition = () => false;
-    /* Horizontal test must not be less than a certain value as the readCarRotation angle will go from a positive value to a negative value at a certain point */
+    /* Horizontal test must not be less than a certain value as the readCarRotation angle will go from a positive value to a negative value at a certain point so its absolute value might never be below a very low value */
     const horizontalTestAngle = 0.015;
 
     /* Set the extra parking space (i.e the space between the front and rear cars minus the length of the car being parked, minus two safety gaps) to a fixed value for rules-based manoeuvres */
