@@ -53,10 +53,10 @@ export class MenuComponent
   public showScenarioForm: 'none' | 'block' = 'block';
   public showManualMode = false;
 
-  private buttonStatus: EButtonStatus = EButtonStatus.Reset;
-  private mode: ERunMode = ERunMode.Automated;
-  private car: ECar = ECar.VW_T5_LWB_Van_2005;
-  private street: EStreet = EStreet.Width_1904mm;
+  #buttonStatus: EButtonStatus = EButtonStatus.Reset;
+  #mode: ERunMode = ERunMode.Automated;
+  #car: ECar = ECar.VW_T5_LWB_Van_2005;
+  #street: EStreet = EStreet.Width_1904mm;
 
   /**
    * Initialize subscriptions with proper cleanup using takeUntil pattern.
@@ -66,7 +66,7 @@ export class MenuComponent
     const carObj = this.data.getCar();
     if (carObj && carObj.car$) {
       carObj.car$.pipe(takeUntil(this.destroy$)).subscribe((value: ECar) => {
-        this.car = value;
+        this.#car = value;
         this.updateDisplayState();
       });
     }
@@ -77,7 +77,7 @@ export class MenuComponent
       modeObj.runMode$
         .pipe(takeUntil(this.destroy$))
         .subscribe((value: ERunMode) => {
-          this.mode = value;
+          this.#mode = value;
           this.updateDisplayState();
         });
     }
@@ -88,7 +88,7 @@ export class MenuComponent
       streetObj.street$
         .pipe(takeUntil(this.destroy$))
         .subscribe((value: EStreet) => {
-          this.street = value;
+          this.#street = value;
           this.updateDisplayState();
         });
     }
@@ -99,7 +99,7 @@ export class MenuComponent
       buttonObj.buttonStatus$
         .pipe(takeUntil(this.destroy$))
         .subscribe((status: EButtonStatus) => {
-          this.buttonStatus = status;
+          this.#buttonStatus = status;
           this.updateDisplayState();
         });
     }
@@ -118,9 +118,9 @@ export class MenuComponent
    * Centralized logic for managing form visibility.
    */
   private updateDisplayState(): void {
-    if (this.buttonStatus === EButtonStatus.Run) {
+    if (this.#buttonStatus === EButtonStatus.Run) {
       this.showManualMode = false;
-      switch (this.mode) {
+      switch (this.#mode) {
         case ERunMode.Automated:
         case ERunMode.Keyboard:
           this.showScenarioForm = 'block';
@@ -130,9 +130,9 @@ export class MenuComponent
       }
     }
 
-    if (this.buttonStatus === EButtonStatus.Reset) {
+    if (this.#buttonStatus === EButtonStatus.Reset) {
       this.showScenarioForm = 'none';
-      switch (this.mode) {
+      switch (this.#mode) {
         case ERunMode.Keyboard:
           this.showManualMode = true;
           break;

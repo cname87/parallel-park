@@ -41,20 +41,20 @@ export class ScreenService {
     private logger: LoggerService,
     private snack: SnackbarService,
   ) {
-    this.defaultScenario = this.objects.scenarios[0];
+    this.#defaultScenario = this.objects.scenarios[0];
   }
 
   /* Operation mode */
-  private mode = ERunMode.Automated;
+  #mode = ERunMode.Automated;
   /* Detects main button click */
-  private isMainButtonClicked = false;
+  #isMainButtonClicked = false;
   /* Stores the main button status when last clicked */
-  private mainButtonLastClickStatus!: EButtonStatus;
-  private selectedManoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
-  private carSetup = ECar.Fiat_Ducato_MWB_Van_2025;
-  private streetSetup = EStreet.Width_1904mm;
-  private defaultScenario!: TScenario;
-  private infoSnackRef!: MatSnackBarRef<TextOnlySnackBar>;
+  #mainButtonLastClickStatus!: EButtonStatus;
+  #selectedManoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
+  #carSetup = ECar.Fiat_Ducato_MWB_Van_2025;
+  #streetSetup = EStreet.Width_1904mm;
+  #defaultScenario!: TScenario;
+  #infoSnackRef!: MatSnackBarRef<TextOnlySnackBar>;
 
   /* Utility function used to watch for button clicks */
   private runEventLoop = (timeMs = 0): Promise<void> => {
@@ -68,9 +68,9 @@ export class ScreenService {
     this.logger.log('getCurrentScenario called', LoggingLevel.TRACE);
     /* Read current scenario from the selected manoeuvre, car and street */
     return {
-      manoeuvre: this.selectedManoeuvre,
-      carSetup: this.carSetup,
-      streetSetup: this.streetSetup,
+      manoeuvre: this.#selectedManoeuvre,
+      carSetup: this.#carSetup,
+      streetSetup: this.#streetSetup,
     };
   }
 
@@ -79,7 +79,7 @@ export class ScreenService {
    *
    * @returns A manoeuvre, i.e. the set of moves to complete a parking manoeuvre.
    */
-  public setupScreen(scenario: TScenario = this.defaultScenario): IPark {
+  public setupScreen(scenario: TScenario = this.#defaultScenario): IPark {
     //
     /* Clear the screen */
     this.config.stage.removeAllChildren();
@@ -134,7 +134,7 @@ export class ScreenService {
         .streetForm.setValue({ street: scenario.streetSetup });
       await this.runManoeuvre(scenario);
       /* Reset if the button clicked when status = Reset */
-      if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
+      if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
         break;
       }
     }
@@ -186,14 +186,14 @@ export class ScreenService {
         const move: TMove = manoeuvre.movie[key];
         await this.mover.routeMove(move);
         /* Reset if the button clicked when status = Reset */
-        if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
+        if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
           break;
         }
       }
     }
 
     /* Test and report parking errors */
-    if (this.mainButtonLastClickStatus !== EButtonStatus.Reset) {
+    if (this.#mainButtonLastClickStatus !== EButtonStatus.Reset) {
       let parkingError = false;
       const manoeuvreInfo = () => {
         const currentLoggingLevel = this.logger.readLogginglevel();
@@ -309,9 +309,9 @@ export class ScreenService {
         this.logger.tapLog('Main button click detected', LoggingLevel.DEBUG),
       )
       .subscribe((status: EButtonStatus) => {
-        this.mainButtonLastClickStatus = status;
+        this.#mainButtonLastClickStatus = status;
         /* Reset this flag to false to detect a main button click */
-        this.isMainButtonClicked = true;
+        this.#isMainButtonClicked = true;
       });
     this.subscriptionManager.add(mainButtonSub);
 
@@ -321,7 +321,7 @@ export class ScreenService {
       const manoeuvreSub = manoeuvreService.manoeuvre$
         .pipe(this.logger.tapLog('Manoeuvre chosen:', LoggingLevel.DEBUG))
         .subscribe((manoeuvre: EManoeuvre) => {
-          this.selectedManoeuvre = manoeuvre;
+          this.#selectedManoeuvre = manoeuvre;
           this.setupScreen(this.getCurrentScenario());
         });
       this.subscriptionManager.add(manoeuvreSub);
@@ -332,7 +332,7 @@ export class ScreenService {
       const carSub = carService.car$
         .pipe(this.logger.tapLog('Car chosen:', LoggingLevel.DEBUG))
         .subscribe((car: ECar) => {
-          this.carSetup = car;
+          this.#carSetup = car;
           this.setupScreen(this.getCurrentScenario());
         });
       this.subscriptionManager.add(carSub);
@@ -343,7 +343,7 @@ export class ScreenService {
       const streetSub = streetService.street$
         .pipe(this.logger.tapLog('Street chosen:', LoggingLevel.DEBUG))
         .subscribe((street: EStreet) => {
-          this.streetSetup = street;
+          this.#streetSetup = street;
           this.setupScreen(this.getCurrentScenario());
         });
       this.subscriptionManager.add(streetSub);
@@ -354,7 +354,7 @@ export class ScreenService {
       const modeSub = modeService.runMode$
         .pipe(this.logger.tapLog('Mode chosen:', LoggingLevel.DEBUG))
         .subscribe((data: ERunMode) => {
-          this.mode = data;
+          this.#mode = data;
           this.setupScreen(this.getCurrentScenario());
         });
       this.subscriptionManager.add(modeSub);
@@ -363,7 +363,7 @@ export class ScreenService {
     /* Subscribe to get latest info messages */
     const infoSub = this.snack.info$.subscribe(
       (snackRef: MatSnackBarRef<TextOnlySnackBar>) => {
-        this.infoSnackRef = snackRef;
+        this.#infoSnackRef = snackRef;
       },
     );
     this.subscriptionManager.add(infoSub);
@@ -381,10 +381,10 @@ export class ScreenService {
     while (true) {
       //
       /* Redraw screen here only if the Reset button was pressed during a manoeuvre i.e. leave the car 'parked' until the next button click otherwise */
-      if (this.mainButtonLastClickStatus === EButtonStatus.Reset) {
+      if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
         /* Dismiss any open info snackbar */
-        if (this.infoSnackRef) {
-          this.infoSnackRef.dismiss();
+        if (this.#infoSnackRef) {
+          this.#infoSnackRef.dismiss();
         }
 
         scenario = this.getCurrentScenario();
@@ -401,10 +401,10 @@ export class ScreenService {
       this.data.getButton('main').enableRun();
 
       /* Set to wait for the next button click */
-      this.isMainButtonClicked = false;
+      this.#isMainButtonClicked = false;
       do {
         await this.runEventLoop();
-      } while (this.isMainButtonClicked === false);
+      } while (this.#isMainButtonClicked === false);
 
       /* Disable all form controls */
       this.data.getRunMode().modeForm.disable({ emitEvent: false });
@@ -418,7 +418,7 @@ export class ScreenService {
       /* Allows menu changes take place */
       await this.runEventLoop();
 
-      switch (this.mode) {
+      switch (this.#mode) {
         case ERunMode.Keyboard:
           /* Read updated scenario */
           scenario = this.getCurrentScenario();
@@ -426,10 +426,10 @@ export class ScreenService {
           /* Enable keyboard moving */
           this.keyMove.runKeyboard();
           /* Set to wait for the next button click */
-          this.isMainButtonClicked = false;
+          this.#isMainButtonClicked = false;
           do {
             await this.runEventLoop();
-          } while (this.isMainButtonClicked === false);
+          } while (this.#isMainButtonClicked === false);
           /* Cancel keyboard operation */
           this.keyMove.cancelKeyboard();
           break;

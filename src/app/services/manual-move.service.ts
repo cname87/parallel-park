@@ -272,7 +272,7 @@ export class ManualMoveService {
   }
 
   #subscriptions: Subscription[] = [];
-  private manoeuvreName: EManoeuvre | EDistOut =
+  #manoeuvreName: EManoeuvre | EDistOut =
     EManoeuvre.Park2Rotate1StraightMinAngle;
 
   /* Tracks the stop move called observable to reset after a stop move */
@@ -316,7 +316,7 @@ export class ManualMoveService {
    */
   private calculateStartPosition(): TPoint {
     const parameters: IParams = {
-      manoeuvre: this.manoeuvreName,
+      manoeuvre: this.#manoeuvreName,
       street: this.street,
       car: this.car,
       config: this.config,
@@ -333,7 +333,7 @@ export class ManualMoveService {
     /* Subscribe to manoeuvre changes to keep local variable updated */
     this.#subscriptions.push(
       this.data.getManoeuvre().manoeuvre$.subscribe((manoeuvre) => {
-        this.manoeuvreName = manoeuvre;
+        this.#manoeuvreName = manoeuvre;
       }),
     );
 
