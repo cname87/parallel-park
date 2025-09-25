@@ -86,19 +86,6 @@ export class AdvancedService {
 }
 ```
 
-## Implementation Status
-
-### ✅ Fixed Components
-- **MenuComponent**: Extended BaseComponent, uses takeUntil pattern
-- **StreetComponent**: Already implemented correctly
-- **ManoeuvreComponent**: Already implemented correctly
-
-### ✅ Fixed Services
-- **ScreenService**: Uses SubscriptionManager, has cleanup() method
-- **MoveService**: Uses SubscriptionManager, has cleanup() method
-- **SnackbarService**: Uses SubscriptionManager, has cleanup() method
-- **ManualMoveService**: Already uses Subscription array correctly
-
 ## Best Practices
 
 ### 1. Always Clean Up
