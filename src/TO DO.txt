@@ -1,0 +1,11 @@
+DATE: 25-Sep-2025
+
+TO DO:
+
+1. Street.service
+  1. Clear up the use of fixed values in street.service
+  2. Rationalize the use of safety gap in bay parking mode in street.service - it's a bit all over the place since I moved to the cars filling the parking spaces.
+
+2. Fix any errors in the automated modes.
+
+3. Complete the bay parking mode parking scenario
