@@ -61,13 +61,13 @@ export interface IRunModeForm {
   runMode: ERunMode;
 }
 
-export interface IParkModeForm {
-  parkMode: EParkMode;
-}
-
 export interface IRunMode {
   modeForm: FormGroup;
   runMode$: Observable<ERunMode>;
+}
+
+export interface IParkModeForm {
+  parkMode: EParkMode;
 }
 
 export interface IParkMode {
@@ -75,8 +75,11 @@ export interface IParkMode {
   parkMode$: Observable<EParkMode>;
 }
 
-export interface IManoeuvreForm {
+export interface IParkParameters {
   manoeuvre: EManoeuvre | EDistOut;
+  street: StreetService;
+  car: CarService;
+  config: ConfigService;
 }
 
 export interface IPark {
@@ -86,16 +89,13 @@ export interface IPark {
   readonly movie: TMovie;
 }
 
+export interface IManoeuvreForm {
+  manoeuvre: EManoeuvre | EDistOut;
+}
+
 export interface IManoeuvre {
   manoeuvreForm: FormGroup;
   manoeuvre$: Observable<EManoeuvre | EDistOut>;
-}
-
-export interface IParams {
-  manoeuvre: EManoeuvre | EDistOut;
-  street: StreetService;
-  car: CarService;
-  config: ConfigService;
 }
 
 export interface ICarForm {
@@ -257,7 +257,8 @@ export const enum EDistOut {
   Out_2000mm = 'Out_2000mm',
 }
 
-export type TScenario = {
+export type TParkingScenario = {
+  mode: ERunMode;
   manoeuvre: EManoeuvre;
   carSetup: ECar;
   streetSetup: EStreet;

@@ -12,12 +12,12 @@ import {
   TPoint,
   TSteer,
   EDirection,
-  IParams,
+  IParkParameters,
   EManoeuvre,
   EDistOut,
 } from '../shared/types';
 import { CarService } from './car.service';
-import { ManoeuvreService } from './manoeuvres/manoeuvre.service';
+import { ParkingService } from './parking/parking.service';
 import { ConfigService } from './config.service';
 import { MoveService } from './move.service';
 import { StreetService } from './street.service';
@@ -81,7 +81,7 @@ export class ManualMoveService {
     private mover: MoveService,
     private street: StreetService,
     private car: CarService,
-    private manoeuvre: ManoeuvreService,
+    private park: ParkingService,
     private config: ConfigService,
     private logger: LoggerService,
     private data: DataService,
@@ -327,13 +327,13 @@ export class ManualMoveService {
    * Calculate start position coordinates
    */
   private calculateStartPosition(): TPoint {
-    const parameters: IParams = {
+    const parameters: IParkParameters = {
       manoeuvre: this.#manoeuvreName,
       street: this.street,
       car: this.car,
       config: this.config,
     };
-    return this.manoeuvre.getStartPosition(parameters);
+    return this.park.getStartPosition(parameters);
   }
 
   /* Called externally to start listening for keyboard events */

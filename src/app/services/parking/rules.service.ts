@@ -12,7 +12,7 @@ import {
   TMoveStraightOrArc,
 } from '../../shared/types';
 import { LoggingLevel } from '../../shared/types';
-import { IParams } from '../../shared/types';
+import { IParkParameters } from '../../shared/types';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +40,7 @@ export class RulesService {
 
   /* The getRules function returns the rules for the rules-based manoeuvres. Park4UsingRules1 is the key manoeuvre used for testing and coming up with an algorithm for parking. It has a stable implementation - see detail below. Park4UsingRules2 can be used for experimental testing and does not necessarily have a stable implementation. */
 
-  getRules({ manoeuvre, street, car, config }: IParams): {
+  getRules({ manoeuvre, street, car, config }: IParkParameters): {
     extraParkingSpace: number;
     startDistXToPivot: number;
     startDistYToPivot: number;

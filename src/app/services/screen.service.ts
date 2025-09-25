@@ -8,7 +8,7 @@ import {
   EStreet,
   IPark,
   LoggingLevel,
-  TScenario,
+  TParkingScenario,
   TMove,
 } from '../shared/types';
 import { ConfigService } from './config.service';
@@ -18,7 +18,7 @@ import { StreetService } from './street.service';
 import { CarService } from './car.service';
 import { MoveService } from './move.service';
 import { ObjectsService } from './objects.service';
-import { ManoeuvreService } from './manoeuvres/manoeuvre.service';
+import { ParkingService } from './parking/parking.service';
 import { ManualMoveService } from './manual-move.service';
 import { DataService } from './data.service';
 import { LoggerService } from './logger.service';
@@ -35,13 +35,18 @@ export class ScreenService {
     private car: CarService,
     private mover: MoveService,
     private objects: ObjectsService,
-    private manoeuvre: ManoeuvreService,
+    private park: ParkingService,
     private keyMove: ManualMoveService,
     private data: DataService,
     private logger: LoggerService,
     private snack: SnackbarService,
   ) {
-    this.#defaultScenario = this.objects.scenarios[0];
+    this.#defaultScenario = {
+      mode: ERunMode.Automated,
+      manoeuvre: EManoeuvre.Park2Rotate1StraightMinAngle,
+      carSetup: ECar.Fiat_Ducato_MWB_Van_2025,
+      streetSetup: EStreet.Width_1904mm,
+    };
   }
 
   /* Operation mode */
@@ -53,7 +58,7 @@ export class ScreenService {
   #selectedManoeuvre = EManoeuvre.Park2Rotate1StraightMinAngle;
   #carSetup = ECar.Fiat_Ducato_MWB_Van_2025;
   #streetSetup = EStreet.Width_1904mm;
-  #defaultScenario!: TScenario;
+  #defaultScenario!: TParkingScenario;
   #infoSnackRef!: MatSnackBarRef<TextOnlySnackBar>;
 
   /* Utility function used to watch for button clicks */
@@ -64,10 +69,11 @@ export class ScreenService {
   };
 
   /* Utility to construct the current scenario object. */
-  public getCurrentScenario(): TScenario {
+  public getCurrentScenario(): TParkingScenario {
     this.logger.log('getCurrentScenario called', LoggingLevel.TRACE);
     /* Read current scenario from the selected manoeuvre, car and street */
     return {
+      mode: this.#mode,
       manoeuvre: this.#selectedManoeuvre,
       carSetup: this.#carSetup,
       streetSetup: this.#streetSetup,
@@ -79,7 +85,7 @@ export class ScreenService {
    *
    * @returns A manoeuvre, i.e. the set of moves to complete a parking manoeuvre.
    */
-  public setupScreen(scenario: TScenario = this.#defaultScenario): IPark {
+  public setupScreen(scenario: TParkingScenario = this.#defaultScenario): IPark {
     //
     /* Clear the screen */
     this.config.stage.removeAllChildren();
@@ -96,7 +102,7 @@ export class ScreenService {
     this.street.setStreetFromScenario(this.objects[scenario.streetSetup]);
 
     /* Run the parking calculations getting a manoeuvre containing set of moves. The returned object contains a calculated parking space length, the start position and the set of moves. */
-    const manoeuvre = this.manoeuvre.getManoeuvre({
+    const manoeuvre = this.park.getParking({
       manoeuvre: scenario.manoeuvre,
       street: this.street,
       car: this.car,
@@ -121,7 +127,7 @@ export class ScreenService {
   /**
    * This runs a set of manoeuvres based on a list of supplied scenarios..
    */
-  async runPlaylist(scenarios: TScenario[]): Promise<void> {
+  async runPlaylist(scenarios: TParkingScenario[]): Promise<void> {
     /* Run the list of scenarios */
     for (const scenario of scenarios) {
       /* Set form values to match scenario */
@@ -132,7 +138,7 @@ export class ScreenService {
       this.data
         .getStreet()
         .streetForm.setValue({ street: scenario.streetSetup });
-      await this.runManoeuvre(scenario);
+      await this.runParking(scenario);
       /* Reset if the button clicked when status = Reset */
       if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
         break;
@@ -141,11 +147,11 @@ export class ScreenService {
   }
 
   /**
-   * This runs one parking manoeuvre, i.e. feeds a set of moves to the move service to park the car.
+   * This runs one parking scenario, i.e. feeds a set of moves to the move service to park the car.
    */
-  async runManoeuvre(scenario: TScenario): Promise<void> {
+  async runParking(scenario: TParkingScenario): Promise<void> {
     //
-    const manoeuvre = this.setupScreen(scenario);
+    const parkScenario = this.setupScreen(scenario);
     //
     /* Print out all manoeuvre data */
     this.logger.log(`**********************************`);
@@ -154,7 +160,7 @@ export class ScreenService {
     this.logger.log(`Car name: ${scenario.carSetup}`);
     this.logger.log(
       `Total parking space: ${Math.round(
-        manoeuvre.parkingSpaceLength * this.config.distScale,
+        parkScenario.parkingSpaceLength * this.config.distScale,
       )}mm`,
     );
     this.logger.log(`Car length: ${this.car.length * this.config.distScale}mm`);
@@ -165,7 +171,7 @@ export class ScreenService {
     );
     this.logger.log(
       `Extra parking space: ${Math.round(
-        (manoeuvre.parkingSpaceLength -
+        (parkScenario.parkingSpaceLength -
           this.car.length -
           2 * this.street.safetyGap) *
           this.config.distScale,
@@ -181,9 +187,9 @@ export class ScreenService {
     );
     this.logger.log(`**********************************`);
     /* Run the parking manoeuvre */
-    for (const key in manoeuvre.movie) {
-      if (Object.prototype.hasOwnProperty.call(manoeuvre.movie, key)) {
-        const move: TMove = manoeuvre.movie[key];
+    for (const key in parkScenario.movie) {
+      if (Object.prototype.hasOwnProperty.call(parkScenario.movie, key)) {
+        const move: TMove = parkScenario.movie[key];
         await this.mover.routeMove(move);
         /* Reset if the button clicked when status = Reset */
         if (this.#mainButtonLastClickStatus === EButtonStatus.Reset) {
@@ -374,7 +380,7 @@ export class ScreenService {
     this.snack.trackMode();
 
     /* Read current scenario and set up starting default screen */
-    let scenario: TScenario = this.getCurrentScenario();
+    let scenario: TParkingScenario = this.getCurrentScenario();
     this.setupScreen(scenario);
 
     /* It loops to here after each completed loop or selected parking manoeuvre and awaits a button click */

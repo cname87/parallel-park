@@ -5,7 +5,6 @@ import {
   EManoeuvre,
   EStreet,
   TCarSetup,
-  TScenario,
   TStreetSetup,
   EDistOut,
   TDistOut,
@@ -35,7 +34,6 @@ export class ObjectsService {
     public data: DataService,
   ) {
     //
-
     this.Width_1595mm = {
       /* Same as 2020 Kia Picanto - narrowest car */
       name: EStreet.Width_1595mm,
@@ -174,7 +172,6 @@ export class ObjectsService {
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
-
     this.Bay_2200mm = {
       name: EStreet.Bay_2200mm,
       type: 'bay',
@@ -196,7 +193,6 @@ export class ObjectsService {
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
-
     this.Bay_2400mm = {
       name: EStreet.Bay_2400mm,
       type: 'bay',
@@ -218,22 +214,6 @@ export class ObjectsService {
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
     };
-  }
-
-  get scenarios(): Array<TScenario> {
-    const scenarios: Array<TScenario> = [];
-    for (const street of this.parallelStreets) {
-      for (const car of this.cars) {
-        for (const manoeuvre of this.parallelManoeuvres) {
-          scenarios.push({
-            manoeuvre: manoeuvre[0],
-            carSetup: car[0],
-            streetSetup: street[0],
-          });
-        }
-      }
-    }
-    return scenarios;
   }
 
   /**
