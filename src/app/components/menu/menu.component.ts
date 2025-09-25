@@ -10,7 +10,8 @@ import { Component } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
 import { EButtonStatus, ECar, ERunMode, EStreet } from '../../shared/types';
 import { DataService } from '../../services/data.service';
-import { BaseComponent } from '../../shared/base.component';
+// eslint-disable-next-line max-len
+import { BaseSubscriptionComponent } from '../../shared/base-subscription.component';
 import { ModeComponent } from '../mode/mode.component';
 import { ButtonComponent } from '../button/button.component';
 import { ManualModeComponent } from '../manual-mode/manual-mode.component';
@@ -43,7 +44,7 @@ import { StreetComponent } from '../street/street.component';
   ],
 })
 export class MenuComponent
-  extends BaseComponent
+  extends BaseSubscriptionComponent
   implements OnInit, AfterViewInit
 {
   constructor(private data: DataService) {
