@@ -110,7 +110,7 @@ export class ManualMoveService {
           }
           break;
         /* Move in reverse and steer clockwise */
-        case EButtonLabels.Back:
+        case EButtonLabels.Reverse:
           if (!this.#running && !this.#moveReverseRunning) {
             this.#running = true;
             this.#moveReverseRunning = true;
@@ -187,7 +187,10 @@ export class ManualMoveService {
                 x: this.street.carFromKerb + this.car.length,
                 y:
                   this.street.frontCarFromTop -
-                  (this.street.parkingSpaceLength - this.car.width) / 2,
+                  (this.street.parkingSpaceLength +
+                    2 * this.street.safetyGap -
+                    this.car.width) /
+                    2,
               };
             } else {
               parkPosition = {
@@ -221,7 +224,7 @@ export class ManualMoveService {
             createjs.Ticker.dispatchEvent('stop');
           }
           break;
-        case EButtonLabels.Back:
+        case EButtonLabels.Reverse:
           if (this.#moveReverseRunning) {
             this.#running = false;
             this.#moveReverseRunning = false;

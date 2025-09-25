@@ -169,11 +169,11 @@ export class ConfigService {
    * * Manual mode run text for all buttons
    */
   manualModeRunTexts: Map<TButtonNames, TButtonLabels> = new Map([
-    ['forward', 'Forward (f)'],
-    ['reverse', 'Back (b)'],
-    ['left', 'Left (l)'],
+    ['forward', 'Forward (↑)'],
+    ['reverse', 'Reverse (↓)'],
+    ['left', 'Left (←)'],
     ['center', 'Center (c)'],
-    ['right', 'Right (r)'],
+    ['right', 'Right (→)'],
     ['start', 'Start (s)'],
     ['park', 'Park (p)'],
   ]);

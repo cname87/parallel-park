@@ -152,10 +152,21 @@ export class StreetService {
       this.frontCarFromLeft =
         this.rearCarFromLeft + this.rearCarLength + this.parkingSpaceLength;
     } else if (this.type === 'bay') {
+      /* Set up the bay parking so each car with its safety gap fills a parking space exactly */
+      this.frontCarWidth =
+        parkingSpaceLength - 2 * this.config.defaultSafetyGap;
       this.frontCarFromTop =
-        this.rearCarFromTop + this.rearCarWidth + this.parkingSpaceLength;
+        this.rearCarFromTop +
+        this.rearCarWidth +
+        2 * this.safetyGap +
+        this.parkingSpaceLength;
+      this.thirdCarWidth =
+        parkingSpaceLength - 2 * this.config.defaultSafetyGap;
       this.thirdCarFromTop =
-        this.frontCarFromTop + this.frontCarWidth + this.parkingSpaceLength;
+        this.frontCarFromTop +
+        this.frontCarWidth +
+        2 * this.safetyGap +
+        this.parkingSpaceLength;
     }
   }
 
@@ -392,21 +403,21 @@ export class StreetService {
   /**
    * Private helper method to draw the limit of the bay parking aisle
    */
-  private drawBayAisleLimit(): createjs.Shape {
+  private drawBayAisleLimit(): void {
     this.logger.log('drawBayAisleLimit', LoggingLevel.TRACE);
 
     const line = new createjs.Shape();
     line.set({ regX: 0, regY: 0 });
     line.set({ x: 0, y: 0 });
 
-    // Calculate position 6m out from the rear of the rear parked car
+    const lineWidth = 2; // Thin vertical line
     const sixMetersInScaledUnits =
       this.config.bayParkingAisleLimit / this.config.distScale;
+    /* Start at the edge of the parking bay line which is set as 4800mm */
     const lineX =
-      this.rearCarFromLeft + this.rearCarLength + sixMetersInScaledUnits;
+      4800 / this.config.distScale + sixMetersInScaledUnits - lineWidth / 2;
     const lineY = this.rearCarFromTop;
     const lineHeight = this.config.canvasH;
-    const lineWidth = 2; // Thin vertical line
 
     line.graphics
       .beginFill(this.borderColor)
@@ -414,7 +425,59 @@ export class StreetService {
       .rect(lineX, lineY, lineWidth, lineHeight);
 
     line.cache(lineX, lineY, lineWidth, lineHeight);
-    return line;
+    this.config.stage.addChild(line);
+  }
+
+  /**
+   * Private helper method to draw the lines demarcating the parking bay.
+   *
+   * @param Yposition - The Y position of the line in real world units
+   * @param length - The length of the line in real world units
+   * @param width - The width of the line in real world units (default 40mm)
+   */
+  private drawParkingBayLine(
+    Yposition: number,
+    length: number,
+    width: number = 40,
+  ): void {
+    this.logger.log('drawParkingBayLine', LoggingLevel.TRACE);
+
+    const line = new createjs.Shape();
+    line.set({ regX: 0, regY: 0 });
+    line.set({ x: 0, y: 0 });
+
+    const lineX = 0;
+    const lineY = Yposition / this.config.distScale;
+    const lineHeight = width / this.config.distScale;
+    const lineWidth = length / this.config.distScale;
+
+    line.graphics
+      .beginFill(this.borderColor)
+      .endStroke()
+      .rect(lineX, lineY, lineWidth, lineHeight);
+
+    line.cache(lineX, lineY, lineWidth, lineHeight);
+    this.config.stage.addChild(line);
+  }
+
+  private drawParkingBayLines(): void {
+    this.logger.log('drawParkingBayLines', LoggingLevel.TRACE);
+
+    /* Width of parking bay line in real world mm */
+    const lineWidth = 40;
+    /* The first line should be right along the safety gap of the rear car */
+    const firstLineY =
+      (this.rearCarWidth + this.safetyGap) * this.config.distScale -
+      lineWidth / 2;
+    /* Length of parking bay line in real world mm which ranges from about 4800 to 5000mm in practice - use the low value */
+    const lineLength = 4800;
+    /* Parking gap between parking bay lines in real world mm */
+    const lineGap = this.parkingSpaceLength * this.config.distScale;
+    /* Draw 5 parking bay lines */
+    const nrLines = 5;
+    for (let i = 0; i < nrLines; i++) {
+      this.drawParkingBayLine(firstLineY + i * lineGap, lineLength, lineWidth);
+    }
   }
 
   /**
@@ -450,8 +513,10 @@ export class StreetService {
         this.thirdCarWidth,
         'third',
       );
-      const aisleLimit = this.drawBayAisleLimit();
-      this.config.stage.addChild(aisleLimit);
+      /* Draw a line representing the bay parking aisle limit */
+      this.drawBayAisleLimit();
+      /* Draw the parking bay lines */
+      this.drawParkingBayLines();
     }
   }
 }

@@ -13,7 +13,7 @@ import { ConfigService } from './config.service';
 import { DataService } from './data.service';
 
 /**
- * Stores all the cars, streets and manoeuvres.
+ * Stores all the cars, streets and manoeuvres, and other objects.
  */
 
 @Injectable({
@@ -177,8 +177,10 @@ export class ObjectsService {
       type: 'bay',
       rearCarFromLeft: this.config.defaultCarFromKerb * this.config.distScale,
       rearCarFromTop: 0,
-      rearCarLength: 5000,
-      rearCarWidth: 2000,
+      /* Set the car length to a balance between a small car and a large van */
+      rearCarLength: 5100,
+      /* Set the car width so width including safety gaps is exactly 2000mm */
+      rearCarWidth: 2000 - this.config.defaultSafetyGap * this.config.distScale,
       frontCarFromLeft: () => {
         return this.Bay_2200mm.rearCarFromLeft;
       },
@@ -187,8 +189,11 @@ export class ObjectsService {
           this.Bay_2200mm.rearCarFromTop + this.Bay_2200mm.parkingSpaceLength
         );
       },
-      frontCarLength: 5000,
-      frontCarWidth: 2000,
+      /* Set the car length to a balance between a small car and a large van */
+      frontCarLength: 5100,
+      /* Set the car width so width including safety gaps is exactly 2000mm */
+      frontCarWidth:
+        2000 - 2 * (this.config.defaultSafetyGap * this.config.distScale),
       parkingSpaceLength: 2200,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
@@ -198,8 +203,10 @@ export class ObjectsService {
       type: 'bay',
       rearCarFromLeft: this.config.defaultCarFromKerb * this.config.distScale,
       rearCarFromTop: 0,
-      rearCarLength: 5000,
-      rearCarWidth: 2000,
+      /* Set the car length to a balance between a small car and a large van */
+      rearCarLength: 5100,
+      /* Set the car width so width including safety gaps is exactly 2000mm */
+      rearCarWidth: 2000 - this.config.defaultSafetyGap * this.config.distScale,
       frontCarFromLeft: () => {
         return this.Bay_2400mm.rearCarFromLeft;
       },
@@ -208,8 +215,11 @@ export class ObjectsService {
           this.Bay_2400mm.rearCarFromTop + this.Bay_2400mm.parkingSpaceLength
         );
       },
-      frontCarLength: 5000,
-      frontCarWidth: 2000,
+      /* Set the car length to a balance between a small car and a large van */
+      frontCarLength: 5100,
+      /* Set the car width so width including safety gaps is exactly 2000mm */
+      frontCarWidth:
+        2000 - 2 * (this.config.defaultSafetyGap * this.config.distScale),
       parkingSpaceLength: 2400,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,

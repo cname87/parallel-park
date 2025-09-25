@@ -75,7 +75,7 @@ export class ManoeuvreComponent implements OnInit, OnDestroy {
       [this.FORM_FIELD_NAMES.manoeuvre]: EManoeuvre.BayPark1,
     };
     this.keyManoeuvreInitialValue = {
-      [this.FORM_FIELD_NAMES.manoeuvre]: EDistOut.Out_500mm,
+      [this.FORM_FIELD_NAMES.manoeuvre]: EDistOut.Out_1000mm,
     };
   }
 

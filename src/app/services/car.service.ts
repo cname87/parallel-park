@@ -882,6 +882,23 @@ export class CarService {
         this.centerRearAxleTurningRadius(ERotateDirection.Counterclockwise) -
           this.width / 2,
       );
+    // Line along front axle
+    this.shadowCarShape.graphics
+      .beginStroke('Blue')
+      .setStrokeDash([20, 10], 0)
+      .setStrokeStyle(1)
+      .moveTo(
+        -this.frontOverhang,
+        -(
+          this.width / 2 +
+          this.centerRearAxleTurningRadius(ERotateDirection.Counterclockwise)
+        ),
+      )
+      .lineTo(
+        -this.frontOverhang,
+        this.centerRearAxleTurningRadius(ERotateDirection.Counterclockwise) -
+          this.width / 2,
+      );
     if (!this.carGroup.children?.includes?.(this.shadowCarShape)) {
       this.carGroup.addChild(this.shadowCarShape);
     }

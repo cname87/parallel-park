@@ -22,19 +22,19 @@ export type TButtonNames =
   | 'park';
 export type TButtonLabels =
   | 'RUN'
-  | 'Forward (f)'
-  | 'Back (b)'
-  | 'Left (l)'
+  | 'Forward (↑)'
+  | 'Reverse (↓)'
+  | 'Left (←)'
   | 'Center (c)'
-  | 'Right (r)'
+  | 'Right (→)'
   | 'Start (s)'
   | 'Park (p)';
 export const enum EButtonLabels {
-  Forward = 'f',
-  Back = 'b',
-  Left = 'l',
+  Forward = 'ArrowUp',
+  Reverse = 'ArrowDown',
+  Left = 'ArrowLeft',
   Center = 'c',
-  Right = 'r',
+  Right = 'ArrowRight',
   Start = 's',
   Park = 'p',
 }
