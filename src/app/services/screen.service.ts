@@ -85,7 +85,9 @@ export class ScreenService {
    *
    * @returns A manoeuvre, i.e. the set of moves to complete a parking manoeuvre.
    */
-  public setupScreen(scenario: TParkingScenario = this.#defaultScenario): IPark {
+  public setupScreen(
+    scenario: TParkingScenario = this.#defaultScenario,
+  ): IPark {
     //
     /* Clear the screen */
     this.config.stage.removeAllChildren();
