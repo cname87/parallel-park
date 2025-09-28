@@ -31,8 +31,8 @@ export class RulesService {
     private config: ConfigService,
   ) {
     this.r1_grossExtraParkingSpace = 1200 / this.config.distScale;
-    this.r1_startDistXToRearCarBumper = 1500 / this.config.distScale;
-    this.r1_startDistYToRearCarSide = 6000 / this.config.distScale;
+    this.r1_startDistXToRearCarBumper = -300 / this.config.distScale;
+    this.r1_startDistYToRearCarSide = 500 / this.config.distScale;
     this.r1_Move1stArcProjectedDistFromRearCar = 1250 / this.config.distScale;
     this.r1_distFromKerb = 200 / config.distScale;
     this.r1_beyondRearBumperDist = -this.config.defaultSafetyGap;
@@ -73,7 +73,7 @@ export class RulesService {
       this.r1_grossExtraParkingSpace - 2 * street.safetyGap;
 
     /* Starting distance car side is out from the front car */
-    /* The starting side y-axis position to the PP is a fixed default minus the safety gap which meaans the car side is the fixed default distance out from the front car */
+    /* The starting side y-axis position to the PP is a fixed default minus the safety gap */
     let startDistYToPivot = this.r1_startDistYToRearCarSide - street.safetyGap;
 
     const midPoint =
@@ -152,7 +152,6 @@ export class RulesService {
           return tooCloseToRearCar || withinKerbDistance;
         };
         break;
-
       case EManoeuvre.BayPark1:
         /* The starting rear bumper x-axis position to the PP is the safety gap which is equivalent to the car rear bumper being level with the rear bumper of the front car */
         startDistXToPivot = this.r1_startDistXToRearCarBumper;
