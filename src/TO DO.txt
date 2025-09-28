@@ -9,3 +9,5 @@ TO DO:
 2. Fix any errors in the automated modes.
 
 3. Complete the bay parking mode parking scenario
+
+4. Overhaul rules.service completely - how can I make the whole program more robust to change.
