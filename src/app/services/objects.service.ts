@@ -177,9 +177,7 @@ export class ObjectsService {
       type: 'bay',
       rearCarFromLeft: this.config.defaultCarFromKerb * this.config.distScale,
       rearCarFromTop: 0,
-      /* Set the car length to a balance between a small car and a large van */
       rearCarLength: 5100,
-      /* Set the car width so width including safety gaps is exactly 2000mm */
       rearCarWidth: 2000 - this.config.defaultSafetyGap * this.config.distScale,
       frontCarFromLeft: () => {
         return this.Bay_2200mm.rearCarFromLeft;
@@ -189,14 +187,15 @@ export class ObjectsService {
           this.Bay_2200mm.rearCarFromTop + this.Bay_2200mm.parkingSpaceLength
         );
       },
-      /* Set the car length to a balance between a small car and a large van */
       frontCarLength: 5100,
-      /* Set the car width so width including safety gaps is exactly 2000mm */
       frontCarWidth:
         2000 - 2 * (this.config.defaultSafetyGap * this.config.distScale),
       parkingSpaceLength: 2200,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      parkingBayLineWidth: 200,
+      parkingBayLineLength: 4800,
+      bayAisleWidth: 6000,
     };
     this.Bay_2400mm = {
       name: EStreet.Bay_2400mm,
@@ -220,9 +219,16 @@ export class ObjectsService {
       /* Set the car width so width including safety gaps is exactly 2000mm */
       frontCarWidth:
         2000 - 2 * (this.config.defaultSafetyGap * this.config.distScale),
+      /* Web says 2400mm bay width. I measured 24450mm centre line to centre line in Park West */
       parkingSpaceLength: 2400,
       carFromKerb: this.config.defaultCarFromKerb * this.config.distScale,
       safetyGap: this.config.defaultSafetyGap * this.config.distScale,
+      /* I measured 200mm in Park West */
+      parkingBayLineWidth: 200,
+      /* Web says 4800mm and I measured 4800mm in Park West */
+      parkingBayLineLength: 4800,
+      /* Web says 6000mm and I measured 60000mm in Park West */
+      bayAisleWidth: 6000,
     };
   }
 

@@ -32,6 +32,9 @@ export class StreetService {
   public safetyGap: number;
   public wheelLength: number;
   public wheelWidth: number;
+  public parkingBayLineWidth: number;
+  public parkingBayLineLength: number;
+  public bayAisleWidth: number;
 
   /* Set the car colors */
   public carColor = 'LightSalmon';
@@ -89,6 +92,10 @@ export class StreetService {
     this.parkingSpaceLength = this.config.defaultParkingSpaceLength;
     this.wheelLength = this.config.defaultWheelLength;
     this.wheelWidth = this.config.defaultWheelWidth;
+    /* Default bay parking values - will be overridden when bay parking is selected */
+    this.parkingBayLineWidth = 200 / this.config.distScale;
+    this.parkingBayLineLength = 4800 / this.config.distScale;
+    this.bayAisleWidth = 6000 / this.config.distScale;
   }
 
   /*  Export car shapes for collision detection */
@@ -116,6 +123,9 @@ export class StreetService {
     frontCarWidth,
     carFromKerb,
     safetyGap,
+    parkingBayLineWidth,
+    parkingBayLineLength,
+    bayAisleWidth,
   }: Omit<TStreetSetup, 'name'>): void {
     this.logger.log('setStreetFromScenario called', LoggingLevel.TRACE);
 
@@ -137,6 +147,16 @@ export class StreetService {
     this.thirdCarWidth = this.frontCarWidth;
     this.carFromKerb = carFromKerb / this.config.distScale;
     this.safetyGap = safetyGap / this.config.distScale;
+    /* Set bay parking properties if provided (only for bay parking streets) */
+    if (parkingBayLineWidth) {
+      this.parkingBayLineWidth = parkingBayLineWidth / this.config.distScale;
+    }
+    if (parkingBayLineLength) {
+      this.parkingBayLineLength = parkingBayLineLength / this.config.distScale;
+    }
+    if (bayAisleWidth) {
+      this.bayAisleWidth = bayAisleWidth / this.config.distScale;
+    }
   }
 
   /**
@@ -188,6 +208,7 @@ export class StreetService {
   ): void {
     this.logger.log('drawCarInternals', LoggingLevel.TRACE);
 
+    /* Minimums so half cars don't get two axles or two wheels */
     const minCarLengthForTwoAxles = this.config.minCarLengthForTwoAxles;
     const minCarWidthForTwoWheels = this.config.minCarWidthForTwoWheels;
 
@@ -410,35 +431,34 @@ export class StreetService {
     line.set({ regX: 0, regY: 0 });
     line.set({ x: 0, y: 0 });
 
-    const lineWidth = 2; // Thin vertical line
-    const sixMetersInScaledUnits =
-      this.config.bayParkingAisleLimit / this.config.distScale;
-    /* Start at the edge of the parking bay line which is set as 4800mm */
+    /* Start at the edge of the parking bay line */
     const lineX =
-      4800 / this.config.distScale + sixMetersInScaledUnits - lineWidth / 2;
+      this.parkingBayLineLength +
+      this.bayAisleWidth -
+      this.parkingBayLineWidth / 2;
     const lineY = this.rearCarFromTop;
     const lineHeight = this.config.canvasH;
 
     line.graphics
       .beginFill(this.borderColor)
       .endStroke()
-      .rect(lineX, lineY, lineWidth, lineHeight);
+      .rect(lineX, lineY, this.parkingBayLineWidth, lineHeight);
 
-    line.cache(lineX, lineY, lineWidth, lineHeight);
+    line.cache(lineX, lineY, this.parkingBayLineWidth, lineHeight);
     this.config.stage.addChild(line);
   }
 
   /**
    * Private helper method to draw the lines demarcating the parking bay.
    *
-   * @param Yposition - The Y position of the line in real world units
-   * @param length - The length of the line in real world units
-   * @param width - The width of the line in real world units (default 40mm)
+   * @param Yposition - The Y position of the line in scaled mm
+   * @param length - The length of the line in scaled mm
+   * @param width - The width of the line in scaled mm (default 200mm)
    */
   private drawParkingBayLine(
     Yposition: number,
     length: number,
-    width: number = 40,
+    width: number = 200,
   ): void {
     this.logger.log('drawParkingBayLine', LoggingLevel.TRACE);
 
@@ -447,9 +467,9 @@ export class StreetService {
     line.set({ x: 0, y: 0 });
 
     const lineX = 0;
-    const lineY = Yposition / this.config.distScale;
-    const lineHeight = width / this.config.distScale;
-    const lineWidth = length / this.config.distScale;
+    const lineY = Yposition;
+    const lineHeight = width;
+    const lineWidth = length;
 
     line.graphics
       .beginFill(this.borderColor)
@@ -463,20 +483,21 @@ export class StreetService {
   private drawParkingBayLines(): void {
     this.logger.log('drawParkingBayLines', LoggingLevel.TRACE);
 
-    /* Width of parking bay line in real world mm */
-    const lineWidth = 40;
+    /* Note: All distances in scaled mm */
+
     /* The first line should be right along the safety gap of the rear car */
     const firstLineY =
-      (this.rearCarWidth + this.safetyGap) * this.config.distScale -
-      lineWidth / 2;
-    /* Length of parking bay line in real world mm which ranges from about 4800 to 5000mm in practice - use the low value */
-    const lineLength = 4800;
-    /* Parking gap between parking bay lines in real world mm */
-    const lineGap = this.parkingSpaceLength * this.config.distScale;
+      this.rearCarWidth + this.safetyGap - this.parkingBayLineWidth / 2;
+    /* Parking gap between parking bay lines */
+    const lineGap = this.parkingSpaceLength;
     /* Draw 5 parking bay lines */
     const nrLines = 5;
     for (let i = 0; i < nrLines; i++) {
-      this.drawParkingBayLine(firstLineY + i * lineGap, lineLength, lineWidth);
+      this.drawParkingBayLine(
+        firstLineY + i * lineGap,
+        this.parkingBayLineLength,
+        this.parkingBayLineWidth,
+      );
     }
   }
 

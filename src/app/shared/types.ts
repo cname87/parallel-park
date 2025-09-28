@@ -148,6 +148,9 @@ export type TStreetSetup = {
   frontCarWidth: number;
   carFromKerb: number;
   safetyGap: number;
+  parkingBayLineWidth?: number; // Optional - only for bay parking
+  parkingBayLineLength?: number; // Optional - only for bay parking
+  bayAisleWidth?: number; // Optional - only for bay parking
 };
 
 export type TDistOut = {

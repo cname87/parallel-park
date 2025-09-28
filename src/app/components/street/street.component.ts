@@ -67,7 +67,8 @@ export class StreetComponent implements OnInit, OnDestroy {
       street: EStreet.Width_1904mm,
     };
     this.bayStreetInitialValue = {
-      street: EStreet.Bay_2200mm,
+      /* I measured 2400mm in Park West */
+      street: EStreet.Bay_2400mm,
     };
   }
 
